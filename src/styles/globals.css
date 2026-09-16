@@ -1,26 +1,77 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  box-sizing: border-box;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  margin: 0;
+  background: #f4f7fb;
+  color: #102a54;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font-family: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: #f4f7fb;
+}
+
+.gradient-brand {
+  background: linear-gradient(
+    135deg,
+    #0876c9 0%,
+    #075da8 55%,
+    #123d78 100%
+  );
+}
+
+.gradient-soft {
+  background: linear-gradient(
+    145deg,
+    #eaf4ff 0%,
+    #f7fbff 100%
+  );
+}
+
+.shadow-soft {
+  box-shadow: 0 10px 35px rgba(16, 42, 84, 0.08);
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+}
+
+.mobile-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.safe-ring {
+  background: conic-gradient(
+    #0876c9 0deg 280deg,
+    #dce9f8 280deg 360deg
+  );
+}
+
+@media (min-width: 768px) {
+  .mobile-container {
+    max-width: 1180px;
+  }
 }

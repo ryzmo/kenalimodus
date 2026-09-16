@@ -1,82 +1,371 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import AppHeader from "../components/AppHeader"
+import BottomNav from "../components/BottomNav"
+import BottomSpace from "../components/BottomSpace"
+import ModusCard from "../components/ModusCard"
+import Icon from "../components/Icon"
+import { MODUS_LIST } from "../data/modusData"
 
 export default function Home() {
+  const [safeScore, setSafeScore] = useState(78)
+  const [copied, setCopied] = useState(false)
+  const [originUrl, setOriginUrl] = useState("https://kenalimodus.id")
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOriginUrl(window.location.origin)
+      const stored = localStorage.getItem("kenali_modus_result")
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored)
+          if (parsed.score !== undefined) {
+            setSafeScore(parsed.score)
+          }
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    }
+  }, [])
+
+  const handleCopyLink = () => {
+    const url = `${originUrl}/challenge`
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(url)
+    }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2500)
+  }
+
+  const modusOfTheWeek = MODUS_LIST[0]
+  const waShareUrl = `https://wa.me/?text=${encodeURIComponent(
+    `Yuk uji seberapa aman kamu dari modus penipuan online terbaru di KENALI MODUS: ${originUrl}/challenge`
+  )}`
+
   return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black`}
-    >
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              index.js
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="app-shell">
+      <AppHeader />
+
+      <main className="mobile-container px-5 pb-8 md:px-8">
+        {/* =========================
+            HERO
+        ========================== */}
+        <section className="relative mt-5 overflow-hidden rounded-[2rem] gradient-brand p-6 text-white shadow-soft md:p-10">
+          <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-white/10 pointer-events-none" />
+          <div className="absolute -bottom-20 right-20 h-44 w-44 rounded-full bg-cyan-300/10 pointer-events-none" />
+
+          <div className="relative max-w-xl">
+            {/* Badge */}
+
+            {/* Heading */}
+            <h1 className="text-3xl font-black leading-tight md:text-5xl">
+              Yuk, kenali modusnya
+              <br />
+              sebelum jadi korbannya.
+            </h1>
+
+            <p className="mt-4 max-w-lg text-sm leading-6 text-blue-50 md:text-base font-normal">
+              Bukan sekadar membaca artikel. Latih refleks pengambilan keputusanmu lewat simulasi 1.5-Minute Challenge, ukur Safe Score, dan lindungi orang terdekat.
+            </p>
+
+            {/* CTA */}
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Link
+                href="/challenge"
+                className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-black text-[#075da8] shadow-lg transition duration-200 hover:-translate-y-0.5 hover:bg-slate-50"
+              >
+                Mulai 1.5-Minute Challenge
+                <Icon name="ArrowRight" size={17} />
+              </Link>
+
+              <Link
+                href="/modus"
+                className="inline-flex items-center gap-2 rounded-2xl bg-white/15 border border-white/20 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-white/25"
+              >
+                Lihat Semua Modus
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================
+            CORE LOOP & POSITIONING
+        ========================== */}
+        {/* =========================
+    CORE LOOP & POSITIONING
+========================= */}
+<section className="mt-6 rounded-3xl bg-white p-5 shadow-soft md:p-7">
+
+  {/* Header */}
+  <div>
+    <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#0876c9]">
+      Core Habit Loop
+    </span>
+
+    <h2 className="mt-2 text-xl font-black leading-tight text-[#102a54] md:text-2xl">
+      Dari edukasi pasif ke praktik pengambilan keputusan
+    </h2>
+  </div>
+
+
+  {/* Flow */}
+  <div className="mt-6 overflow-x-auto pb-1 hide-scrollbar">
+    <div className="flex min-w-max items-center gap-2">
+
+      {/* Discover */}
+      <div className="flex items-center gap-2">
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-[#0876c9]">
+          1
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs/pages/getting-started?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <span className="whitespace-nowrap text-xs font-black text-[#102a54]">
+          Discover
+        </span>
+      </div>
+
+
+      <Icon
+        name="ChevronRight"
+        size={16}
+        className="shrink-0 text-slate-300"
+      />
+
+
+      {/* Learn */}
+      <div className="flex items-center gap-2">
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-[#0876c9]">
+          2
         </div>
-      </main>
+
+        <span className="whitespace-nowrap text-xs font-black text-[#102a54]">
+          Learn
+        </span>
+      </div>
+
+
+      <Icon
+        name="ChevronRight"
+        size={16}
+        className="shrink-0 text-slate-300"
+      />
+
+
+      {/* Practice */}
+      <div className="flex items-center gap-2">
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-[#0876c9]">
+          3
+        </div>
+
+        <span className="whitespace-nowrap text-xs font-black text-[#102a54]">
+          Practice
+        </span>
+      </div>
+
+
+      <Icon
+        name="ChevronRight"
+        size={16}
+        className="shrink-0 text-slate-300"
+      />
+
+
+      {/* Safe Score */}
+      <div className="flex items-center gap-2">
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-[#0876c9]">
+          4
+        </div>
+
+        <span className="whitespace-nowrap text-xs font-black text-[#102a54]">
+          Safe Score
+        </span>
+      </div>
+
+
+      <Icon
+        name="ChevronRight"
+        size={16}
+        className="shrink-0 text-slate-300"
+      />
+
+
+      {/* Protect */}
+      <div className="flex items-center gap-2">
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-[#0876c9]">
+          5
+        </div>
+
+        <span className="whitespace-nowrap text-xs font-black text-[#102a54]">
+          Protect
+        </span>
+      </div>
+
     </div>
-  );
+  </div>
+
+</section>
+
+        {/* =========================
+            QUICK FEATURES
+        ========================== */}
+        <section className="mt-6 grid gap-4 md:grid-cols-3">
+          {/* Modus of the week */}
+          <div className="flex flex-col justify-between rounded-3xl bg-white p-5 shadow-soft md:col-span-2">
+            <div>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    Modus of the week
+                  </p>
+                  <h2 className="mt-1 text-xl font-black text-[#102a54]">
+                    {modusOfTheWeek.title}
+                  </h2>
+                </div>
+
+                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-red-50 text-red-500">
+                  <Icon name="AlertTriangle" size={22} />
+                </div>
+              </div>
+
+              <p className="mt-3 text-sm leading-6 text-slate-500">
+                {modusOfTheWeek.desc}
+              </p>
+            </div>
+
+            <Link
+              href="/challenge"
+              className="mt-4 flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm font-black text-[#102a54] transition hover:bg-blue-50 hover:text-[#0876c9]"
+            >
+              Coba skenarionya langsung
+              <Icon name="ChevronRight" size={18} />
+            </Link>
+          </div>
+
+          {/* Safe Score Preview */}
+          <div className="flex flex-col justify-between rounded-3xl bg-white p-5 shadow-soft">
+            <div>
+              <div className="flex items-center gap-2 text-[#0876c9]">
+                <Icon name="TrendingUp" size={18} />
+                <span className="text-[10px] font-black uppercase tracking-widest">
+                  Safe Score Anda
+                </span>
+              </div>
+
+              <div className="mt-3 flex items-end gap-2">
+                <span className="text-4xl font-black text-[#102a54]">
+                  {safeScore}
+                </span>
+                <span className="pb-1 text-sm font-bold text-slate-400">
+                  / 100
+                </span>
+              </div>
+
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-[#0876c9] transition-all duration-500"
+                  style={{ width: `${safeScore}%` }}
+                />
+              </div>
+
+              <p className="mt-2 text-[11px] text-slate-400">
+                Berdasarkan hasil evaluasi challenge terakhirmu.
+              </p>
+            </div>
+
+            <Link
+              href="/hasil"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm font-black text-[#0876c9] hover:underline"
+            >
+              Lihat profil & rekomendasi
+              <Icon name="ArrowRight" size={15} />
+            </Link>
+          </div>
+        </section>
+
+        {/* =========================
+            MODUS TERBARU LIST
+        ========================== */}
+        <section className="mt-8">
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                Stay updated
+              </p>
+              <h2 className="mt-1 text-2xl font-black text-[#102a54]">
+                Modus Terbaru
+              </h2>
+            </div>
+
+            <Link
+              href="/modus"
+              className="inline-flex items-center gap-1 text-sm font-black text-[#0876c9] hover:underline"
+            >
+              Lihat semua ({MODUS_LIST.length})
+              <Icon name="ChevronRight" size={15} />
+            </Link>
+          </div>
+
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            {MODUS_LIST.slice(0, 3).map((item) => (
+              <ModusCard
+                key={item.id}
+                tag={item.tag}
+                title={item.title}
+                desc={item.desc}
+                level={item.level}
+                icon={item.icon}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* =========================
+            PROTECT OTHERS & SHARING
+        ========================== */}
+        <section className="mt-8 rounded-3xl border border-blue-100 bg-blue-50/70 p-5 md:p-7">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex gap-4">
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white text-[#0876c9] shadow-sm">
+                <Icon name="UsersRound" size={22} />
+              </div>
+
+              <div>
+                <h2 className="font-black text-[#102a54] text-base md:text-lg">
+                  Lindungi Orang di Sekitarmu
+                </h2>
+                <p className="mt-1 text-xs leading-relaxed text-slate-500 max-w-lg">
+                  Sudah selesai challenge? Bagikan link challenge ini ke keluarga atau teman di WhatsApp supaya mereka ikut menguji refleks keamanan mereka.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex shrink-0 gap-2">
+              <a
+                href={waShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-2xl bg-[#0876c9] px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-[#075da8]"
+              >
+                <Icon name="MessageSquare" size={15} />
+                Share WhatsApp
+              </a>
+
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="inline-flex items-center gap-1.5 rounded-2xl bg-white border border-slate-200 px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100"
+              >
+                <Icon name="Copy" size={15} />
+                {copied ? "Tersalin!" : "Salin Link"}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <BottomSpace />
+      </main>
+
+      <BottomNav />
+    </div>
+  )
 }
