@@ -1873,3 +1873,252 @@ export const PIPELINE_STEPS = [
     icon: "BookOpen"
   }
 ]
+
+// ============================================
+// POINTS & REWARD GAMIFICATION DATA
+// ============================================
+
+export const POINTS_ACTIVITIES = [
+  {
+    id: "complete-challenge",
+    activity: "Menyelesaikan Scam Challenge",
+    points: 10,
+    icon: "Zap",
+    color: "blue"
+  },
+  {
+    id: "perfect-score",
+    activity: "Menjawab seluruh skenario dengan benar",
+    points: 10,
+    icon: "CheckCircle2",
+    color: "emerald"
+  },
+  {
+    id: "watch-edu-video",
+    activity: "Menonton Video Edukasi #AwasModus",
+    points: 2,
+    icon: "Video",
+    color: "cyan"
+  },
+  {
+    id: "read-edu-article",
+    activity: "Membaca Artikel Edukatips",
+    points: 1,
+    icon: "BookOpen",
+    color: "purple"
+  },
+  {
+    id: "new-modus",
+    activity: "Mengikuti Modus Terbaru",
+    points: 5,
+    icon: "BookOpen",
+    color: "indigo"
+  },
+  {
+    id: "streak",
+    activity: "Menjaga challenge streak",
+    points: 10,
+    icon: "Flame",
+    color: "amber"
+  },
+  {
+    id: "share-challenge",
+    activity: "Membagikan challenge melalui Protect Others",
+    points: 10,
+    icon: "UsersRound",
+    color: "cyan"
+  }
+]
+
+export const REWARD_CATALOG = [
+  {
+    id: "voucher-digital",
+    title: "Voucher Belanja Digital",
+    desc: "Voucher e-commerce senilai Rp 25.000 untuk pengguna setia.",
+    icon: "Gift",
+    cost: 50,
+    category: "Voucher",
+    color: "blue",
+    available: true
+  },
+  {
+    id: "badge-scam-buster",
+    title: "Exclusive Badge 'Scam Buster'",
+    desc: "Badge eksklusif yang tampil di profil sebagai tanda penguasaan anti-fraud.",
+    icon: "Medal",
+    cost: 30,
+    category: "Badge",
+    color: "amber",
+    available: true
+  },
+  {
+    id: "priority-alert",
+    title: "Priority Alert Access",
+    desc: "Akses prioritas notifikasi modus penipuan terbaru sebelum dipublikasi umum.",
+    icon: "Bell",
+    cost: 80,
+    category: "Benefit",
+    color: "purple",
+    available: true
+  },
+  {
+    id: "mystery-box",
+    title: "Mystery Reward Box",
+    desc: "Hadiah langsung kejutan — bisa voucher, merchandise, atau benefit premium.",
+    icon: "Sparkles",
+    cost: 100,
+    category: "Hadiah Langsung",
+    color: "emerald",
+    available: true
+  },
+  {
+    id: "family-shield",
+    title: "Family Shield Premium",
+    desc: "Fitur Grup Keluarga premium: pantau hingga 10 anggota keluarga secara real-time.",
+    icon: "Shield",
+    cost: 120,
+    category: "Benefit",
+    color: "cyan",
+    available: true
+  },
+  {
+    id: "voucher-cashback",
+    title: "Cashback Transfer Voucher",
+    desc: "Voucher cashback 1% untuk 5 kali transaksi transfer berikutnya.",
+    icon: "Star",
+    cost: 150,
+    category: "Voucher",
+    color: "rose",
+    available: false
+  }
+]
+
+export const TIER_LEVELS = [
+  {
+    id: "bronze",
+    name: "Bronze",
+    minPoints: 0,
+    maxPoints: 49,
+    color: "#cd7f32",
+    bgColor: "from-amber-800/10 to-amber-600/5",
+    borderColor: "border-amber-300",
+    icon: "Shield"
+  },
+  {
+    id: "silver",
+    name: "Silver",
+    minPoints: 50,
+    maxPoints: 149,
+    color: "#a0a0a0",
+    bgColor: "from-slate-400/10 to-slate-300/5",
+    borderColor: "border-slate-300",
+    icon: "Award"
+  },
+  {
+    id: "gold",
+    name: "Gold",
+    minPoints: 150,
+    maxPoints: 299,
+    color: "#f59e0b",
+    bgColor: "from-yellow-500/10 to-amber-400/5",
+    borderColor: "border-yellow-400",
+    icon: "Crown"
+  },
+  {
+    id: "platinum",
+    name: "Platinum",
+    minPoints: 300,
+    maxPoints: Infinity,
+    color: "#0876c9",
+    bgColor: "from-blue-600/10 to-cyan-400/5",
+    borderColor: "border-blue-300",
+    icon: "Sparkles"
+  }
+]
+
+export const LEADERBOARD_MOCK = [
+  { rank: 1, name: "Andi S.", points: 385, tier: "Platinum", streak: 14 },
+  { rank: 2, name: "Rina M.", points: 320, tier: "Platinum", streak: 11 },
+  { rank: 3, name: "Budi P.", points: 275, tier: "Gold", streak: 9 },
+  { rank: 4, name: "Sari W.", points: 210, tier: "Gold", streak: 7 },
+  { rank: 5, name: "Dian K.", points: 180, tier: "Gold", streak: 6 }
+]
+
+// ============================================
+// BCA OFFICIAL EDUCATION MEDIA (#AWASMODUS)
+// ============================================
+
+export const BCA_EDU_VIDEOS = [
+  {
+    id: "bca-vid-1",
+    title: "Jangan Tertipu Website Palsu! Ingat Selalu B-C-A!",
+    campaign: "#AWASMODUS",
+    tagline: "Mantra Jitu Lawan Penipu",
+    desc: "Kenali rumus sakti B-C-A: Buka dengan ketik manual, Cek keaslian website, Ayo bintangin di browser agar aman dari link jebakan situs palsu.",
+    duration: "0:55",
+    views: "2.100 Views",
+    date: "26 Jan 2026",
+    badge: "Utama",
+    source: "Solusi BCA / #AwasModus",
+    pointsAward: 2,
+    mantraPoints: [
+      { letter: "B", title: "Buka dengan ketik manual", desc: "Ketik alamat portal resmi langsung di browser (contoh: bca.co.id atau klikbca.com)." },
+      { letter: "C", title: "Cek keaslian website", desc: "Pastikan ada ikon gembok keamanan SSL/HTTPS dan sertifikat digital resmi." },
+      { letter: "A", title: "Ayo bintangin", desc: "Bookmark website resmi BCA di browser agar tidak perlu mencari di search engine yang rawan iklan palsu." }
+    ]
+  },
+  {
+    id: "bca-vid-2",
+    title: "Awas Modus Situs Palsu KlikBCA Bisnis",
+    campaign: "#AWASMODUS",
+    tagline: "Waspada Iklan Palsu di Search Engine",
+    desc: "Penipu membeli iklan berbayar di mesin pencari dengan tampilan mirip situs resmi KlikBCA Bisnis. Jangan asal klik hasil teratas.",
+    duration: "0:55",
+    views: "1.850 Views",
+    date: "20 Jan 2026",
+    badge: "Bisnis",
+    source: "Berita BCA",
+    pointsAward: 2,
+    mantraPoints: [
+      { letter: "1", title: "Jangan Klik Hasil Iklan (Ad)", desc: "Situs phishing sering dipromosikan lewat Google Ads dengan URL tiruan." },
+      { letter: "2", title: "Perhatikan Typo Nama Domain", desc: "Penipu sering menggunakan nama mirip seperti klik-bca-id atau bca-online." }
+    ]
+  }
+]
+
+export const BCA_EDU_ARTICLES = [
+  {
+    id: "art-1",
+    title: "Hindari Website Palsu dengan Mantra B-C-A",
+    category: "Awas Modus",
+    date: "9 Sep 2026",
+    readTime: "2 mnt baca",
+    sourceUrl: "https://www.bca.co.id/id/informasi/news-and-features/awas-modus",
+    summary: "Saat ini marak website tiruan yang menyerupai internet banking. Lindungi diri Anda dengan menerapkan tiga langkah sederhana: Buka dengan ketik manual, Cek keaslian, dan Ayo bintangin.",
+    content: "Penipuan bermodus website palsu kian marak. Modus ini biasanya memancing korban dengan tampilan antarmuka yang sangat mirip situs resmi bank.\n\nTips Mengamankan Diri:\n1. B - Buka dengan ketik manual: Jangan klik link dari SMS, chat WhatsApp, atau email mencurigakan.\n2. C - Cek keaslian website: Pastikan domain resmi berakhiran .bca.co.id atau .klikbca.com dan memiliki sertifikat SSL gembok hijau/aman.\n3. A - Ayo bintangin: Simpan (bookmark) alamat resmi di browser agar akses berikutnya selalu terarah ke situs yang benar.",
+    pointsAward: 1
+  },
+  {
+    id: "art-2",
+    title: "Informasi Perubahan Layanan & Waspada Modus CS Palsu",
+    category: "News & Features",
+    date: "8 Sep 2026",
+    readTime: "3 mnt baca",
+    sourceUrl: "https://www.bca.co.id/id/informasi/news-and-features",
+    summary: "Waspadai nomor telepon atau akun WhatsApp tidak bercentang hijau yang mengatasnamakan Bank BCA dan meminta verifikasi OTP/PIN.",
+    content: "Halo BCA resmi hanya dapat dihubungi melalui nomor resmi 1500888 atau aplikasi haloBCA (bebas pulsa), serta akun WhatsApp resmi yang memiliki centang hijau terverifikasi.\n\nPetugas BCA tidak pernah:\n• Meminta kode OTP, PIN m-BCA, atau nomor CVV kartu debit/kredit.\n• Meminta nasabah menginstal file aplikasi berformat .apk.\n• Mengirimkan link pembatalan tarif transfer.",
+    pointsAward: 1
+  },
+  {
+    id: "art-3",
+    title: "Tips Terhindar dari Penipuan File .APK di WhatsApp",
+    category: "Edukatips",
+    date: "1 Sep 2026",
+    readTime: "2 mnt baca",
+    sourceUrl: "https://www.bca.co.id/id/informasi/edukatips",
+    summary: "Ketahui bahaya file APK undangan pernikahan, resi kurir, dan surat tilang yang dapat menyadap SMS OTP m-banking.",
+    content: "File berekstensi .apk adalah paket aplikasi Android yang dapat mengakses SMS dan notifikasi tanpa izin jika diinstal.\n\nPencegahan:\n• Jangan pernah klik atau buka file .apk dari kontak tak dikenal.\n• Matikan izin 'Install unknown apps' pada pengaturan smartphone Anda.\n• Jika terlanjur terinstal, segera putuskan koneksi internet dan hubungi Halo BCA.",
+    pointsAward: 1
+  }
+]
+

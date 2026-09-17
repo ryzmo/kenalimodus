@@ -332,13 +332,8 @@ export default function ChallengePage() {
         ==================================================== */}
         {stage === "intro" && (
           <section className="mt-6 rounded-3xl bg-white p-6 shadow-soft md:p-9">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold text-slate-600">
-                1.5-Minute Scam Challenge
-              </span>
-            </div>
 
-            <h1 className="mt-4 text-2xl font-black leading-tight text-[#102a54] md:text-3xl">
+            <h1 className="text-2xl font-black leading-tight text-[#102a54] md:text-3xl">
               1.5-Minute Scam Challenge
             </h1>
 

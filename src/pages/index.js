@@ -76,15 +76,8 @@ export default function Home() {
                 className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-black text-[#075da8] shadow-lg transition duration-200 hover:-translate-y-0.5 hover:bg-slate-50"
               >
                 Mulai 1.5-Minute Challenge
-                <Icon name="ArrowRight" size={17} />
               </Link>
 
-              <Link
-                href="/modus"
-                className="inline-flex items-center gap-2 rounded-2xl bg-white/15 border border-white/20 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-white/25"
-              >
-                Lihat Semua Modus
-              </Link>
             </div>
           </div>
         </section>
@@ -93,117 +86,75 @@ export default function Home() {
             CORE LOOP & POSITIONING
         ========================== */}
         {/* =========================
-    CORE LOOP & POSITIONING
-========================= */}
-<section className="mt-6 rounded-3xl bg-white p-5 shadow-soft md:p-7">
+            CORE HABIT LOOP
+        ========================== */}
+        <section className="mt-6 rounded-3xl bg-white p-5 shadow-soft md:p-7">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
+            <div>
+              <span className="inline-block rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#0876c9]">
+                Core Habit Loop
+              </span>
+              <h2 className="mt-2 text-xl font-black leading-tight text-[#102a54] md:text-2xl">
+                Dari edukasi pasif ke praktik pengambilan keputusan
+              </h2>
+            </div>
+            <p className="text-xs font-semibold text-slate-400">
+              5 Langkah Membangun Refleks Aman
+            </p>
+          </div>
 
-  {/* Header */}
-  <div>
-    <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#0876c9]">
-      Core Habit Loop
-    </span>
-
-    <h2 className="mt-2 text-xl font-black leading-tight text-[#102a54] md:text-2xl">
-      Dari edukasi pasif ke praktik pengambilan keputusan
-    </h2>
-  </div>
-
-
-  {/* Flow */}
-  <div className="mt-6 overflow-x-auto pb-1 hide-scrollbar">
-    <div className="flex min-w-max items-center gap-2">
-
-      {/* Discover */}
-      <div className="flex items-center gap-2">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-[#0876c9]">
-          1
-        </div>
-
-        <span className="whitespace-nowrap text-xs font-black text-[#102a54]">
-          Discover
-        </span>
-      </div>
-
-
-      <Icon
-        name="ChevronRight"
-        size={16}
-        className="shrink-0 text-slate-300"
-      />
-
-
-      {/* Learn */}
-      <div className="flex items-center gap-2">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-[#0876c9]">
-          2
-        </div>
-
-        <span className="whitespace-nowrap text-xs font-black text-[#102a54]">
-          Learn
-        </span>
-      </div>
-
-
-      <Icon
-        name="ChevronRight"
-        size={16}
-        className="shrink-0 text-slate-300"
-      />
-
-
-      {/* Practice */}
-      <div className="flex items-center gap-2">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-[#0876c9]">
-          3
-        </div>
-
-        <span className="whitespace-nowrap text-xs font-black text-[#102a54]">
-          Practice
-        </span>
-      </div>
-
-
-      <Icon
-        name="ChevronRight"
-        size={16}
-        className="shrink-0 text-slate-300"
-      />
-
-
-      {/* Safe Score */}
-      <div className="flex items-center gap-2">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-[#0876c9]">
-          4
-        </div>
-
-        <span className="whitespace-nowrap text-xs font-black text-[#102a54]">
-          Safe Score
-        </span>
-      </div>
-
-
-      <Icon
-        name="ChevronRight"
-        size={16}
-        className="shrink-0 text-slate-300"
-      />
-
-
-      {/* Protect */}
-      <div className="flex items-center gap-2">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-50 text-xs font-black text-[#0876c9]">
-          5
-        </div>
-
-        <span className="whitespace-nowrap text-xs font-black text-[#102a54]">
-          Protect
-        </span>
-      </div>
-
-    </div>
-  </div>
-
-</section>
+          {/* Stepper Timeline Grid */}
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+            {[
+              {
+                step: "01",
+                name: "Discover",
+                desc: "Pahami pola & skenario penipuan terbaru",
+              },
+              {
+                step: "02",
+                name: "Learn",
+                desc: "Analisis ciri, taktik, dan red flags",
+              },
+              {
+                step: "03",
+                name: "Practice",
+                desc: "Simulasi keputusan di bawah tekanan",
+              },
+              {
+                step: "04",
+                name: "Safe Score",
+                desc: "Ukur ketahanan & refleks keamanan",
+              },
+              {
+                step: "05",
+                name: "Protect",
+                desc: "Lindungi diri & keluarga bersama",
+              },
+            ].map((item, idx) => (
+              <div
+                key={item.step}
+                className="group relative flex flex-col justify-between rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 transition hover:border-blue-200 hover:bg-blue-50/40"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black tracking-widest text-[#0876c9]">
+                      {item.step}
+                    </span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-slate-200 group-hover:bg-[#0876c9] transition" />
+                  </div>
+                  <h3 className="mt-2 text-sm font-black text-[#102a54]">
+                    {item.name}
+                  </h3>
+                  <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* =========================
             QUICK FEATURES
@@ -221,15 +172,7 @@ export default function Home() {
                     {modusOfTheWeek.title}
                   </h2>
                 </div>
-
-                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-red-50 text-red-500">
-                  <Icon name="AlertTriangle" size={22} />
-                </div>
               </div>
-
-              <p className="mt-3 text-sm leading-6 text-slate-500">
-                {modusOfTheWeek.desc}
-              </p>
             </div>
 
             <Link
@@ -283,6 +226,38 @@ export default function Home() {
         </section>
 
         {/* =========================
+            BCA OFFICIAL #AWASMODUS BANNER
+        ========================== */}
+        <section className="mt-6 rounded-3xl gradient-brand p-5 text-white shadow-soft md:p-7">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-cyan-400/20 border border-cyan-300/30 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-cyan-200">
+                  #AWASMODUS BCA
+                </span>
+                <span className="text-[11px] text-blue-200 font-semibold">
+                  Mantra Jitu B-C-A Lawan Penipu
+                </span>
+              </div>
+              <h3 className="mt-2 text-base font-black md:text-lg">
+                Jangan Tertipu Website Palsu! Terapkan Rumus B-C-A
+              </h3>
+              <p className="mt-1 text-xs text-blue-100 max-w-xl">
+                Buka dengan ketik manual, Cek keaslian website, dan Ayo bintangin di browsermu. Tonton video edukasi & baca artikel resmi Bank BCA.
+              </p>
+            </div>
+
+            <Link
+              href="/modus"
+              className="shrink-0 inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-xs font-black text-[#075da8] shadow-md hover:bg-slate-100 transition"
+            >
+              <span>Tonton & Baca Edukasi</span>
+              <Icon name="ArrowRight" size={14} />
+            </Link>
+          </div>
+        </section>
+
+        {/* =========================
             MODUS TERBARU LIST
         ========================== */}
         <section className="mt-8">
@@ -300,7 +275,7 @@ export default function Home() {
               href="/modus"
               className="inline-flex items-center gap-1 text-sm font-black text-[#0876c9] hover:underline"
             >
-              Lihat semua ({MODUS_LIST.length})
+              Lihat semua
               <Icon name="ChevronRight" size={15} />
             </Link>
           </div>

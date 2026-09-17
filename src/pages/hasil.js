@@ -145,29 +145,54 @@ export default function HasilPage() {
         ==================================================== */}
         <section className="mt-6 rounded-3xl bg-white p-6 shadow-soft md:p-8">
           <div className="flex flex-col items-center text-center">
-            <span className="rounded-full bg-blue-50 px-3.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#0876c9]">
-              Profil Keamanan Pribadi & Safe Score
-            </span>
+
 
             <h1 className="mt-3 text-2xl font-black text-[#102a54] md:text-3xl">
-              Safe Score & Hasil Evaluasi
+              Safe Score
             </h1>
 
-            {/* Score Ring / Number */}
+            {/* Score Ring / Water Liquid Fill */}
             <div className="mt-6 flex flex-col items-center">
-              <div className="relative flex h-36 w-36 items-center justify-center rounded-full bg-slate-50 border-4 border-blue-50 shadow-inner">
-                <div className="flex flex-col items-center">
-                  <span className="text-4xl font-black text-[#102a54]">
+              <div className="relative flex h-40 w-40 items-center justify-center rounded-full overflow-hidden border-4 border-blue-100 bg-slate-50 shadow-inner">
+                {/* Liquid Body */}
+                <div
+                  className={`absolute bottom-0 left-0 right-0 w-full transition-all duration-1000 ease-out ${score >= 80
+                    ? "bg-gradient-to-t from-[#075da8] via-[#0876c9] to-[#38bdf8]"
+                    : score >= 60
+                      ? "bg-gradient-to-t from-amber-700 via-amber-500 to-amber-300"
+                      : "bg-gradient-to-t from-red-700 via-red-500 to-rose-300"
+                    }`}
+                  style={{ height: `${Math.min(Math.max(score, 8), 100)}%` }}
+                >
+                  {/* Wave Layer 1 */}
+                  <div className="absolute left-1/2 -top-12 h-64 w-64 -translate-x-1/2 rounded-[40%] bg-white/25 wave-liquid-1" />
+
+                  {/* Wave Layer 2 */}
+                  <div className="absolute left-1/2 -top-14 h-64 w-64 -translate-x-1/2 rounded-[38%] bg-white/15 wave-liquid-2" />
+                </div>
+
+                {/* Glass Reflection Highlight */}
+                <div className="pointer-events-none absolute top-2.5 left-7 right-7 h-4 rounded-full bg-white/30 blur-[0.5px]" />
+
+                {/* Center Number & Text */}
+                <div className="relative z-10 flex flex-col items-center drop-shadow-md">
+                  <span
+                    className={`text-4xl font-black tracking-tight transition-colors duration-500 ${score >= 45 ? "text-white" : "text-[#102a54]"
+                      }`}
+                  >
                     {score}
                   </span>
-                  <span className="text-xs font-bold text-slate-400">
+                  <span
+                    className={`text-xs font-bold transition-colors duration-500 ${score >= 45 ? "text-blue-100" : "text-slate-400"
+                      }`}
+                  >
                     / 100
                   </span>
                 </div>
               </div>
 
               <div className={`mt-4 text-sm font-black ${scoreColor}`}>
-                Tingkat Refleks: {scoreLevel}
+                {scoreLevel}
               </div>
 
               <p className="mt-2 max-w-md text-xs leading-relaxed text-slate-500">
@@ -177,13 +202,6 @@ export default function HasilPage() {
 
             {/* Quick Actions */}
             <div className="mt-6 flex w-full max-w-md flex-col gap-2.5 sm:flex-row">
-              <Link
-                href="/keluarga"
-                className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#102a54] px-4 py-3 text-xs font-black text-white shadow-md transition hover:bg-[#1a3e75]"
-              >
-                <Icon name="UsersRound" size={16} />
-                Skor Keluarga
-              </Link>
 
               <button
                 type="button"
@@ -211,16 +229,10 @@ export default function HasilPage() {
         <section className="mt-8 rounded-3xl bg-white p-6 shadow-soft md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
             <div>
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#0876c9]">
-                4.3.1 Pengukuran Dampak Perilaku
-              </span>
-              <h2 className="mt-1 text-xl font-black text-[#102a54]">
-                Perubahan Perilaku (Pre-Test vs Post-Test)
+              <h2 className="text-xl font-black text-[#102a54]">
+                Perubahan Perilaku
               </h2>
             </div>
-            <span className="text-xs font-semibold text-slate-400">
-              Metrik Terukur Eksperimen
-            </span>
           </div>
 
           {/* 3 Metric Cards */}
@@ -264,25 +276,6 @@ export default function HasilPage() {
               </p>
             </div>
           </div>
-
-          {/* Mathematical Formulations Table */}
-          <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
-            <h3 className="text-xs font-black text-[#102a54] mb-2 flex items-center gap-2">
-              <Icon name="SlidersHorizontal" size={14} className="text-[#0876c9]" />
-              Formulasi & Hasil Perhitungan Berdasarkan Data Pengguna:
-            </h3>
-
-            <div className="space-y-2 text-xs text-slate-600">
-              <div className="flex flex-col sm:flex-row sm:justify-between border-b border-slate-200 pb-1.5">
-                <span><strong>Behavioral Impact:</strong> Risky Rate (Pre) − Risky Rate (Post)</span>
-                <span className="font-mono font-bold text-[#102a54]">{preRiskyRate}% − {postRiskyRate}% = {behavioralImpact}%</span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between">
-                <span><strong>Relative Reduction (X%):</strong> [(Pre − Post) / Pre] × 100%</span>
-                <span className="font-mono font-bold text-emerald-700">[({preRiskyRate}% − {postRiskyRate}%) / {preRiskyRate}%] × 100% = <strong>{relativeReduction}%</strong></span>
-              </div>
-            </div>
-          </div>
         </section>
 
         {/* ====================================================
@@ -291,10 +284,7 @@ export default function HasilPage() {
         <section className="mt-8 rounded-3xl bg-white p-6 shadow-soft md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
             <div>
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700">
-                4.3.2 Estimasi Dampak Finansial
-              </span>
-              <h2 className="mt-1 text-xl font-black text-[#102a54]">
+              <h2 className=" text-xl font-black text-[#102a54]">
                 Proyeksi Kerugian yang Dihindari (External Benchmark OJK)
               </h2>
             </div>
@@ -345,206 +335,7 @@ export default function HasilPage() {
           </div>
         </section>
 
-        {/* ====================================================
-            SUBBAB 4.3.3: PROYEKSI NET BENEFIT & PROJECTED ROI
-        ==================================================== */}
-        <section className="mt-8 rounded-3xl bg-white p-6 shadow-soft md:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
-            <div>
-              <span className="rounded-full bg-purple-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-purple-700">
-                4.3.3 Proyeksi Net Benefit dan ROI
-              </span>
-              <h2 className="mt-1 text-xl font-black text-[#102a54]">
-                Kalkulator Kelayakan Bisnis & Projected ROI
-              </h2>
-            </div>
-          </div>
 
-          {/* Interactive Simulator Sliders */}
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
-              <label className="text-xs font-black text-[#102a54] block">
-                Skala Laporan Relevan: {scenarioReportCount.toLocaleString()} Laporan
-              </label>
-              <input
-                type="range"
-                min="100"
-                max="5000"
-                step="100"
-                value={scenarioReportCount}
-                onChange={(e) => setScenarioReportCount(Number(e.target.value))}
-                className="mt-2 w-full accent-[#0876c9]"
-              />
-              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                <span>100 Laporan</span>
-                <span>1.000 Laporan (Std)</span>
-                <span>5.000 Laporan</span>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
-              <label className="text-xs font-black text-[#102a54] block">
-                Estimasi Biaya Investasi Solusi: {formatRupiah(implementationCost)}
-              </label>
-              <input
-                type="range"
-                min="50000000"
-                max="1000000000"
-                step="50000000"
-                value={implementationCost}
-                onChange={(e) => setImplementationCost(Number(e.target.value))}
-                className="mt-2 w-full accent-[#0876c9]"
-              />
-              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                <span>Rp 50 Juta</span>
-                <span>Rp 250 Juta (Dev + Ops)</span>
-                <span>Rp 1 Miliar</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Result Net Benefit & ROI Grid */}
-          <div className="mt-5 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl border border-blue-100 bg-blue-50/40 p-4">
-              <div className="text-[10px] font-bold uppercase text-[#0876c9]">
-                Potential Financial Benefit
-              </div>
-              <div className="mt-1 text-xl font-black text-[#102a54]">
-                {formatRupiah(calculatedBenefit)}
-              </div>
-              <p className="mt-1 text-[11px] text-slate-500">
-                {scenarioReportCount} × {relativeReduction}% × Rp 21,89 Juta
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4">
-              <div className="text-[10px] font-bold uppercase text-emerald-800">
-                Net Benefit
-              </div>
-              <div className="mt-1 text-xl font-black text-emerald-600">
-                {formatRupiah(roiCalculations.netBenefit)}
-              </div>
-              <p className="mt-1 text-[11px] text-slate-500">
-                Financial Benefit − Biaya Investasi
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-purple-100 bg-purple-50/50 p-4">
-              <div className="text-[10px] font-bold uppercase text-purple-800">
-                Projected ROI
-              </div>
-              <div className="mt-1 text-xl font-black text-purple-700">
-                {roiCalculations.roiPercent > 0 ? `+${roiCalculations.roiPercent}%` : `${roiCalculations.roiPercent}%`}
-              </div>
-              <p className="mt-1 text-[11px] text-slate-500">
-                [(Net Benefit) / Investasi] × 100%
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ====================================================
-            NEONDB REAL-TIME AGGREGATE COHORT
-        ==================================================== */}
-        {globalStats && (
-          <section className="mt-8 rounded-3xl bg-white p-6 shadow-soft md:p-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700">
-                  NeonDB Cohort Database
-                </span>
-                <h2 className="mt-1 text-base font-black text-[#102a54] md:text-lg">
-                  Hasil Agregat Seluruh Responden ({globalStats.totalParticipants || 0} Partisipan)
-                </h2>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                Live Sync
-              </div>
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <div className="rounded-2xl bg-slate-50 p-3 text-center">
-                <div className="text-[10px] font-bold text-slate-400 uppercase">Avg Pre Risky Rate</div>
-                <div className="mt-1 text-lg font-black text-amber-600">{globalStats.avgPreRiskyRate}%</div>
-              </div>
-
-              <div className="rounded-2xl bg-slate-50 p-3 text-center">
-                <div className="text-[10px] font-bold text-slate-400 uppercase">Avg Post Risky Rate</div>
-                <div className="mt-1 text-lg font-black text-emerald-600">{globalStats.avgPostRiskyRate}%</div>
-              </div>
-
-              <div className="rounded-2xl bg-slate-50 p-3 text-center">
-                <div className="text-[10px] font-bold text-slate-400 uppercase">Avg Reduction (X%)</div>
-                <div className="mt-1 text-lg font-black text-[#0876c9]">{globalStats.avgRelativeReduction}%</div>
-              </div>
-
-              <div className="rounded-2xl bg-slate-50 p-3 text-center">
-                <div className="text-[10px] font-bold text-slate-400 uppercase">Avg Post Score</div>
-                <div className="mt-1 text-lg font-black text-[#102a54]">{globalStats.avgPostScore}/100</div>
-              </div>
-            </div>
-
-            {/* Individual Respondents Table */}
-            {globalStats.recentParticipants && globalStats.recentParticipants.length > 0 && (
-              <div className="mt-6 border-t border-slate-100 pt-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xs font-black text-[#102a54] uppercase tracking-wider">
-                    Daftar Hasil Responden Terbaru (NeonDB Live Feed)
-                  </h3>
-                  <span className="text-[10px] font-bold text-slate-400">
-                    {globalStats.recentParticipants.length} Data Terakhir
-                  </span>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs text-slate-600">
-                    <thead>
-                      <tr className="border-b border-slate-200 text-[10px] font-black uppercase text-slate-400">
-                        <th className="py-2">Nama / ID</th>
-                        <th className="py-2 text-center">Umur</th>
-                        <th className="py-2 text-center">Pre Score</th>
-                        <th className="py-2 text-center">Post Score</th>
-                        <th className="py-2 text-center">Pre Risky</th>
-                        <th className="py-2 text-center">Post Risky</th>
-                        <th className="py-2 text-right">Reduction (X%)</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {globalStats.recentParticipants.map((p, idx) => (
-                        <tr key={p.sessionId || idx} className="hover:bg-slate-50/60 transition">
-                          <td className="py-2.5 font-bold text-[#102a54]">
-                            {p.participantName || `Responden #${idx + 1}`}
-                          </td>
-                          <td className="py-2.5 text-center">
-                            <span className="rounded-md bg-blue-50 px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#0876c9]">
-                              {p.participantAge ? `${p.participantAge} thn` : "25 thn"}
-                            </span>
-                          </td>
-                          <td className="py-2.5 text-center font-mono text-slate-500">
-                            {p.preScore || 0}
-                          </td>
-                          <td className="py-2.5 text-center font-mono font-bold text-emerald-600">
-                            {p.postScore || 0}
-                          </td>
-                          <td className="py-2.5 text-center font-mono text-amber-600">
-                            {p.preRiskyRate}%
-                          </td>
-                          <td className="py-2.5 text-center font-mono text-emerald-600">
-                            {p.postRiskyRate}%
-                          </td>
-                          <td className="py-2.5 text-right font-mono font-black text-[#0876c9]">
-                            {p.relativeReduction}%
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </section>
-        )}
 
         {/* Security Recommendations Section */}
         <section className="mt-8 rounded-3xl bg-white p-6 shadow-soft md:p-8">
@@ -627,18 +418,16 @@ export default function HasilPage() {
               return (
                 <div
                   key={badge.id}
-                  className={`flex flex-col items-center rounded-2xl border p-4 text-center transition ${
-                    unlocked
-                      ? "border-blue-100 bg-blue-50/50"
-                      : "border-slate-100 bg-slate-50/40 opacity-50"
-                  }`}
+                  className={`flex flex-col items-center rounded-2xl border p-4 text-center transition ${unlocked
+                    ? "border-blue-100 bg-blue-50/50"
+                    : "border-slate-100 bg-slate-50/40 opacity-50"
+                    }`}
                 >
                   <div
-                    className={`grid h-12 w-12 place-items-center rounded-2xl ${
-                      unlocked
-                        ? "bg-[#0876c9] text-white shadow-sm"
-                        : "bg-slate-200 text-slate-400"
-                    }`}
+                    className={`grid h-12 w-12 place-items-center rounded-2xl ${unlocked
+                      ? "bg-[#0876c9] text-white shadow-sm"
+                      : "bg-slate-200 text-slate-400"
+                      }`}
                   >
                     <Icon name={badge.icon} size={22} />
                   </div>
@@ -652,11 +441,10 @@ export default function HasilPage() {
                   </p>
 
                   <span
-                    className={`mt-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
-                      unlocked
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-slate-100 text-slate-400"
-                    }`}
+                    className={`mt-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${unlocked
+                      ? "bg-emerald-100 text-emerald-700"
+                      : "bg-slate-100 text-slate-400"
+                      }`}
                   >
                     {unlocked ? "Terbuka" : `Skor Min. ${badge.unlockedScore}`}
                   </span>

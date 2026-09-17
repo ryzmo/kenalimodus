@@ -38,7 +38,14 @@ import {
   TrendingUp,
   AlertCircle,
   Info,
-  ChevronLeft
+  ChevronLeft,
+  Star,
+  Gift,
+  Flame,
+  Crown,
+  Target,
+  Sparkles,
+  Medal
 } from "lucide-react"
 
 const icons = {
@@ -81,7 +88,14 @@ const icons = {
   TrendingUp,
   AlertCircle,
   Info,
-  ChevronLeft
+  ChevronLeft,
+  Star,
+  Gift,
+  Flame,
+  Crown,
+  Target,
+  Sparkles,
+  Medal
 }
 
 export default function Icon({ name, className = "", size = 20, strokeWidth = 2, ...props }) {

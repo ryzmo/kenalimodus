@@ -3,7 +3,6 @@ import { useRouter } from "next/router"
 import Icon from "./Icon"
 
 export default function BottomNav() {
-
   const router = useRouter()
 
   const items = [
@@ -23,6 +22,11 @@ export default function BottomNav() {
       icon: "Zap"
     },
     {
+      href: "/rewards",
+      label: "Rewards",
+      icon: "Trophy"
+    },
+    {
       href: "/keluarga",
       label: "Keluarga",
       icon: "UsersRound"
@@ -35,16 +39,12 @@ export default function BottomNav() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur md:bottom-5 md:left-1/2 md:right-auto md:w-[560px] md:-translate-x-1/2 md:rounded-3xl md:border md:shadow-soft">
-      <div className="mx-auto grid max-w-lg grid-cols-5 px-1 py-2">
-
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur md:bottom-5 md:left-1/2 md:right-auto md:w-[620px] md:-translate-x-1/2 md:rounded-3xl md:border md:shadow-soft">
+      <div className="mx-auto grid max-w-lg grid-cols-6 px-1 py-2">
         {items.map((item) => {
-
-          const active =
-            router.pathname === item.href
+          const active = router.pathname === item.href
 
           return (
-
             <Link
               key={item.href}
               href={item.href}
@@ -54,25 +54,16 @@ export default function BottomNav() {
                   : "text-slate-400 hover:text-[#0876c9]"
               }`}
             >
-
               <Icon
                 name={item.icon}
                 size={20}
                 strokeWidth={active ? 2.7 : 2}
               />
-
-              <span>
-                {item.label}
-              </span>
-
+              <span>{item.label}</span>
             </Link>
-
           )
-
         })}
-
       </div>
-
     </nav>
   )
 }

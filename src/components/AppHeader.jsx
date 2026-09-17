@@ -184,6 +184,12 @@ export default function AppHeader() {
             Challenge
           </Link>
           <Link
+            href="/rewards"
+            className="text-sm font-bold text-slate-500 transition hover:text-[#0876c9]"
+          >
+            Rewards
+          </Link>
+          <Link
             href="/keluarga"
             className="text-sm font-bold text-slate-500 transition hover:text-[#0876c9]"
           >
@@ -209,11 +215,10 @@ export default function AppHeader() {
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}
             aria-label="Pemberitahuan"
-            className={`relative grid h-10 w-10 place-items-center rounded-full transition shadow-sm ${
-              isOpen
-                ? "bg-blue-50 text-[#0876c9] ring-2 ring-[#0876c9]/20"
-                : "bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-[#0876c9]"
-            }`}
+            className={`relative grid h-10 w-10 place-items-center rounded-full transition shadow-sm ${isOpen
+              ? "bg-blue-50 text-[#0876c9] ring-2 ring-[#0876c9]/20"
+              : "bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-[#0876c9]"
+              }`}
           >
             <Icon name="Bell" size={19} />
             {unreadCount > 0 && (
@@ -231,9 +236,6 @@ export default function AppHeader() {
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="grid h-7 w-7 place-items-center rounded-lg bg-blue-50 text-[#0876c9]">
-                    <Icon name="Bell" size={15} />
-                  </div>
                   <div>
                     <h3 className="text-sm font-black text-[#102a54]">Pemberitahuan</h3>
                     <div className="text-[10px] font-semibold text-slate-400">
@@ -259,33 +261,30 @@ export default function AppHeader() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("all")}
-                  className={`flex-1 rounded-lg py-1.5 transition text-center ${
-                    activeTab === "all"
-                      ? "bg-white text-[#102a54] shadow-xs font-black"
-                      : "text-slate-500 hover:text-slate-800"
-                  }`}
+                  className={`flex-1 rounded-lg py-1.5 transition text-center ${activeTab === "all"
+                    ? "bg-white text-[#102a54] shadow-xs font-black"
+                    : "text-slate-500 hover:text-slate-800"
+                    }`}
                 >
                   Semua ({notifications.length})
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab("threat")}
-                  className={`flex-1 rounded-lg py-1.5 transition text-center ${
-                    activeTab === "threat"
-                      ? "bg-white text-red-600 shadow-xs font-black"
-                      : "text-slate-500 hover:text-slate-800"
-                  }`}
+                  className={`flex-1 rounded-lg py-1.5 transition text-center ${activeTab === "threat"
+                    ? "bg-white text-red-600 shadow-xs font-black"
+                    : "text-slate-500 hover:text-slate-800"
+                    }`}
                 >
                   Peringatan ({notifications.filter((n) => n.type === "threat").length})
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab("activity")}
-                  className={`flex-1 rounded-lg py-1.5 transition text-center ${
-                    activeTab === "activity"
-                      ? "bg-white text-[#0876c9] shadow-xs font-black"
-                      : "text-slate-500 hover:text-slate-800"
-                  }`}
+                  className={`flex-1 rounded-lg py-1.5 transition text-center ${activeTab === "activity"
+                    ? "bg-white text-[#0876c9] shadow-xs font-black"
+                    : "text-slate-500 hover:text-slate-800"
+                    }`}
                 >
                   Aktivitas ({notifications.filter((n) => n.type !== "threat").length})
                 </button>
@@ -307,15 +306,14 @@ export default function AppHeader() {
                       <div
                         key={notif.id}
                         onClick={() => handleNotificationClick(notif)}
-                        className={`group relative cursor-pointer rounded-2xl border p-3.5 transition hover:shadow-sm ${
-                          notif.unread
-                            ? isRed
-                              ? "border-red-100 bg-red-50/40 hover:bg-red-50/70"
-                              : isAmber
+                        className={`group relative cursor-pointer rounded-2xl border p-3.5 transition hover:shadow-sm ${notif.unread
+                          ? isRed
+                            ? "border-red-100 bg-red-50/40 hover:bg-red-50/70"
+                            : isAmber
                               ? "border-amber-100 bg-amber-50/40 hover:bg-amber-50/70"
                               : "border-blue-100 bg-blue-50/40 hover:bg-blue-50/70"
-                            : "border-slate-100 bg-white hover:bg-slate-50"
-                        }`}
+                          : "border-slate-100 bg-white hover:bg-slate-50"
+                          }`}
                       >
                         {/* Text Content */}
                         <div className="flex-1 min-w-0">
@@ -325,13 +323,12 @@ export default function AppHeader() {
                                 <span className="h-2 w-2 shrink-0 rounded-full bg-[#0876c9]" />
                               )}
                               <span
-                                className={`rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${
-                                  isRed
-                                    ? "bg-red-100 text-red-700"
-                                    : isAmber
+                                className={`rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${isRed
+                                  ? "bg-red-100 text-red-700"
+                                  : isAmber
                                     ? "bg-amber-100 text-amber-700"
                                     : "bg-blue-100 text-[#0876c9]"
-                                }`}
+                                  }`}
                               >
                                 {notif.badge}
                               </span>
@@ -351,7 +348,6 @@ export default function AppHeader() {
 
                           <div className="mt-2.5 flex items-center gap-1 text-[10px] font-bold text-[#0876c9]">
                             <span>Buka Halaman</span>
-                            <Icon name="ArrowRight" size={11} className="transition group-hover:translate-x-0.5" />
                           </div>
                         </div>
                       </div>
@@ -367,7 +363,7 @@ export default function AppHeader() {
                   onClick={() => setIsOpen(false)}
                   className="text-[11px] font-bold text-[#0876c9] hover:underline"
                 >
-                  Lihat Semua Modus Terbaru →
+                  Lihat Semua Modus Terbaru
                 </Link>
                 <button
                   type="button"
