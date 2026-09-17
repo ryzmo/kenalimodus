@@ -425,7 +425,7 @@ export default function ChallengePage() {
               </div>
             </div>
 
-            <div className="mt-7 flex items-center gap-3">
+            <div className="mt-7 flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={handleStartPreTest}
@@ -434,6 +434,14 @@ export default function ChallengePage() {
                 Mulai Challenge Sekarang
                 <Icon name="ArrowRight" size={17} />
               </button>
+
+              <Link
+                href="/soal-pretest"
+                className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50"
+              >
+                <Icon name="BookOpen" size={16} />
+                Lihat Kumpulan Soal Pre-Test
+              </Link>
             </div>
           </section>
         )}
