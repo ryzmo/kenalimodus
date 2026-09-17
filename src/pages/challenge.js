@@ -43,8 +43,8 @@ export default function ChallengePage() {
   })
   const [currentAriStep, setCurrentAriStep] = useState(0)
 
-  // 1.5-Minute Timer State (90 seconds)
-  const [timeLeft, setTimeLeft] = useState(90)
+  // 2-Minute Timer State (120 seconds)
+  const [timeLeft, setTimeLeft] = useState(120)
   const [timerActive, setTimerActive] = useState(false)
   const timerRef = useRef(null)
 
@@ -98,7 +98,7 @@ export default function ChallengePage() {
     setSelectedOption(null)
     setShowFeedback(false)
     setPreAnswers([])
-    setTimeLeft(90)
+    setTimeLeft(120)
     setTimerActive(true)
   }
 
@@ -152,7 +152,7 @@ export default function ChallengePage() {
     setSelectedOption(null)
     setShowFeedback(false)
     setPostAnswers([])
-    setTimeLeft(90)
+    setTimeLeft(120)
     setTimerActive(true)
   }
 
@@ -334,7 +334,7 @@ export default function ChallengePage() {
           <section className="mt-6 rounded-3xl bg-white p-6 shadow-soft md:p-9">
 
             <h1 className="text-2xl font-black leading-tight text-[#102a54] md:text-3xl">
-              1.5-Minute Scam Challenge
+              2-Minute Scam Challenge
             </h1>
 
             <p className="mt-3 text-sm leading-relaxed text-slate-600">
@@ -545,51 +545,55 @@ export default function ChallengePage() {
               </p>
 
               {/* 5 Core Rules */}
-              <div className="mt-5 space-y-3 text-xs">
-                <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
-                  <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#102a54] text-white text-[10px] font-black">
-                    1
+              <div className="mt-5 space-y-3">
+                {[
+                  {
+                    num: "1",
+                    title: "Kerahasiaan Data:",
+                    desc: "Jangan pernah membagikan OTP, PIN, CVV, atau password kepada siapa pun termasuk pihak bank."
+                  },
+                  {
+                    num: "2",
+                    title: "Waspada File .APK:",
+                    desc: (
+                      <>
+                        Jangan pernah membuka atau menginstal file berakhiran{" "}
+                        <code className="rounded bg-slate-200/80 px-1 py-0.5 font-mono text-[11px] text-slate-800">
+                          .apk
+                        </code>{" "}
+                        dari WhatsApp atau Telegram.
+                      </>
+                    )
+                  },
+                  {
+                    num: "3",
+                    title: "Periksa Domain URL:",
+                    desc: "Jangan klik link SMS. Ketik manual alamat portal resmi bank di browser Anda."
+                  },
+                  {
+                    num: "4",
+                    title: "Tolak Syarat Deposit:",
+                    desc: "Tawaran kerja paruh waktu yang meminta deposit uang terlebih dahulu adalah penipuan."
+                  },
+                  {
+                    num: "5",
+                    title: "Verifikasi Nama QRIS:",
+                    desc: "Selalu periksa kesesuaian nama merchant di layar m-banking sebelum menginput PIN transaksi."
+                  }
+                ].map((item) => (
+                  <div
+                    key={item.num}
+                    className="flex items-start gap-3.5 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 transition hover:border-blue-100 hover:bg-blue-50/30"
+                  >
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#102a54] text-xs font-black text-white shadow-xs">
+                      {item.num}
+                    </div>
+                    <div className="text-xs leading-relaxed text-slate-700">
+                      <strong className="font-black text-[#102a54] mr-1.5">{item.title}</strong>
+                      {item.desc}
+                    </div>
                   </div>
-                  <div>
-                    <strong className="text-[#102a54]">Kerahasiaan Data:</strong> Jangan pernah membagikan OTP, PIN, CVV, atau password kepada siapa pun termasuk pihak bank.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
-                  <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#102a54] text-white text-[10px] font-black">
-                    2
-                  </div>
-                  <div>
-                    <strong className="text-[#102a54]">Waspada File .APK:</strong> Jangan pernah membuka atau menginstal file berakhiran <code>.apk</code> dari WhatsApp atau Telegram.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
-                  <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#102a54] text-white text-[10px] font-black">
-                    3
-                  </div>
-                  <div>
-                    <strong className="text-[#102a54]">Periksa Domain URL:</strong> Jangan klik link SMS. Ketik manual alamat portal resmi bank di browser Anda.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
-                  <div className="grid h-6 w-6 place-items-center rounded-full bg-[#102a54] text-white text-[10px] font-black">
-                    4
-                  </div>
-                  <div>
-                    <strong className="text-[#102a54]">Tolak Syarat Deposit:</strong> Tawaran kerja paruh waktu yang meminta deposit uang terlebih dahulu adalah penipuan.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
-                  <div className="grid h-6 w-6 place-items-center rounded-full bg-[#102a54] text-white text-[10px] font-black">
-                    5
-                  </div>
-                  <div>
-                    <strong className="text-[#102a54]">Verifikasi Nama QRIS:</strong> Selalu periksa kesesuaian nama merchant di layar m-banking sebelum menginput PIN transaksi.
-                  </div>
-                </div>
+                ))}
               </div>
 
               <div className="mt-6 flex justify-end">
@@ -598,7 +602,7 @@ export default function ChallengePage() {
                   onClick={handleStartPostTest}
                   className="flex items-center gap-2 rounded-2xl bg-[#0876c9] px-6 py-3.5 text-xs font-black text-white shadow-md transition hover:bg-[#075da8]"
                 >
-                  Mulai Tantangan Bagian 2 (1,5 Menit)
+                  Mulai Tantangan Bagian 2 (2 Menit)
                   <Icon name="ArrowRight" size={16} />
                 </button>
               </div>

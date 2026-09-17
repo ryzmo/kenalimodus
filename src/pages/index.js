@@ -38,6 +38,7 @@ export default function Home() {
     setTimeout(() => setCopied(false), 2500)
   }
 
+  const [activeChannelModal, setActiveChannelModal] = useState(null)
   const modusOfTheWeek = MODUS_LIST[0]
   const waShareUrl = `https://wa.me/?text=${encodeURIComponent(
     `Yuk uji seberapa aman kamu dari modus penipuan online terbaru di KENALI MODUS: ${originUrl}/challenge`
@@ -66,16 +67,16 @@ export default function Home() {
             </h1>
 
             <p className="mt-4 max-w-lg text-sm leading-6 text-blue-50 md:text-base font-normal">
-              Bukan sekadar membaca artikel. Latih refleks pengambilan keputusanmu lewat simulasi 1.5-Minute Challenge, ukur Safe Score, dan lindungi orang terdekat.
+              Bukan sekadar membaca artikel. Latih refleks pengambilan keputusanmu lewat simulasi 2-Minute Challenge, ukur Safe Score, dan lindungi orang terdekat.
             </p>
 
-            {/* CTA */}
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            {/* Action buttons */}
+            <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 href="/challenge"
-                className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-black text-[#075da8] shadow-lg transition duration-200 hover:-translate-y-0.5 hover:bg-slate-50"
+                className="inline-flex items-center gap-2 rounded-2xl bg-[#0876c9] px-6 py-3.5 text-sm font-black text-white shadow-soft transition duration-200 hover:bg-[#075da8]"
               >
-                Mulai 1.5-Minute Challenge
+                Mulai 2-Minute Challenge
               </Link>
 
             </div>
@@ -295,6 +296,147 @@ export default function Home() {
         </section>
 
         {/* =========================
+            KANAL IMPLEMENTASI & DISTRIBUSI
+        ========================== */}
+        <section className="mt-8">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-1">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#0876c9]">
+                Omnichannel Strategy
+              </span>
+              <h2 className="mt-1 text-2xl font-black text-[#102a54]">
+                Kanal & Implementasi
+              </h2>
+            </div>
+            <p className="text-xs font-semibold text-slate-400">
+              Integrasi ekosistem distribusi Kenali Modus
+            </p>
+          </div>
+
+          <div className="mt-4 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+            {/* 1. myBCA */}
+            <div
+              onClick={() =>
+                setActiveChannelModal({
+                  type: "myBCA",
+                  badge: "In-App Feature",
+                  title: "Integrasi myBCA",
+                  subtitle: "Banner & Card Menuju Challenge / Modus Terbaru",
+                  desc: "Nasabah myBCA dapat mengakses modul Kenali Modus langsung dari homepage aplikasi myBCA melalui banner dinamis atau card rekomendasi berbasis risiko transaksi nasabah.",
+                  previewType: "mybca",
+                })
+              }
+              className="group cursor-pointer rounded-3xl border border-slate-100 bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-md"
+            >
+              <div className="flex items-center justify-between">
+                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[#0876c9]">
+                  myBCA
+                </span>
+                <span className="text-[11px] font-bold text-[#0876c9] group-hover:translate-x-0.5 transition">
+                  Lihat Mockup →
+                </span>
+              </div>
+              <h3 className="mt-3 text-base font-black text-[#102a54]">
+                In-App Banner / Card
+              </h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+                Banner/card interaktif di beranda aplikasi myBCA menuju 2-Minute Challenge atau modul modus perbankan terbaru.
+              </p>
+            </div>
+
+            {/* 2. Media Sosial */}
+            <div
+              onClick={() =>
+                setActiveChannelModal({
+                  type: "social",
+                  badge: "Social Media Campaign",
+                  title: "Media Sosial & Edukasi Viral",
+                  subtitle: "Konten Modus of the Week + Direct Link Challenge",
+                  desc: "Konten infografis micro-learning & carousel interaktif di Instagram, TikTok, dan X Bank BCA dengan hook kasus viral nyata dan link instan menuju simulasi challenge.",
+                  previewType: "social",
+                })
+              }
+              className="group cursor-pointer rounded-3xl border border-slate-100 bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:border-purple-200 hover:shadow-md"
+            >
+              <div className="flex items-center justify-between">
+                <span className="rounded-full bg-purple-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-purple-700">
+                  Media Sosial
+                </span>
+                <span className="text-[11px] font-bold text-purple-700 group-hover:translate-x-0.5 transition">
+                  Lihat Mockup →
+                </span>
+              </div>
+              <h3 className="mt-3 text-base font-black text-[#102a54]">
+                Modus of the Week
+              </h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+                Konten mingguan viral di medsos resmi BCA yang mengulas modus hangat dengan tautan langsung ke latihan challenge.
+              </p>
+            </div>
+
+            {/* 3. QR Campaign */}
+            <div
+              onClick={() =>
+                setActiveChannelModal({
+                  type: "qr",
+                  badge: "On-Ground & Collateral",
+                  title: "QR Code Campaign",
+                  subtitle: "Poster Cabang, Booth Acara, Merchandise & Edukatips",
+                  desc: "QR Code khusus tercetak pada standing banner kantor cabang BCA, merchant partner, booth pameran, serta merchandise nasabah untuk scan-and-play di tempat.",
+                  previewType: "qr",
+                })
+              }
+              className="group cursor-pointer rounded-3xl border border-slate-100 bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:border-emerald-200 hover:shadow-md"
+            >
+              <div className="flex items-center justify-between">
+                <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700">
+                  QR Campaign
+                </span>
+                <span className="text-[11px] font-bold text-emerald-700 group-hover:translate-x-0.5 transition">
+                  Lihat Mockup →
+                </span>
+              </div>
+              <h3 className="mt-3 text-base font-black text-[#102a54]">
+                Scan QR Code Fisik
+              </h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+                QR code pada poster kantor cabang, booth event, merchandise, dan flyer materi edukasi nasabah.
+              </p>
+            </div>
+
+            {/* 4. Push Notification */}
+            <div
+              onClick={() =>
+                setActiveChannelModal({
+                  type: "push",
+                  badge: "Real-Time Alert",
+                  title: "Push Notification Cerdas",
+                  subtitle: "Early Warning Saat Modus Baru Sedang Marak",
+                  desc: "Notifikasi pintar berbasis kejadian aktual yang langsung mengingatkan nasabah jika ada lonjakan modus penipuan berkedok promo/undian/file undangan.",
+                  previewType: "push",
+                })
+              }
+              className="group cursor-pointer rounded-3xl border border-slate-100 bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:border-amber-200 hover:shadow-md"
+            >
+              <div className="flex items-center justify-between">
+                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-amber-700">
+                  Push Notification
+                </span>
+                <span className="text-[11px] font-bold text-amber-700 group-hover:translate-x-0.5 transition">
+                  Lihat Mockup →
+                </span>
+              </div>
+              <h3 className="mt-3 text-base font-black text-[#102a54]">
+                Alert Modus Ramai
+              </h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+                Pemberitahuan instan di smartphone saat terdeteksi gelombang modus baru yang membutuhkan kewaspadaan ekstra.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================
             PROTECT OTHERS & SHARING
         ========================== */}
         <section className="mt-8 rounded-3xl border border-blue-100 bg-blue-50/70 p-5 md:p-7">
@@ -336,6 +478,152 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Modal Detail Kanal & Implementasi */}
+        {activeChannelModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs animate-in fade-in duration-200">
+            <div className="relative w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-start justify-between">
+                <span className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#0876c9]">
+                  {activeChannelModal.badge}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveChannelModal(null)}
+                  className="grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <h2 className="mt-3 text-xl font-black text-[#102a54]">
+                {activeChannelModal.title}
+              </h2>
+              <p className="mt-1 text-xs font-bold text-[#0876c9]">
+                {activeChannelModal.subtitle}
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-slate-600">
+                {activeChannelModal.desc}
+              </p>
+
+              {/* Mockup Preview Visualizer */}
+              <div className="mt-5 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                  Simulasi Tampilan Implementasi
+                </div>
+
+                {activeChannelModal.previewType === "mybca" && (
+                  <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-[#102a54] to-[#0876c9] p-4 text-white shadow-sm">
+                    <div className="flex items-center justify-between text-[10px] text-cyan-200 font-bold">
+                      <span>myBCA Home Card</span>
+                      <span className="bg-white/20 px-2 py-0.5 rounded-full text-white">Baru</span>
+                    </div>
+                    <div className="mt-2 text-sm font-black">
+                      Berapa Skor Ketahanan Finansialmu?
+                    </div>
+                    <p className="mt-1 text-[11px] text-blue-100">
+                      Ikuti 2-Minute Scam Challenge langsung di myBCA dan dapatkan lencana nasabah waspada!
+                    </p>
+                    <Link
+                      href="/challenge"
+                      onClick={() => setActiveChannelModal(null)}
+                      className="mt-3 inline-block rounded-xl bg-white px-3.5 py-1.5 text-xs font-black text-[#075da8]"
+                    >
+                      Buka Challenge
+                    </Link>
+                  </div>
+                )}
+
+                {activeChannelModal.previewType === "social" && (
+                  <div className="rounded-2xl border border-purple-100 bg-white p-4 shadow-sm">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-8 w-8 rounded-full bg-[#102a54] flex items-center justify-center text-[10px] font-black text-white">
+                        BCA
+                      </div>
+                      <div>
+                        <div className="text-xs font-black text-[#102a54]">@GoodLifeBCA</div>
+                        <div className="text-[10px] text-slate-400">Sponsored • Modus of the Week</div>
+                      </div>
+                    </div>
+                    <div className="mt-2 text-xs text-slate-700">
+                      <strong>Hati-hati modus file APK Surat Tilang / Undangan!</strong> Jangan sembarangan klik file .apk di WhatsApp. Coba tes kemampuanmu di Kenali Modus sekarang:
+                    </div>
+                    <div className="mt-3 rounded-xl bg-slate-100 p-2.5 flex items-center justify-between text-xs">
+                      <span className="font-bold text-[#102a54]">kenalimodus.id/challenge</span>
+                      <Link
+                        href="/challenge"
+                        onClick={() => setActiveChannelModal(null)}
+                        className="rounded-lg bg-purple-600 px-3 py-1 font-bold text-white text-[11px]"
+                      >
+                        Play Now
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
+                {activeChannelModal.previewType === "qr" && (
+                  <div className="flex flex-col sm:flex-row items-center gap-4 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
+                    <div className="flex flex-col items-center justify-center rounded-xl bg-emerald-50 border-2 border-dashed border-emerald-300 p-3 w-28 h-28 shrink-0 text-emerald-800 font-mono">
+                      <div className="text-xs font-black">QR CODE</div>
+                      <div className="text-[9px] font-bold text-emerald-600 mt-1">SCAN ME</div>
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-[#102a54]">
+                        Poster & Standee Cabang BCA
+                      </div>
+                      <p className="mt-1 text-[11px] text-slate-500">
+                        "Sambil menunggu antrean di Customer Service, scan QR untuk mainkan 2-Minute Scam Challenge dan tukarkan reward!"
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {activeChannelModal.previewType === "push" && (
+                  <div className="rounded-2xl border border-amber-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                      <span className="font-bold text-amber-700 flex items-center gap-1">
+                        BCA Safe Alert • Sekarang
+                      </span>
+                      <span>Baru saja</span>
+                    </div>
+                    <div className="mt-1 text-xs font-black text-[#102a54]">
+                      Waspada Modus Scamming APK Mengatasnamakan Kurir Paket!
+                    </div>
+                    <p className="mt-1 text-[11px] text-slate-600">
+                      Sedang ramai modus APK kirim resi. Kenali ciri-cirinya dalam 1 menit sebelum Anda atau keluarga menjadi korban.
+                    </p>
+                    <div className="mt-2.5 flex gap-2">
+                      <Link
+                        href="/modus"
+                        onClick={() => setActiveChannelModal(null)}
+                        className="rounded-lg bg-amber-600 px-3 py-1 font-bold text-white text-[11px]"
+                      >
+                        Lihat Modus
+                      </Link>
+                      <Link
+                        href="/challenge"
+                        onClick={() => setActiveChannelModal(null)}
+                        className="rounded-lg bg-slate-100 px-3 py-1 font-bold text-slate-700 text-[11px]"
+                      >
+                        Uji Skenario
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-5 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setActiveChannelModal(null)}
+                  className="rounded-2xl bg-slate-100 px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-200 transition"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <BottomSpace />
       </main>

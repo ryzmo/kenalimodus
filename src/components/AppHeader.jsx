@@ -31,7 +31,7 @@ const DEFAULT_NOTIFICATIONS = [
   {
     id: "notif-3",
     type: "challenge",
-    title: "1.5-Minute Scam Challenge Baru Siap Diuji",
+    title: "2-Minute Scam Challenge Baru Siap Diuji",
     desc: "Latih ketajaman refleks Anda menghadapi modus perbankan digital terkini dan ukur Safe Score terbaru Anda sekarang.",
     time: "3 jam yang lalu",
     unread: true,
