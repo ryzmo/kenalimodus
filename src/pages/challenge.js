@@ -327,9 +327,7 @@ export default function ChallengePage() {
       <AppHeader />
 
       <main className="mobile-container px-5 pb-8 md:px-8">
-        {/* ====================================================
-            STAGE 0: CHALLENGE INTRO
-        ==================================================== */}
+        {/* Stage 0: Challenge Intro */}
         {stage === "intro" && (
           <section className="mt-6 rounded-3xl bg-white p-6 shadow-soft md:p-9">
 
@@ -434,21 +432,11 @@ export default function ChallengePage() {
                 Mulai Challenge Sekarang
                 <Icon name="ArrowRight" size={17} />
               </button>
-
-              <Link
-                href="/soal-pretest"
-                className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50"
-              >
-                <Icon name="BookOpen" size={16} />
-                Lihat Kumpulan Soal Pre-Test
-              </Link>
             </div>
           </section>
         )}
 
-        {/* ====================================================
-            STAGE 1: PRE-TEST (1.5 MINUTES TIMER)
-        ==================================================== */}
+        {/* Stage 1: Pre-Test */}
         {stage === "pre_test" && activePreScenario && (
           <div className="mt-6">
             <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100">
@@ -534,9 +522,7 @@ export default function ChallengePage() {
           </div>
         )}
 
-        {/* ====================================================
-            STAGE 2: INTERVENTION / 5 GOLDEN RULES
-        ==================================================== */}
+        {/* Stage 2: 5 Golden Rules Intervention */}
         {stage === "intervention" && (
           <div className="mt-6">
             <div className="rounded-3xl bg-white p-6 shadow-soft md:p-8">
@@ -618,9 +604,7 @@ export default function ChallengePage() {
           </div>
         )}
 
-        {/* ====================================================
-            STAGE 3: POST-TEST (1.5 MINUTES TIMER + FEEDBACK)
-        ==================================================== */}
+        {/* Stage 3: Post-Test */}
         {stage === "post_test" && activePostScenario && (
           <div className="mt-6">
             <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100">
@@ -761,9 +745,7 @@ export default function ChallengePage() {
           </div>
         )}
 
-        {/* ====================================================
-            STAGE 4: ATTENTION, REPETITION, INTENTION (ARI)
-        ==================================================== */}
+        {/* Stage 4: ARI Survey */}
         {stage === "ari_survey" && activeAriQuestion && (
           <div className="mt-6">
             <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100">

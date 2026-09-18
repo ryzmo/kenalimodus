@@ -76,9 +76,7 @@ button {
   }
 }
 
-/* ============================================
-   POINTS & REWARD GAMIFICATION STYLES
-============================================ */
+/* Points & reward gamification styles */
 
 .gradient-gold {
   background: linear-gradient(
@@ -160,9 +158,7 @@ button {
   animation: tier-glow 3s ease-in-out infinite;
 }
 
-/* ============================================
-   WATER WAVE LIQUID FILL ANIMATIONS
-============================================ */
+/* Water wave liquid fill animations */
 @keyframes wave-rotate {
   0% {
     transform: translate(-50%, -75%) rotate(0deg);

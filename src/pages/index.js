@@ -49,9 +49,7 @@ export default function Home() {
       <AppHeader />
 
       <main className="mobile-container px-5 pb-8 md:px-8">
-        {/* =========================
-            HERO
-        ========================== */}
+        {/* Hero section */}
         <section className="relative mt-5 overflow-hidden rounded-[2rem] gradient-brand p-6 text-white shadow-soft md:p-10">
           <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-white/10 pointer-events-none" />
           <div className="absolute -bottom-20 right-20 h-44 w-44 rounded-full bg-cyan-300/10 pointer-events-none" />
@@ -83,12 +81,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* =========================
-            CORE LOOP & POSITIONING
-        ========================== */}
-        {/* =========================
-            CORE HABIT LOOP
-        ========================== */}
+        {/* Core Habit Loop */}
         <section className="mt-6 rounded-3xl bg-white p-5 shadow-soft md:p-7">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
@@ -157,9 +150,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* =========================
-            QUICK FEATURES
-        ========================== */}
+        {/* Quick features */}
         <section className="mt-6 grid gap-4 md:grid-cols-3">
           {/* Modus of the week */}
           <div className="flex flex-col justify-between rounded-3xl bg-white p-5 shadow-soft md:col-span-2">
@@ -226,9 +217,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* =========================
-            BCA OFFICIAL #AWASMODUS BANNER
-        ========================== */}
+        {/* BCA Official #AwasModus Banner */}
         <section className="mt-6 rounded-3xl gradient-brand p-5 text-white shadow-soft md:p-7">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -258,9 +247,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* =========================
-            MODUS TERBARU LIST
-        ========================== */}
+        {/* Modus terbaru list */}
         <section className="mt-8">
           <div className="flex items-end justify-between">
             <div>
@@ -295,9 +282,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* =========================
-            KANAL IMPLEMENTASI & DISTRIBUSI
-        ========================== */}
+        {/* Kanal implementasi & distribusi */}
         <section className="mt-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-1">
             <div>
@@ -436,9 +421,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* =========================
-            PROTECT OTHERS & SHARING
-        ========================== */}
+        {/* Protect others & sharing */}
         <section className="mt-8 rounded-3xl border border-blue-100 bg-blue-50/70 p-5 md:p-7">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex gap-4">

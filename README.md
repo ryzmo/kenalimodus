@@ -1,40 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Kenali Modus (Prototype)
 
-## Getting Started
+Kenali Modus adalah aplikasi web prototype simulasi interaktif dan edukasi keamanan perbankan digital berbasis **Mobile-First Responsive Design**. Aplikasi ini dirancang untuk menguji, mengukur, dan melatih refleks pengambilan keputusan pengguna terhadap berbagai modus penipuan digital terkini melalui pendekatan 2-Minute Scam Challenge.
 
-First, run the development server:
+Proyek ini berstatus sebagai prototype untuk kebutuhan riset, demonstrasi fitur, serta evaluasi efektivitas intervensi perilaku dan dampak finansial dengan pengalaman pengguna yang dioptimalkan untuk perangkat seluler (smartphone) dan tetap adaptif di desktop.
 
+---
+
+## Fitur & Pendekatan Desain
+
+- **Mobile-First Experience**: Dirancang khusus dengan prioritas antarmuka smartphone (bottom navigation, touch-friendly tap targets, dan layout percakapan simulasi yang realistis) serta responsif di layar tablet dan desktop.
+- **2-Minute Scam Challenge**: Simulasi kuis interaktif skenario nyata penipuan digital (APK kurir, QRIS palsu, social engineering, dll).
+- **Gamifikasi & Rewards**: Level profil risiko, lencana keamanan, sistem poin, dan simulasi reward voucher.
+- **Mode Lindungi Keluarga**: Fitur berbagi edukasi dan pantau skor keamanan anggota keluarga.
+- **Dampak Finansial & Riset**: Evaluasi pra & pasca intervensi serta dashboard dampak kerugian yang berhasil dicegah.
+
+---
+
+## Tech Stack
+
+### Frontend
+- Framework: Next.js (Pages Router)
+- Library UI: React 19
+- Styling: Tailwind CSS v4 dan Custom CSS (Mobile-First Architecture)
+- Iconography: Lucide React
+
+### Backend & Database (Lightweight)
+- Serverless API Routes: Next.js API Routes
+- Database: NeonDB (Serverless PostgreSQL)
+
+---
+
+## Prasyarat Sistem
+
+Pastikan perangkat Anda telah terpasang:
+- Node.js versi 18.17 atau yang lebih baru
+- npm (bawaan Node.js), yarn, pnpm, atau bun
+- Git
+
+---
+
+## Panduan Instalasi dan Menjalankan Aplikasi
+
+### 1. Clone Repository
+Unduh repositori proyek ke komputer lokal Anda:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/username/kenalimodus.git
+cd kenalimodus
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Instal Dependensi
+Jalankan perintah berikut untuk menginstal seluruh pustaka yang diperlukan:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+### 3. Konfigurasi Environment Variables (Opsional)
+Buat berkas `.env.local` di root direktori jika Anda ingin menghubungkan aplikasi ke database NeonDB:
+```env
+DATABASE_URL=postgresql://user:password@endpoint/dbname?sslmode=require
+```
+Catatan: Jika `DATABASE_URL` tidak diisi, aplikasi tetap dapat berjalan menggunakan penyimpanan lokal (browser localStorage / in-memory fallback).
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+### 4. Jalankan Server Pengembangan
+Mulai server development:
+```bash
+npm run dev
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+### 5. Buka di Browser
+Akses aplikasi melalui peramban web pada alamat:
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Perintah Tambahan
 
-To learn more about Next.js, take a look at the following resources:
+- Membangun aplikasi untuk produksi:
+  ```bash
+  npm run build
+  ```
+- Menjalankan versi produksi:
+  ```bash
+  npm start
+  ```
+- Menjalankan linter kode:
+  ```bash
+  npm run lint
+  ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Catatan Status Prototype
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+ Ini merupakan prototype fungsional. Seluruh skenario simulasi, kuesioner evaluasi, serta visualisasi data disajikan sebagai media pembelajaran dan pengujian interaktif untuk meningkatkan kewaspadaan terhadap penipuan digital.

@@ -134,9 +134,7 @@ export default function AdminImpactPage() {
           </div>
         </div>
 
-        {/* ====================================================
-            METRIC CARDS (RISK METRICS & ARI METRICS)
-        ==================================================== */}
+        {/* Metric cards (Risk & ARI metrics) */}
         <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
           <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="text-xs font-medium text-slate-500">Total Partisipan</div>
@@ -202,9 +200,7 @@ export default function AdminImpactPage() {
           </div>
         </div>
 
-        {/* ====================================================
-            DATA TABLE: RAW, CALCULATED, AGE & ARI RATINGS
-        ==================================================== */}
+        {/* Data table: raw, calculated, age & ARI ratings */}
         <div className="mt-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-100">
             <div>

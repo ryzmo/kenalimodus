@@ -128,9 +128,7 @@ export default function ModusPage() {
           </div>
         </section>
 
-        {/* ====================================================
-            FEATURED VIDEO #AWASMODUS (MANTRA JITU B-C-A)
-        ==================================================== */}
+        {/* Featured Video #AwasModus */}
         {(selectedCategory === "Semua" || selectedCategory === "Video #AwasModus") && (
           <section className="mt-6 rounded-3xl gradient-brand p-6 text-white shadow-soft md:p-8">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -204,9 +202,7 @@ export default function ModusPage() {
           </section>
         )}
 
-        {/* ====================================================
-            OFFICIAL BCA ARTIKEL & EDUKATIPS FEED
-        ==================================================== */}
+        {/* Official BCA Artikel & Edukatips feed */}
         {(selectedCategory === "Semua" || selectedCategory === "Artikel Edukatips") && (
           <section className="mt-8">
             <div className="flex items-center justify-between">
@@ -258,9 +254,7 @@ export default function ModusPage() {
           </section>
         )}
 
-        {/* ====================================================
-            MODUS SIMULASI LIST GRID
-        ==================================================== */}
+        {/* Modus simulasi list grid */}
         {selectedCategory !== "Video #AwasModus" && selectedCategory !== "Artikel Edukatips" && (
           <section className="mt-8">
             <div className="flex items-center justify-between">
@@ -347,9 +341,7 @@ export default function ModusPage() {
         <BottomSpace />
       </main>
 
-      {/* ====================================================
-          MODAL VIDEO PLAYER #AWASMODUS
-      ==================================================== */}
+      {/* Modal video player #AwasModus */}
       {activeVideoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 p-4 backdrop-blur-sm">
           <div className="relative w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl">
@@ -423,9 +415,7 @@ export default function ModusPage() {
         </div>
       )}
 
-      {/* ====================================================
-          MODAL ARTIKEL EDUKATIPS BCA
-      ==================================================== */}
+      {/* Modal artikel edukatips BCA */}
       {activeArticleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
           <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl md:p-8">

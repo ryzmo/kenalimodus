@@ -201,12 +201,6 @@ export default function AppHeader() {
           >
             Profil
           </Link>
-          <Link
-            href="/admin/impact"
-            className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-[#102a54] transition hover:bg-blue-50 hover:text-[#0876c9]"
-          >
-            Admin Panel
-          </Link>
         </nav>
 
         {/* Notification Bell with Dropdown Container */}
@@ -228,9 +222,7 @@ export default function AppHeader() {
             )}
           </button>
 
-          {/* ====================================================
-              NOTIFICATION DROPDOWN POPOVER
-          ==================================================== */}
+          {/* Notification dropdown popover */}
           {isOpen && (
             <div className="absolute right-0 top-12 z-50 w-[92vw] max-w-sm rounded-3xl border border-slate-200 bg-white p-4 shadow-2xl transition-all animate-in fade-in zoom-in-95 sm:w-96">
               {/* Header */}

@@ -34,7 +34,8 @@ yarn-error.log*
 .env*
 
 # vercel
-.vercel
+# local private / docs
+jangan_ikut_ke_github/
 
 # typescript
 *.tsbuildinfo

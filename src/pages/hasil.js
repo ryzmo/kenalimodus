@@ -140,9 +140,7 @@ export default function HasilPage() {
       <AppHeader />
 
       <main className="mobile-container px-5 pb-8 md:px-8">
-        {/* ====================================================
-            HERO SCORE SECTION
-        ==================================================== */}
+        {/* Hero score section */}
         <section className="mt-6 rounded-3xl bg-white p-6 shadow-soft md:p-8">
           <div className="flex flex-col items-center text-center">
 
@@ -223,9 +221,7 @@ export default function HasilPage() {
           </div>
         </section>
 
-        {/* ====================================================
-            SUBBAB 4.3.1: PENGUKURAN DAMPAK PERILAKU
-        ==================================================== */}
+        {/* Pengukuran dampak perilaku */}
         <section className="mt-8 rounded-3xl bg-white p-6 shadow-soft md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
             <div>
@@ -278,9 +274,7 @@ export default function HasilPage() {
           </div>
         </section>
 
-        {/* ====================================================
-            SUBBAB 4.3.2: ESTIMASI DAMPAK FINANSIAL (IASC / OJK)
-        ==================================================== */}
+        {/* Estimasi dampak finansial (IASC / OJK) */}
         <section className="mt-8 rounded-3xl bg-white p-6 shadow-soft md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
             <div>

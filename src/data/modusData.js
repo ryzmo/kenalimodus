@@ -819,10 +819,7 @@ export const ALL_SCENARIOS_POOL = [
       "Jangan menilai keaslian investasi hanya dari nama, logo, atau dokumen. Verifikasi melalui kanal resmi perusahaan."
   }
 ]
-// ==========================================
-// DATA SKENARIO KHUSUS PRE-TEST (BASELINE) & POST-TEST (EVALUASI)
-// Modus berbasis data laporan IASC (Indonesia Anti-Scam Centre / OJK)
-// ==========================================
+// Data skenario Pre-Test (Baseline) & Post-Test (Evaluasi) berbasis laporan IASC/OJK
 
 export const PRE_TEST_SCENARIOS = [
   {
@@ -1587,9 +1584,7 @@ export const POST_TEST_SCENARIOS = [
   }
 ]
 
-// ==========================================
-// FORMULA & PARAMETER STATISTIK BEHAVIORAL & FINANCIAL IMPACT (SUBBAB 4.3)
-// ==========================================
+// Formula & parameter statistik behavioral & financial impact
 
 // Benchmark Data OJK & IASC (22 Nov 2024 - 28 Des 2025)
 export const IMPACT_BENCHMARK_OJK = {
@@ -1677,9 +1672,7 @@ export function formatRupiah(number) {
   }).format(number)
 }
 
-// ==========================================
-// KUESIONER EVALUASI PASCA-CHALLENGE: ATTENTION, REPETITION, INTENTION (ARI)
-// ==========================================
+// Kuesioner evaluasi pasca-challenge: Attention, Repetition, Intention (ARI)
 export const ARI_SURVEY_QUESTIONS = [
   {
     id: "ari_attention",
@@ -1874,9 +1867,7 @@ export const PIPELINE_STEPS = [
   }
 ]
 
-// ============================================
-// POINTS & REWARD GAMIFICATION DATA
-// ============================================
+// Points & reward gamification data
 
 export const POINTS_ACTIVITIES = [
   {
@@ -2044,9 +2035,7 @@ export const LEADERBOARD_MOCK = [
   { rank: 5, name: "Dian K.", points: 180, tier: "Gold", streak: 6 }
 ]
 
-// ============================================
-// BCA OFFICIAL EDUCATION MEDIA (#AWASMODUS)
-// ============================================
+// BCA official education media (#AwasModus)
 
 export const BCA_EDU_VIDEOS = [
   {
