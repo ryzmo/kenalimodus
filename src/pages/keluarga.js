@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import AppHeader from "../components/AppHeader"
 import BottomNav from "../components/BottomNav"
 import BottomSpace from "../components/BottomSpace"
@@ -9,7 +10,7 @@ import { DEFAULT_FAMILY_MEMBERS } from "../data/modusData"
 export default function KeluargaPage() {
   const [members, setMembers] = useState(DEFAULT_FAMILY_MEMBERS)
   const [groupName, setGroupName] = useState("Keluarga Sejahtera")
-  const [inviteCode, setInviteCode] = useState("AMAN-BCA-778")
+  const [inviteCode] = useState("AMAN-BCA-778")
   const [copiedInvite, setCopiedInvite] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [newMemberName, setNewMemberName] = useState("")
@@ -31,7 +32,6 @@ export default function KeluargaPage() {
         }
       }
 
-      // Sync personal score from challenge result if available
       const storedPersonalResult = localStorage.getItem("kenali_modus_result")
       if (storedPersonalResult) {
         try {
@@ -48,7 +48,7 @@ export default function KeluargaPage() {
                         ? "Tinggi (Waspada)"
                         : parsedRes.score >= 60
                           ? "Cukup Waspada"
-                          : "Rentan"
+                          : "Rentan (Perlu Edukasi)"
                   }
                   : m
               )
@@ -61,57 +61,17 @@ export default function KeluargaPage() {
     }
   }, [])
 
-  const saveMembersToStorage = (updatedMembers, updatedGroupName = groupName) => {
-    setMembers(updatedMembers)
-    if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "kenali_family_group",
-        JSON.stringify({ groupName: updatedGroupName, members: updatedMembers })
-      )
-    }
-  }
-
-  // Calculate Family Defense Index (Average Score)
-  const totalScore = members.reduce((acc, m) => acc + m.score, 0)
-  const avgScore = Math.round(totalScore / members.length)
-  const vulnerableCount = members.filter((m) => m.score < 65).length
-
-  let defenseStatus = "Tinggi (Keluarga Terlindungi)"
-  let defenseBadgeColor = "bg-emerald-50 text-emerald-700 border-emerald-200"
-
-  if (avgScore < 60) {
-    defenseStatus = "Rentan (Perlu Perhatian Segera)"
-    defenseBadgeColor = "bg-red-50 text-red-700 border-red-200"
-  } else if (avgScore < 75) {
-    defenseStatus = "Waspada Sedang (Terdapat Anggota Rentan)"
-    defenseBadgeColor = "bg-amber-50 text-amber-700 border-amber-200"
-  }
+  const averageScore = Math.round(
+    members.reduce((acc, curr) => acc + curr.score, 0) / members.length
+  )
 
   const handleCopyInvite = () => {
-    const inviteLink = `${originUrl}/keluarga?join=${inviteCode}`
-    const shareText = `Halo! Yuk gabung ke Grup Anti-Fraud ${groupName} di KENALI MODUS untuk saling pantau Safe Score dan melindungi keluarga dari penipuan digital: ${inviteLink}`
+    const text = `Yuk gabung ke grup perlindungan digital "${groupName}" di Kenali Modus BCA: ${originUrl}/keluarga?join=${inviteCode}`
     if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(shareText)
+      navigator.clipboard.writeText(text)
     }
     setCopiedInvite(true)
     setTimeout(() => setCopiedInvite(false), 2500)
-  }
-
-  const handleNudgeMember = (member) => {
-    const nudgeMessage = `Halo ${member.name}! Di grup ${groupName} KENALI MODUS, Safe Score ${member.name} saat ini ${member.score}/100 dan masih rentan di modus "${member.weakCategory}". Yuk luangkan 2 menit coba simulasi challenge baru biar makin waspada: ${originUrl}/challenge?target=${member.id}`
-    const waUrl = `https://wa.me/?text=${encodeURIComponent(nudgeMessage)}`
-
-    // Increment nudge count
-    const updated = members.map((m) =>
-      m.id === member.id ? { ...m, nudgeCount: (m.nudgeCount || 0) + 1 } : m
-    )
-    saveMembersToStorage(updated)
-    setNudgedMember(member.name)
-    setTimeout(() => setNudgedMember(null), 3000)
-
-    if (typeof window !== "undefined") {
-      window.open(waUrl, "_blank")
-    }
   }
 
   const handleAddMember = (e) => {
@@ -119,287 +79,227 @@ export default function KeluargaPage() {
     if (!newMemberName.trim()) return
 
     const newMember = {
-      id: `member-${Date.now()}`,
-      name: newMemberName.trim(),
+      id: `fam-${Date.now()}`,
+      name: newMemberName,
       relation: newMemberRole,
+      age: 40,
       score: 50,
-      status: "Belum Mengikuti Challenge",
-      weakCategory: "Belum Terdata",
-      lastActive: "Baru ditambahkan",
-      avatarColor: "bg-slate-600",
-      completedChallenges: 0,
-      nudgeCount: 0,
-      recommendation: "Ajak untuk pertama kali menyelesaikan 2-Minute Scam Challenge."
+      status: "Rentan (Belum Tes)",
+      lastChallenge: "Belum pernah",
+      vulnerableTo: "Modus Belum Teridentifikasi",
+      avatarBg: "bg-blue-100 text-blue-700"
     }
 
     const updated = [...members, newMember]
-    saveMembersToStorage(updated)
+    setMembers(updated)
     setNewMemberName("")
     setShowAddModal(false)
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("kenali_family_group", JSON.stringify({ groupName, members: updated }))
+    }
+  }
+
+  const handleNudge = (member) => {
+    const text = `Halo ${member.name}, yuk ikuti 2-Minute Scam Challenge di Kenali Modus BCA untuk mengukur ketahanan keamanan perbankanmu: ${originUrl}/challenge`
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`
+    window.open(waUrl, "_blank")
+    setNudgedMember(member.name)
+    setTimeout(() => setNudgedMember(null), 2500)
   }
 
   return (
-    <div className="app-shell">
-      <AppHeader />
+    <div className="app-shell flex justify-center bg-[#e7eff6] min-h-screen text-[#002554]">
+      <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl min-h-screen md:min-h-0 md:my-5 md:rounded-[44px] shadow-2xl bg-gradient-to-b from-[#0292fc] via-[#85caff] to-[#f4faff] flex flex-col relative overflow-hidden border border-white/60 pb-safe">
+        
+        <AppHeader title="Grup Keluarga" subtitle="Perlindungan Multi-Generasi" />
 
-      <main className="mobile-container px-5 pb-8 md:px-8">
-        {/* Header Title */}
-        <section className="mt-6 flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-black text-[#102a54] md:text-3xl">
-              {groupName}
-            </h1>
+        {/* Top Family Summary Header */}
+        <section className="px-6 pt-1 pb-5 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-sky-100">
+                Skor Keamanan Rata-Rata
+              </div>
+              <div className="text-4xl font-black tracking-tight text-white mt-0.5">
+                {averageScore} <span className="text-sm font-bold text-sky-200">/ 100</span>
+              </div>
+              <div className="mt-1 text-xs font-semibold text-white/95">
+                {groupName} • {members.length} Anggota Terdaftar
+              </div>
+            </div>
+
+            <div className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center p-2 shadow-sm">
+              <Image
+                src="/3d-family-icon.png"
+                alt="Family Protection"
+                width={48}
+                height={48}
+                className="object-contain"
+              />
+            </div>
+          </div>
+
+          {/* Quick Actions in Header */}
+          <div className="mt-4 flex gap-2">
+            <button
+              type="button"
+              onClick={handleCopyInvite}
+              className="flex-1 rounded-xl bg-white/25 backdrop-blur-md border border-white/40 py-2 text-xs font-bold text-white shadow-xs active:scale-95 transition"
+            >
+              {copiedInvite ? "Link Tersalin!" : "Undang Anggota"}
+            </button>
             <button
               type="button"
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-50 px-3 py-1.5 text-xs font-black text-[#0876c9] hover:bg-blue-100 shrink-0"
+              className="rounded-xl bg-white px-4 py-2 text-xs font-bold text-[#003882] shadow-xs active:scale-95 transition"
             >
-              <Icon name="UsersRound" size={14} />
-              +
+              + Tambah
             </button>
           </div>
-          <p className="text-xs leading-relaxed text-slate-500 max-w-xl">
-            Pantau Safe Score keluarga secara kolektif, ingatkan anggota yang masih rentan, dan bangun kebiasaan aman bersama.
-          </p>
         </section>
 
-        {/* Family Defense Index Banner */}
-        <section className="mt-6 rounded-3xl bg-white p-6 shadow-soft md:p-8">
-          <div className="grid gap-6 md:grid-cols-3 md:items-center">
-            {/* Average Score Gauge */}
-            <div className="flex flex-col items-center border-b border-slate-100 pb-6 text-center md:border-b-0 md:border-r md:pb-0 md:pr-6">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                Family Defense Index
-              </span>
-              <div className="mt-3 flex items-baseline gap-1">
-                <span className="text-5xl font-black text-[#102a54]">
-                  {avgScore}
-                </span>
-                <span className="text-sm font-bold text-slate-400">/ 100</span>
-              </div>
-              <div
-                className={`mt-3 inline-flex rounded-full border px-3 py-1 text-[10px] font-black ${defenseBadgeColor}`}
-              >
-                {defenseStatus}
-              </div>
+        {/* BOTTOM SHEET: Member List & Vulnerability Cards */}
+        <main className="flex-1 bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] px-5 pt-5 space-y-4 shadow-2xl">
+          
+          {nudgedMember && (
+            <div className="rounded-2xl bg-[#003882] text-white p-3 text-xs font-bold text-center animate-in fade-in">
+              Pesan pengingat WhatsApp dikirimkan ke {nudgedMember}!
             </div>
+          )}
 
-            {/* Insight & Vulnerable Members Alert */}
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-black text-[#102a54]">
-                  Status Ketahanan Keluarga
-                </h2>
-              </div>
+          <div className="flex items-center justify-between px-1">
+            <span className="text-xs font-black uppercase tracking-wider text-[#002554]">
+              Status Ketahanan Anggota
+            </span>
+            <span className="text-[11px] text-slate-400">Deteksi Risiko Skenario</span>
+          </div>
 
-              <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                {vulnerableCount > 0 ? (
-                  <>
-                    Terdapat <strong className="text-red-600 font-bold">{vulnerableCount} anggota keluarga</strong> yang skornya di bawah 65 dan membutuhkan latihan pengingat berkala.
-                  </>
-                ) : (
-                  "Seluruh anggota keluarga telah memiliki Safe Score tinggi. Lakukan latihan rutin setiap minggu untuk menjaga refleks."
-                )}
-              </p>
-
-              {/* Quick Actions */}
-              <div className="mt-4 flex flex-wrap gap-2.5">
-                <button
-                  type="button"
-                  onClick={handleCopyInvite}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-slate-100 px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200"
+          <div className="space-y-3">
+            {members.map((m) => {
+              const isVulnerable = m.score < 65
+              return (
+                <div
+                  key={m.id}
+                  className="glass-card rounded-[24px] p-4 flex flex-col justify-between border border-white"
                 >
-                  <Icon name="Copy" size={14} />
-                  {copiedInvite ? "Link Undangan Disalin!" : "Bagikan Kode Grup"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Nudge Confirmation Toast */}
-        {nudgedMember && (
-          <div className="mt-4 rounded-2xl bg-emerald-50 border border-emerald-200 p-3 text-xs font-bold text-emerald-800 flex items-center gap-2">
-            <Icon name="CheckCircle2" size={16} className="text-emerald-600" />
-            Template pengingat WhatsApp untuk {nudgedMember} berhasil dibuka!
-          </div>
-        )}
-
-        {/* Family Members List */}
-        <section className="mt-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-[#102a54]">
-              Anggota Keluarga ({members.length})
-            </h2>
-            <span className="text-xs text-slate-400">Urut berdasarkan skor</span>
-          </div>
-
-          <div className="mt-3 space-y-2">
-            {members
-              .sort((a, b) => b.score - a.score)
-              .map((member, idx) => {
-                const isVulnerable = member.score < 65
-
-                return (
-                  <div
-                    key={member.id}
-                    className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-slate-300 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    {/* Left: Info */}
-                    <div className="flex items-center gap-3">
-                      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl text-xs font-bold ${
-                        idx === 0 ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-600"
-                      }`}>
-                        #{idx + 1}
-                      </span>
-
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-[#102a54] truncate">
-                            {member.name}
-                          </span>
-                          <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 shrink-0">
-                            {member.relation}
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">
-                          Rentan: <span className={isVulnerable ? "font-bold text-red-600" : "text-slate-600"}>{member.weakCategory}</span> · {member.completedChallenges}x challenge
-                        </div>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-black text-[#002554]">{m.name}</span>
+                        <span className="rounded-md bg-blue-50 text-[#0292fc] px-2 py-0.5 text-[9px] font-bold">
+                          {m.relation}
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-500 mt-0.5">
+                        {m.vulnerableTo}
                       </div>
                     </div>
 
-                    {/* Right: Score & Action */}
-                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 border-t border-slate-100 sm:pt-0 sm:border-0">
-                      <div className="text-left sm:text-right">
-                        <span className="text-sm font-black text-[#102a54]">
-                          {member.score}
-                          <span className="text-xs font-normal text-slate-400">/100</span>
-                        </span>
-                        <span
-                          className={`ml-2 text-[10px] font-bold uppercase sm:ml-0 sm:block ${
-                            isVulnerable ? "text-red-600" : "text-emerald-600"
-                          }`}
-                        >
-                          {member.status}
-                        </span>
+                    <div className="text-right">
+                      <div className="text-lg font-black text-[#002554] leading-none">
+                        {m.score}
+                        <span className="text-xs font-bold text-slate-400">/100</span>
                       </div>
-
-                      <button
-                        type="button"
-                        onClick={() => handleNudgeMember(member)}
-                        className={`rounded-xl px-3 py-1.5 text-xs font-bold transition shrink-0 ${
-                          isVulnerable
-                            ? "bg-red-50 text-red-700 hover:bg-red-100"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                      <span
+                        className={`inline-block mt-1 text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                          m.score >= 80
+                            ? "bg-emerald-50 text-emerald-600"
+                            : m.score >= 60
+                              ? "bg-amber-50 text-amber-600"
+                              : "bg-red-50 text-red-600"
                         }`}
                       >
-                        {isVulnerable ? "Ingatkan WA" : "Tantang WA"}
-                      </button>
+                        {m.status}
+                      </span>
                     </div>
                   </div>
-                )
-              })}
+
+                  <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[10px] text-slate-400">
+                      Tes: {m.lastChallenge}
+                    </span>
+                    {isVulnerable && m.id !== "saya" && (
+                      <button
+                        type="button"
+                        onClick={() => handleNudge(m)}
+                        className="rounded-lg bg-emerald-600 px-3 py-1 text-[11px] font-bold text-white shadow-xs hover:bg-emerald-700 active:scale-95 transition"
+                      >
+                        Ingatkan via WhatsApp
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
           </div>
-        </section>
 
-        {/* Continuous Loop Educational Banner */}
-        <section className="mt-8 rounded-3xl gradient-brand p-6 text-white shadow-soft md:p-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div className="max-w-xl">
-              <span className="text-[10px] font-black uppercase tracking-widest text-cyan-200">
-                Continuous Habit Loop
-              </span>
-              <h2 className="mt-1 text-xl font-black md:text-2xl">
-                Modus Penipuan Terus Berevolusi di Dunia Nyata
-              </h2>
-              <p className="mt-2 text-xs leading-relaxed text-blue-100">
-                Satu kali tes tidak cukup. Penipu selalu menciptakan variasi skenario baru setiap minggu. Buat jadwal latihan rutin bersama keluarga agar refleks tetap terlatih.
-              </p>
-            </div>
+          <BottomSpace />
+        </main>
 
-            <Link
-              href="/challenge"
-              className="shrink-0 inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-xs font-black text-[#075da8] shadow-md hover:bg-slate-100"
-            >
-              <Icon name="RotateCcw" size={15} />
-              Coba Skenario Adaptif Sekarang
-            </Link>
-          </div>
-        </section>
+        <BottomNav />
 
-        <BottomSpace />
-      </main>
-
-      {/* Add Member Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-black text-[#102a54]">
-                Tambah Anggota Keluarga
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowAddModal(false)}
-                className="grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-slate-500"
-              >
-                <Icon name="X" size={16} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddMember} className="mt-4 flex flex-col gap-3">
-              <div>
-                <label className="text-[11px] font-black uppercase tracking-wider text-slate-500">
-                  Nama Anggota
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Contoh: Paman Budi, Nenek Ani..."
-                  value={newMemberName}
-                  onChange={(e) => setNewMemberName(e.target.value)}
-                  className="mt-1 w-full rounded-2xl border border-slate-200 p-3 text-xs font-bold text-[#102a54] focus:border-[#0876c9] focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-black uppercase tracking-wider text-slate-500">
-                  Hubungan / Peran
-                </label>
-                <select
-                  value={newMemberRole}
-                  onChange={(e) => setNewMemberRole(e.target.value)}
-                  className="mt-1 w-full rounded-2xl border border-slate-200 p-3 text-xs font-bold text-[#102a54] focus:border-[#0876c9] focus:outline-none"
-                >
-                  <option value="Orang Tua">Orang Tua</option>
-                  <option value="Kakak/Adik">Kakak/Adik</option>
-                  <option value="Pasangan">Pasangan</option>
-                  <option value="Kerabat">Kerabat</option>
-                  <option value="Teman/Rekan">Teman/Rekan</option>
-                </select>
-              </div>
-
-              <div className="mt-2 flex gap-2">
+        {/* Modal Tambah Anggota */}
+        {showAddModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-2xs animate-in fade-in">
+            <div className="w-full max-w-xs rounded-[32px] bg-white p-5 shadow-2xl">
+              <div className="flex items-center justify-between pb-2">
+                <span className="text-xs font-bold text-[#002554]">Tambah Anggota Keluarga</span>
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 rounded-2xl bg-slate-100 py-3 text-xs font-bold text-slate-700"
+                  className="h-7 w-7 rounded-full bg-slate-100 text-xs font-bold text-slate-500"
                 >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 rounded-2xl bg-[#0876c9] py-3 text-xs font-black text-white shadow-sm"
-                >
-                  Simpan Anggota
+                  ✕
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
 
-      <BottomNav />
+              <form onSubmit={handleAddMember} className="mt-3 space-y-3">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500">Nama</label>
+                  <input
+                    type="text"
+                    required
+                    value={newMemberName}
+                    onChange={(e) => setNewMemberName(e.target.value)}
+                    placeholder="Contoh: Kakek Budi"
+                    className="w-full mt-1 rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium focus:outline-none focus:border-[#0292fc]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500">Hubungan</label>
+                  <select
+                    value={newMemberRole}
+                    onChange={(e) => setNewMemberRole(e.target.value)}
+                    className="w-full mt-1 rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium focus:outline-none focus:border-[#0292fc]"
+                  >
+                    <option value="Orang Tua">Orang Tua / Lansia</option>
+                    <option value="Anak">Anak Remaja</option>
+                    <option value="Pasangan">Pasangan</option>
+                    <option value="Keluarga">Kerabat</option>
+                  </select>
+                </div>
+
+                <div className="pt-2 flex gap-2">
+                  <button
+                    type="submit"
+                    className="flex-1 rounded-xl bg-[#0292fc] py-2 text-xs font-bold text-white shadow-xs"
+                  >
+                    Simpan
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddModal(false)}
+                    className="rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600"
+                  >
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

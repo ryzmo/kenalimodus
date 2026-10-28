@@ -1,16 +1,52 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import AppHeader from "../components/AppHeader"
+import Image from "next/image"
 import BottomNav from "../components/BottomNav"
 import BottomSpace from "../components/BottomSpace"
-import ModusCard from "../components/ModusCard"
 import Icon from "../components/Icon"
 import { MODUS_LIST } from "../data/modusData"
 
+const DEFAULT_NOTIFICATIONS = [
+  {
+    id: "notif-1",
+    type: "threat",
+    title: "Peringatan: Modus APK Undangan & Tilang",
+    desc: "Waspada file .APK berbahaya di WhatsApp yang mencuri OTP & SMS.",
+    time: "10m lalu",
+    unread: true,
+    link: "/modus",
+    badge: "Darurat",
+  },
+  {
+    id: "notif-2",
+    type: "threat",
+    title: "CS Palsu Perubahan Tarif Transfer",
+    desc: "Penipu meminta nasabah klik link pembatalan palsu.",
+    time: "1j lalu",
+    unread: true,
+    link: "/modus",
+    badge: "Waspada",
+  },
+  {
+    id: "notif-3",
+    type: "challenge",
+    title: "2-Minute Scam Challenge Baru",
+    desc: "Latih ketajaman refleks perbankan digitalmu sekarang.",
+    time: "3j lalu",
+    unread: true,
+    link: "/challenge",
+    badge: "Tantangan",
+  }
+]
+
 export default function Home() {
-  const [safeScore, setSafeScore] = useState(78)
+  const [safeScore, setSafeScore] = useState(84)
   const [copied, setCopied] = useState(false)
   const [originUrl, setOriginUrl] = useState("https://kenalimodus.id")
+  const [selectedOrgan, setSelectedOrgan] = useState("apk")
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [notifications, setNotifications] = useState(DEFAULT_NOTIFICATIONS)
+  const notifRef = useRef(null)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -29,6 +65,22 @@ export default function Home() {
     }
   }, [])
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setNotificationsOpen(false)
+      }
+    }
+    if (notificationsOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [notificationsOpen])
+
+  const unreadCount = notifications.filter((n) => n.unread).length
+
   const handleCopyLink = () => {
     const url = `${originUrl}/challenge`
     if (typeof navigator !== "undefined" && navigator.clipboard) {
@@ -38,580 +90,370 @@ export default function Home() {
     setTimeout(() => setCopied(false), 2500)
   }
 
-  const [activeChannelModal, setActiveChannelModal] = useState(null)
-  const modusOfTheWeek = MODUS_LIST[0]
   const waShareUrl = `https://wa.me/?text=${encodeURIComponent(
     `Yuk uji seberapa aman kamu dari modus penipuan online terbaru di KENALI MODUS: ${originUrl}/challenge`
   )}`
 
+  const appServices = [
+    {
+      title: "2-Min Test",
+      sub: "Uji Refleks",
+      iconImg: "/3d-shield-icon.png",
+      href: "/challenge",
+      badge: "Utama",
+      badgeColor: "bg-amber-500",
+    },
+    {
+      title: "Katalog Modus",
+      sub: "Pola Penipuan",
+      iconImg: "/3d-alert-icon.png",
+      href: "/modus",
+      badge: null,
+    },
+    {
+      title: "Keluarga",
+      sub: "Pantau Lansia",
+      iconImg: "/3d-family-icon.png",
+      href: "/keluarga",
+      badge: null,
+    },
+    {
+      title: "Rewards",
+      sub: "Tukar Poin",
+      iconImg: "/3d-trophy-icon.png",
+      href: "/rewards",
+      badge: "Poin",
+      badgeColor: "bg-red-500",
+    },
+  ]
+
+  const scamFocusTypes = [
+    {
+      id: "apk",
+      label: "File APK",
+      sub: "Surat Tilang & Undangan",
+      risk: "Tinggi",
+      icon: "Smartphone",
+    },
+    {
+      id: "transfer",
+      label: "Tarif Palsu",
+      sub: "CS Gadungan Mengaku BCA",
+      risk: "Waspada",
+      icon: "PhoneCall",
+    },
+    {
+      id: "qr",
+      label: "QRIS Palsu",
+      sub: "Stiker Tempelan Merchant",
+      risk: "Sedang",
+      icon: "QrCode",
+    },
+  ]
+
   return (
-    <div className="app-shell">
-      <AppHeader />
+    <div className="app-shell flex justify-center bg-[#e7eff6] min-h-screen text-[#002554]">
+      {/* iOS Curved Device Mockup Frame */}
+      <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl min-h-screen md:min-h-0 md:my-5 md:rounded-[44px] shadow-2xl bg-gradient-to-b from-[#0292fc] via-[#85caff] to-[#f4faff] flex flex-col relative overflow-hidden border border-white/60 pb-safe">
 
-      <main className="mobile-container px-5 pb-8 md:px-8">
-        {/* Hero section */}
-        <section className="relative mt-5 overflow-hidden rounded-[2rem] gradient-brand p-6 text-white shadow-soft md:p-10">
-          <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-white/10 pointer-events-none" />
-          <div className="absolute -bottom-20 right-20 h-44 w-44 rounded-full bg-cyan-300/10 pointer-events-none" />
 
-          <div className="relative max-w-xl">
-            {/* Badge */}
-
-            {/* Heading */}
-            <h1 className="text-3xl font-black leading-tight md:text-5xl">
-              Yuk, kenali modusnya
-              <br />
-              sebelum jadi korbannya.
-            </h1>
-
-            <p className="mt-4 max-w-lg text-sm leading-6 text-blue-50 md:text-base font-normal">
-              Bukan sekadar membaca artikel. Latih refleks pengambilan keputusanmu lewat simulasi 2-Minute Challenge, ukur Safe Score, dan lindungi orang terdekat.
-            </p>
-
-            {/* Action buttons */}
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href="/challenge"
-                className="inline-flex items-center gap-2 rounded-2xl bg-[#0876c9] px-6 py-3.5 text-sm font-black text-white shadow-soft transition duration-200 hover:bg-[#075da8]"
-              >
-                Mulai 2-Minute Challenge
-              </Link>
-
-            </div>
-          </div>
-        </section>
-
-        {/* Core Habit Loop */}
-        <section className="mt-6 rounded-3xl bg-white p-5 shadow-soft md:p-7">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
-            <div>
-              <span className="inline-block rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#0876c9]">
-                Core Habit Loop
-              </span>
-              <h2 className="mt-2 text-xl font-black leading-tight text-[#102a54] md:text-2xl">
-                Dari edukasi pasif ke praktik pengambilan keputusan
-              </h2>
-            </div>
-            <p className="text-xs font-semibold text-slate-400">
-              5 Langkah Membangun Refleks Aman
-            </p>
-          </div>
-
-          {/* Stepper Timeline Grid */}
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-            {[
-              {
-                step: "01",
-                name: "Discover",
-                desc: "Pahami pola & skenario penipuan terbaru",
-              },
-              {
-                step: "02",
-                name: "Learn",
-                desc: "Analisis ciri, taktik, dan red flags",
-              },
-              {
-                step: "03",
-                name: "Practice",
-                desc: "Simulasi keputusan di bawah tekanan",
-              },
-              {
-                step: "04",
-                name: "Safe Score",
-                desc: "Ukur ketahanan & refleks keamanan",
-              },
-              {
-                step: "05",
-                name: "Protect",
-                desc: "Lindungi diri & keluarga bersama",
-              },
-            ].map((item, idx) => (
-              <div
-                key={item.step}
-                className="group relative flex flex-col justify-between rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 transition hover:border-blue-200 hover:bg-blue-50/40"
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black tracking-widest text-[#0876c9]">
-                      {item.step}
-                    </span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-slate-200 group-hover:bg-[#0876c9] transition" />
-                  </div>
-                  <h3 className="mt-2 text-sm font-black text-[#102a54]">
-                    {item.name}
-                  </h3>
-                  <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
-                    {item.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Quick features */}
-        <section className="mt-6 grid gap-4 md:grid-cols-3">
-          {/* Modus of the week */}
-          <div className="flex flex-col justify-between rounded-3xl bg-white p-5 shadow-soft md:col-span-2">
-            <div>
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    Modus of the week
-                  </p>
-                  <h2 className="mt-1 text-xl font-black text-[#102a54]">
-                    {modusOfTheWeek.title}
-                  </h2>
-                </div>
+        {/* NATIVE APP USER BAR (Exact like "Good Morning Sarah" in Reference Screen 3) */}
+        <div className="px-6 pt-7 flex items-center justify-between z-20">
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-full bg-white/30 p-0.5 border-2 border-white/50 shadow-sm flex items-center justify-center">
+              <div className="h-full w-full rounded-full bg-[#003882] flex items-center justify-center text-white font-black text-xs shadow-inner">
+                Hi
               </div>
             </div>
+            <div>
+              <div className="text-[11px] font-medium text-white/90 flex items-center gap-1 leading-none">
+                <span>Good Morning</span>
+                <span className="text-amber-300">👋</span>
+              </div>
+              <div className="text-base font-extrabold text-white tracking-tight mt-1">
+                Kenali Modus
+              </div>
+            </div>
+          </div>
 
-            <Link
-              href="/challenge"
-              className="mt-4 flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm font-black text-[#102a54] transition hover:bg-blue-50 hover:text-[#0876c9]"
+          {/* Native App Bell Button with Popover */}
+          <div className="relative" ref={notifRef}>
+            <button
+              type="button"
+              onClick={() => setNotificationsOpen(!notificationsOpen)}
+              className="h-10 w-10 rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center text-white shadow-xs active:scale-95 transition"
+              aria-label="Notifikasi"
             >
-              Coba skenarionya langsung
-              <Icon name="ChevronRight" size={18} />
-            </Link>
-          </div>
+              <Icon name="Bell" size={18} />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-400 ring-2 ring-white" />
+              )}
+            </button>
 
-          {/* Safe Score Preview */}
-          <div className="flex flex-col justify-between rounded-3xl bg-white p-5 shadow-soft">
-            <div>
-              <div className="flex items-center gap-2 text-[#0876c9]">
-                <Icon name="TrendingUp" size={18} />
-                <span className="text-[10px] font-black uppercase tracking-widest">
-                  Safe Score Anda
-                </span>
+            {/* Notification Popover */}
+            {notificationsOpen && (
+              <div className="absolute right-0 top-12 z-50 w-72 rounded-3xl border border-slate-100 bg-white p-3.5 shadow-2xl animate-in fade-in zoom-in-95 text-[#002554]">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <span className="text-xs font-bold text-[#003882]">Peringatan Keamanan</span>
+                  <span className="text-[10px] text-slate-400">{unreadCount} baru</span>
+                </div>
+                <div className="mt-2 divide-y divide-slate-50 max-h-56 overflow-y-auto">
+                  {notifications.map((n) => (
+                    <div key={n.id} className="py-2">
+                      <div className="text-[11px] font-bold text-[#003882]">{n.title}</div>
+                      <div className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">{n.desc}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
+            )}
+          </div>
+        </div>
 
-              <div className="mt-3 flex items-end gap-2">
-                <span className="text-4xl font-black text-[#102a54]">
+        {/* HERO TOP SECTION (Exact Sky Blue Gradient fading downward with 3D Robot Assistant) */}
+        <section className="px-6 pt-2 relative text-white">
+          <div className="flex items-center justify-between">
+            <div className="max-w-[200px] md:max-w-xs z-10">
+              <div className="flex items-baseline gap-1">
+                <span className="text-5xl md:text-6xl font-black tracking-tight text-white leading-none drop-shadow-sm">
                   {safeScore}
                 </span>
-                <span className="pb-1 text-sm font-bold text-slate-400">
-                  / 100
-                </span>
+                <span className="text-sm font-bold text-white/80">/100</span>
               </div>
 
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+              {/* Progress Slider Pill with knob (Exact Match to Screen 3) */}
+              <div className="mt-3.5 relative h-2.5 w-40 rounded-full bg-white/30 backdrop-blur-xs flex items-center">
                 <div
-                  className="h-full rounded-full bg-[#0876c9] transition-all duration-500"
+                  className="h-full rounded-full bg-white transition-all duration-700"
                   style={{ width: `${safeScore}%` }}
+                />
+                <div
+                  className="absolute h-4 w-4 rounded-full bg-[#0292fc] border-2 border-white shadow-md"
+                  style={{ left: `calc(${safeScore}% - 8px)` }}
                 />
               </div>
 
-              <p className="mt-2 text-[11px] text-slate-400">
-                Berdasarkan hasil evaluasi challenge terakhirmu.
-              </p>
-            </div>
-
-            <Link
-              href="/hasil"
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-black text-[#0876c9] hover:underline"
-            >
-              Lihat profil & rekomendasi
-              <Icon name="ArrowRight" size={15} />
-            </Link>
-          </div>
-        </section>
-
-        {/* BCA Official #AwasModus Banner */}
-        <section className="mt-6 rounded-3xl gradient-brand p-5 text-white shadow-soft md:p-7">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-cyan-400/20 border border-cyan-300/30 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-cyan-200">
-                  #AWASMODUS BCA
-                </span>
-                <span className="text-[11px] text-blue-200 font-semibold">
-                  Mantra Jitu B-C-A Lawan Penipu
-                </span>
+              <div className="mt-3 text-xs font-semibold text-white/95 leading-snug drop-shadow-xs">
+                Complete your AI anti-scam check in just 2 minutes today.
               </div>
-              <h3 className="mt-2 text-base font-black md:text-lg">
-                Jangan Tertipu Website Palsu! Terapkan Rumus B-C-A
-              </h3>
-              <p className="mt-1 text-xs text-blue-100 max-w-xl">
-                Buka dengan ketik manual, Cek keaslian website, dan Ayo bintangin di browsermu. Tonton video edukasi & baca artikel resmi Bank BCA.
-              </p>
+
+              {/* <Link
+                href="/challenge"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/35 backdrop-blur-md px-4 py-2 text-xs font-black text-white border border-white/60 shadow-sm active:scale-95 transition hover:bg-white/45"
+              >
+                <span>Continue</span>
+              </Link> */}
             </div>
 
-            <Link
-              href="/modus"
-              className="shrink-0 inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-xs font-black text-[#075da8] shadow-md hover:bg-slate-100 transition"
-            >
-              <span>Tonton & Baca Edukasi</span>
-              <Icon name="ArrowRight" size={14} />
-            </Link>
-          </div>
-        </section>
-
-        {/* Modus terbaru list */}
-        <section className="mt-8">
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                Stay updated
-              </p>
-              <h2 className="mt-1 text-2xl font-black text-[#102a54]">
-                Modus Terbaru
-              </h2>
-            </div>
-
-            <Link
-              href="/modus"
-              className="inline-flex items-center gap-1 text-sm font-black text-[#0876c9] hover:underline"
-            >
-              Lihat semua
-              <Icon name="ChevronRight" size={15} />
-            </Link>
-          </div>
-
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
-            {MODUS_LIST.slice(0, 3).map((item) => (
-              <ModusCard
-                key={item.id}
-                tag={item.tag}
-                title={item.title}
-                desc={item.desc}
-                level={item.level}
-                icon={item.icon}
+            <div className="relative w-44 h-48 sm:w-52 sm:h-56 shrink-0 drop-shadow-2xl  scale-100 -translate-y-5">
+              <Image
+                src="/image2.png"
+                alt="3D BCA Cyber Cop Assistant"
+                fill
+                priority
+                className="object-contain"
               />
-            ))}
-          </div>
-        </section>
-
-        {/* Kanal implementasi & distribusi */}
-        <section className="mt-8">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-1">
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#0876c9]">
-                Omnichannel Strategy
-              </span>
-              <h2 className="mt-1 text-2xl font-black text-[#102a54]">
-                Kanal & Implementasi
-              </h2>
-            </div>
-            <p className="text-xs font-semibold text-slate-400">
-              Integrasi ekosistem distribusi Kenali Modus
-            </p>
-          </div>
-
-          <div className="mt-4 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-            {/* 1. myBCA */}
-            <div
-              onClick={() =>
-                setActiveChannelModal({
-                  type: "myBCA",
-                  badge: "In-App Feature",
-                  title: "Integrasi myBCA",
-                  subtitle: "Banner & Card Menuju Challenge / Modus Terbaru",
-                  desc: "Nasabah myBCA dapat mengakses modul Kenali Modus langsung dari homepage aplikasi myBCA melalui banner dinamis atau card rekomendasi berbasis risiko transaksi nasabah.",
-                  previewType: "mybca",
-                })
-              }
-              className="group cursor-pointer rounded-3xl border border-slate-100 bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-md"
-            >
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[#0876c9]">
-                  myBCA
-                </span>
-                <span className="text-[11px] font-bold text-[#0876c9] group-hover:translate-x-0.5 transition">
-                  Lihat Mockup →
-                </span>
-              </div>
-              <h3 className="mt-3 text-base font-black text-[#102a54]">
-                In-App Banner / Card
-              </h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
-                Banner/card interaktif di beranda aplikasi myBCA menuju 2-Minute Challenge atau modul modus perbankan terbaru.
-              </p>
-            </div>
-
-            {/* 2. Media Sosial */}
-            <div
-              onClick={() =>
-                setActiveChannelModal({
-                  type: "social",
-                  badge: "Social Media Campaign",
-                  title: "Media Sosial & Edukasi Viral",
-                  subtitle: "Konten Modus of the Week + Direct Link Challenge",
-                  desc: "Konten infografis micro-learning & carousel interaktif di Instagram, TikTok, dan X Bank BCA dengan hook kasus viral nyata dan link instan menuju simulasi challenge.",
-                  previewType: "social",
-                })
-              }
-              className="group cursor-pointer rounded-3xl border border-slate-100 bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:border-purple-200 hover:shadow-md"
-            >
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-purple-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-purple-700">
-                  Media Sosial
-                </span>
-                <span className="text-[11px] font-bold text-purple-700 group-hover:translate-x-0.5 transition">
-                  Lihat Mockup →
-                </span>
-              </div>
-              <h3 className="mt-3 text-base font-black text-[#102a54]">
-                Modus of the Week
-              </h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
-                Konten mingguan viral di medsos resmi BCA yang mengulas modus hangat dengan tautan langsung ke latihan challenge.
-              </p>
-            </div>
-
-            {/* 3. QR Campaign */}
-            <div
-              onClick={() =>
-                setActiveChannelModal({
-                  type: "qr",
-                  badge: "On-Ground & Collateral",
-                  title: "QR Code Campaign",
-                  subtitle: "Poster Cabang, Booth Acara, Merchandise & Edukatips",
-                  desc: "QR Code khusus tercetak pada standing banner kantor cabang BCA, merchant partner, booth pameran, serta merchandise nasabah untuk scan-and-play di tempat.",
-                  previewType: "qr",
-                })
-              }
-              className="group cursor-pointer rounded-3xl border border-slate-100 bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:border-emerald-200 hover:shadow-md"
-            >
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700">
-                  QR Campaign
-                </span>
-                <span className="text-[11px] font-bold text-emerald-700 group-hover:translate-x-0.5 transition">
-                  Lihat Mockup →
-                </span>
-              </div>
-              <h3 className="mt-3 text-base font-black text-[#102a54]">
-                Scan QR Code Fisik
-              </h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
-                QR code pada poster kantor cabang, booth event, merchandise, dan flyer materi edukasi nasabah.
-              </p>
-            </div>
-
-            {/* 4. Push Notification */}
-            <div
-              onClick={() =>
-                setActiveChannelModal({
-                  type: "push",
-                  badge: "Real-Time Alert",
-                  title: "Push Notification Cerdas",
-                  subtitle: "Early Warning Saat Modus Baru Sedang Marak",
-                  desc: "Notifikasi pintar berbasis kejadian aktual yang langsung mengingatkan nasabah jika ada lonjakan modus penipuan berkedok promo/undian/file undangan.",
-                  previewType: "push",
-                })
-              }
-              className="group cursor-pointer rounded-3xl border border-slate-100 bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:border-amber-200 hover:shadow-md"
-            >
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-amber-700">
-                  Push Notification
-                </span>
-                <span className="text-[11px] font-bold text-amber-700 group-hover:translate-x-0.5 transition">
-                  Lihat Mockup →
-                </span>
-              </div>
-              <h3 className="mt-3 text-base font-black text-[#102a54]">
-                Alert Modus Ramai
-              </h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
-                Pemberitahuan instan di smartphone saat terdeteksi gelombang modus baru yang membutuhkan kewaspadaan ekstra.
-              </p>
             </div>
           </div>
         </section>
 
-        {/* Protect others & sharing */}
-        <section className="mt-8 rounded-3xl border border-blue-100 bg-blue-50/70 p-5 md:p-7">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex gap-4">
-              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white text-[#0876c9] shadow-sm">
-                <Icon name="UsersRound" size={22} />
-              </div>
+        {/* BOTTOM SHEET: Soft Sky-White to Clean Card Container */}
+        <main className="flex-1 bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] px-5 pt-5 space-y-4 md:space-y-5 shadow-2xl">
+
+          {/* 1. EMERGENCY SCAM CALLOUT (Glassmorphic Card matching Screen 3 "Emergency Call") */}
+          <section className="glass-card rounded-[26px] p-3.5 flex items-center justify-between gap-3 shadow-soft border border-white/90">
+            <div className="flex items-center gap-3">
 
               <div>
-                <h2 className="font-black text-[#102a54] text-base md:text-lg">
-                  Lindungi Orang di Sekitarmu
-                </h2>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500 max-w-lg">
-                  Sudah selesai challenge? Bagikan link challenge ini ke keluarga atau teman di WhatsApp supaya mereka ikut menguji refleks keamanan mereka.
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-black text-[#002554]">
+                    Emergency Call (Halo BCA)
+                  </span>
+                  <span className="rounded-full bg-red-100 text-red-700 text-[8px] font-extrabold px-1.5 py-0.2">
+                    1500888
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-500 font-medium leading-tight mt-0.5">
+                  Call now for urgent anti-fraud help & blocking
+                </div>
               </div>
             </div>
 
-            <div className="flex shrink-0 gap-2">
+            <a
+              href="tel:1500888"
+              className="h-10 w-10 shrink-0 rounded-full bg-[#001c3d] text-white flex items-center justify-center shadow-md hover:bg-[#002d60] transition active:scale-95"
+              aria-label="Panggil Halo BCA"
+            >
+              <Icon name="PhoneCall" size={17} />
+            </a>
+          </section>
+
+          {/* 2. 3D GLOSSY SERVICES (Matching 2x2 Clean Vitals Grid in Screen 3) */}
+          <section>
+
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {appServices.map((service) => (
+                <Link
+                  key={service.title}
+                  href={service.href}
+                  className="glass-card rounded-[24px] p-3.5 flex flex-col justify-between group active:scale-95 transition hover:shadow-md border border-white"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="relative h-12 w-12 rounded-2xl overflow-hidden shadow-2xs group-hover:scale-105 transition">
+                      <Image
+                        src={service.iconImg}
+                        alt={service.title}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    {service.badge && (
+                      <span
+                        className={`text-[8px] font-black text-white px-2 py-0.5 rounded-full ${service.badgeColor} shadow-2xs`}
+                      >
+                        {service.badge}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-3">
+                    <div className="text-xs font-black text-[#002554] leading-tight">
+                      {service.title}
+                    </div>
+
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* 4. RUMUS B-C-A LAWAN PENIPU (Pill Card) */}
+          <section className="rounded-[26px] bg-gradient-to-r from-[#0292fc] via-[#21a4ff] to-[#47b5ff] p-4 text-white shadow-soft">
+            <div className="flex items-center justify-between">
+              <span className="rounded-lg bg-white/25 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+                #AWASMODUS
+              </span>
+              <span className="text-[10px] text-white/90 font-semibold">
+                Rumus Jitu B-C-A
+              </span>
+            </div>
+
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              <div className="rounded-2xl bg-white/15 p-2.5 text-center border border-white/20 backdrop-blur-xs">
+                <div className="text-base font-black text-white leading-none">B</div>
+                <div className="text-[11px] font-extrabold text-white mt-1">Buka Manual</div>
+                <div className="text-[8px] text-white/80">Ketik link resmi</div>
+              </div>
+              <div className="rounded-2xl bg-white/15 p-2.5 text-center border border-white/20 backdrop-blur-xs">
+                <div className="text-base font-black text-white leading-none">C</div>
+                <div className="text-[11px] font-extrabold text-white mt-1">Cek Keaslian</div>
+                <div className="text-[8px] text-white/80">Domain bca.co.id</div>
+              </div>
+              <div className="rounded-2xl bg-white/15 p-2.5 text-center border border-white/20 backdrop-blur-xs">
+                <div className="text-base font-black text-white leading-none">A</div>
+                <div className="text-[11px] font-extrabold text-white mt-1">Ayo Simpan</div>
+                <div className="text-[8px] text-white/80">Bintangin web</div>
+              </div>
+            </div>
+          </section>
+
+          {/* 5. MODUS TERKINI (Interactive Action Cards) */}
+          <section>
+            <div className="flex items-center justify-between px-1 mb-2.5">
+              <div className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-[#0292fc] animate-ping" />
+                <h2 className="text-xs font-black uppercase tracking-wider text-[#002554]">
+                  Modus Sedang Ramai
+                </h2>
+              </div>
+              <Link
+                href="/modus"
+                className="text-xs font-bold text-[#0292fc] hover:underline"
+              >
+                Lihat Semua
+              </Link>
+            </div>
+
+            <div className="space-y-2.5">
+              {MODUS_LIST.slice(0, 3).map((item) => {
+                const iconName =
+                  item.category === "Impersonation"
+                    ? "PhoneCall"
+                    : item.category === "APK Berbahaya"
+                      ? "Smartphone"
+                      : "Link"
+
+                return (
+                  <Link
+                    key={item.id}
+                    href="/challenge"
+                    className="glass-card rounded-[22px] p-3.5 flex items-center justify-between gap-3 active:scale-98 transition hover:border-blue-200 border border-white group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="h-11 w-11 shrink-0 rounded-2xl bg-gradient-to-br from-blue-50 to-sky-100/60 text-[#0292fc] flex items-center justify-center border border-blue-100 shadow-2xs group-hover:scale-105 transition">
+                        <Icon name={iconName} size={20} strokeWidth={2.2} />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="text-xs font-black text-[#002554] truncate">
+                          {item.title}
+                        </h3>
+                        <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                          {item.description || item.desc}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="h-8 w-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shrink-0 group-hover:bg-[#0292fc] group-hover:text-white transition">
+                      <Icon name="ChevronRight" size={16} />
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </section>
+
+          {/* 6. SHARE KE KELUARGA (Unified iOS Blue Theme) */}
+          <section className="glass-card rounded-[26px] p-3.5 flex items-center justify-between gap-3 border border-white">
+            <div className="flex items-center gap-3">
+              <div className="h-11 w-11 shrink-0 rounded-2xl bg-gradient-to-br from-[#0292fc] to-[#0055b8] text-white flex items-center justify-center shadow-sm">
+                <Icon name="UsersRound" size={19} strokeWidth={2.2} />
+              </div>
+              <div>
+                <div className="text-xs font-black text-[#002554]">
+                  Lindungi Keluarga
+                </div>
+                <div className="text-[10px] text-slate-500 leading-tight mt-0.5">
+                  Ajak kerabat uji refleks keamanan online
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
               <a
                 href={waShareUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-2xl bg-[#0876c9] px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-[#075da8]"
+                className="flex h-9 items-center gap-1.5 rounded-xl bg-[#0292fc] px-3.5 text-xs font-bold text-white shadow-xs hover:bg-[#007ad6] active:scale-95 transition"
               >
-                <Icon name="MessageSquare" size={15} />
-                Share WhatsApp
+                <span>Share</span>
               </a>
-
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="inline-flex items-center gap-1.5 rounded-2xl bg-white border border-slate-200 px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 active:scale-95 shadow-2xs hover:bg-slate-50 transition"
+                aria-label="Salin Link"
               >
-                <Icon name="Copy" size={15} />
-                {copied ? "Tersalin!" : "Salin Link"}
+                {copied ? <span className="text-[10px] font-bold text-[#0292fc]">✓</span> : <Icon name="Copy" size={14} />}
               </button>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Modal Detail Kanal & Implementasi */}
-        {activeChannelModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="relative w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-              <div className="flex items-start justify-between">
-                <span className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#0876c9]">
-                  {activeChannelModal.badge}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setActiveChannelModal(null)}
-                  className="grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 font-bold"
-                >
-                  ✕
-                </button>
-              </div>
+          <BottomSpace />
+        </main>
 
-              <h2 className="mt-3 text-xl font-black text-[#102a54]">
-                {activeChannelModal.title}
-              </h2>
-              <p className="mt-1 text-xs font-bold text-[#0876c9]">
-                {activeChannelModal.subtitle}
-              </p>
-              <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                {activeChannelModal.desc}
-              </p>
-
-              {/* Mockup Preview Visualizer */}
-              <div className="mt-5 rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                  Simulasi Tampilan Implementasi
-                </div>
-
-                {activeChannelModal.previewType === "mybca" && (
-                  <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-[#102a54] to-[#0876c9] p-4 text-white shadow-sm">
-                    <div className="flex items-center justify-between text-[10px] text-cyan-200 font-bold">
-                      <span>myBCA Home Card</span>
-                      <span className="bg-white/20 px-2 py-0.5 rounded-full text-white">Baru</span>
-                    </div>
-                    <div className="mt-2 text-sm font-black">
-                      Berapa Skor Ketahanan Finansialmu?
-                    </div>
-                    <p className="mt-1 text-[11px] text-blue-100">
-                      Ikuti 2-Minute Scam Challenge langsung di myBCA dan dapatkan lencana nasabah waspada!
-                    </p>
-                    <Link
-                      href="/challenge"
-                      onClick={() => setActiveChannelModal(null)}
-                      className="mt-3 inline-block rounded-xl bg-white px-3.5 py-1.5 text-xs font-black text-[#075da8]"
-                    >
-                      Buka Challenge
-                    </Link>
-                  </div>
-                )}
-
-                {activeChannelModal.previewType === "social" && (
-                  <div className="rounded-2xl border border-purple-100 bg-white p-4 shadow-sm">
-                    <div className="flex items-center gap-2.5">
-                      <div className="h-8 w-8 rounded-full bg-[#102a54] flex items-center justify-center text-[10px] font-black text-white">
-                        BCA
-                      </div>
-                      <div>
-                        <div className="text-xs font-black text-[#102a54]">@GoodLifeBCA</div>
-                        <div className="text-[10px] text-slate-400">Sponsored • Modus of the Week</div>
-                      </div>
-                    </div>
-                    <div className="mt-2 text-xs text-slate-700">
-                      <strong>Hati-hati modus file APK Surat Tilang / Undangan!</strong> Jangan sembarangan klik file .apk di WhatsApp. Coba tes kemampuanmu di Kenali Modus sekarang:
-                    </div>
-                    <div className="mt-3 rounded-xl bg-slate-100 p-2.5 flex items-center justify-between text-xs">
-                      <span className="font-bold text-[#102a54]">kenalimodus.id/challenge</span>
-                      <Link
-                        href="/challenge"
-                        onClick={() => setActiveChannelModal(null)}
-                        className="rounded-lg bg-purple-600 px-3 py-1 font-bold text-white text-[11px]"
-                      >
-                        Play Now
-                      </Link>
-                    </div>
-                  </div>
-                )}
-
-                {activeChannelModal.previewType === "qr" && (
-                  <div className="flex flex-col sm:flex-row items-center gap-4 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
-                    <div className="flex flex-col items-center justify-center rounded-xl bg-emerald-50 border-2 border-dashed border-emerald-300 p-3 w-28 h-28 shrink-0 text-emerald-800 font-mono">
-                      <div className="text-xs font-black">QR CODE</div>
-                      <div className="text-[9px] font-bold text-emerald-600 mt-1">SCAN ME</div>
-                    </div>
-                    <div>
-                      <div className="text-xs font-black text-[#102a54]">
-                        Poster & Standee Cabang BCA
-                      </div>
-                      <p className="mt-1 text-[11px] text-slate-500">
-                        "Sambil menunggu antrean di Customer Service, scan QR untuk mainkan 2-Minute Scam Challenge dan tukarkan reward!"
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {activeChannelModal.previewType === "push" && (
-                  <div className="rounded-2xl border border-amber-200 bg-white p-4 shadow-sm">
-                    <div className="flex items-center justify-between text-[10px] text-slate-400">
-                      <span className="font-bold text-amber-700 flex items-center gap-1">
-                        BCA Safe Alert • Sekarang
-                      </span>
-                      <span>Baru saja</span>
-                    </div>
-                    <div className="mt-1 text-xs font-black text-[#102a54]">
-                      Waspada Modus Scamming APK Mengatasnamakan Kurir Paket!
-                    </div>
-                    <p className="mt-1 text-[11px] text-slate-600">
-                      Sedang ramai modus APK kirim resi. Kenali ciri-cirinya dalam 1 menit sebelum Anda atau keluarga menjadi korban.
-                    </p>
-                    <div className="mt-2.5 flex gap-2">
-                      <Link
-                        href="/modus"
-                        onClick={() => setActiveChannelModal(null)}
-                        className="rounded-lg bg-amber-600 px-3 py-1 font-bold text-white text-[11px]"
-                      >
-                        Lihat Modus
-                      </Link>
-                      <Link
-                        href="/challenge"
-                        onClick={() => setActiveChannelModal(null)}
-                        className="rounded-lg bg-slate-100 px-3 py-1 font-bold text-slate-700 text-[11px]"
-                      >
-                        Uji Skenario
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-5 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setActiveChannelModal(null)}
-                  className="rounded-2xl bg-slate-100 px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-200 transition"
-                >
-                  Tutup
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <BottomSpace />
-      </main>
-
-      <BottomNav />
-    </div>
+        <BottomNav />
+      </div>
+    </div >
   )
 }

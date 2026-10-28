@@ -19,13 +19,10 @@ export default function BottomNav() {
     {
       href: "/challenge",
       label: "Challenge",
-      icon: "Zap"
+      icon: "Zap",
+      highlight: true
     },
-    {
-      href: "/rewards",
-      label: "Rewards",
-      icon: "Trophy"
-    },
+
     {
       href: "/keluarga",
       label: "Keluarga",
@@ -39,27 +36,52 @@ export default function BottomNav() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur md:bottom-5 md:left-1/2 md:right-auto md:w-[620px] md:-translate-x-1/2 md:rounded-3xl md:border md:shadow-soft">
-      <div className="mx-auto grid max-w-lg grid-cols-6 px-1 py-2">
+    <nav className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm md:max-w-md floating-nav rounded-full px-3 py-2">
+      <div className="flex items-center justify-between">
         {items.map((item) => {
           const active = router.pathname === item.href
+
+          if (item.highlight) {
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="relative -top-3 flex flex-col items-center group"
+                aria-label="Mulai Challenge"
+              >
+                <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-[#003882] via-[#0055b8] to-[#0088ff] text-white flex items-center justify-center shadow-lg group-hover:scale-105 active:scale-95 transition ring-4 ring-white">
+                  <Icon name="Zap" size={22} strokeWidth={2.5} />
+                </div>
+                <span className="text-[9px] font-extrabold text-[#003882] mt-0.5 tracking-tight">
+                  {item.label}
+                </span>
+              </Link>
+            )
+          }
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-1 rounded-2xl py-2 text-[11px] font-bold transition ${
-                active
-                  ? "bg-blue-50 text-[#0876c9]"
-                  : "text-slate-400 hover:text-[#0876c9]"
-              }`}
+              className={`flex flex-col items-center justify-center py-1 transition ${active ? "text-[#003882]" : "text-slate-400 hover:text-slate-600"
+                }`}
             >
-              <Icon
-                name={item.icon}
-                size={20}
-                strokeWidth={active ? 2.7 : 2}
-              />
-              <span>{item.label}</span>
+              <div
+                className={`h-8 w-8 rounded-full flex items-center justify-center transition ${active ? "bg-blue-50 text-[#003882]" : "text-slate-400"
+                  }`}
+              >
+                <Icon
+                  name={item.icon}
+                  size={18}
+                  strokeWidth={active ? 2.6 : 1.8}
+                />
+              </div>
+              <span
+                className={`text-[9px] tracking-tight ${active ? "font-extrabold text-[#003882]" : "font-semibold"
+                  }`}
+              >
+                {item.label}
+              </span>
             </Link>
           )
         })}

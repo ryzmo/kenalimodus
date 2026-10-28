@@ -323,150 +323,141 @@ export default function ChallengePage() {
   }
 
   return (
-    <div className="app-shell">
-      <AppHeader />
+    <div className="app-shell flex justify-center bg-[#e7eff6] min-h-screen text-[#002554]">
+      {/* iOS App Frame */}
+      <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl min-h-screen md:min-h-0 md:my-5 md:rounded-[44px] shadow-2xl bg-gradient-to-b from-[#0292fc] via-[#85caff] to-[#f4faff] flex flex-col relative overflow-hidden border border-white/60 pb-safe">
+        
+        <AppHeader title="2-Min Challenge" subtitle="Simulasi Refleks Digital" />
 
-      <main className="mobile-container px-5 pb-8 md:px-8">
-        {/* Stage 0: Challenge Intro */}
-        {stage === "intro" && (
-          <section className="mt-6 rounded-3xl bg-white p-6 shadow-soft md:p-9">
-
-            <h1 className="text-2xl font-black leading-tight text-[#102a54] md:text-3xl">
-              2-Minute Scam Challenge
-            </h1>
-
-            <p className="mt-3 text-sm leading-relaxed text-slate-600">
-              Uji ketajaman refleks Anda menghadapi modus penipuan perbankan digital terbaru seperti CS Palsu via WhatsApp,
-              file APK berbahaya, link phishing login, tawaran deposit modal, dan QRIS palsu.
-            </p>
-
-            {/* Input Data Profil Peserta (Nama & Umur) */}
-            <div className="mt-6 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/70 to-slate-50 p-4 sm:p-5">
-              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#0876c9] mb-3">
-                <Icon name="User" size={15} />
-                Profil Peserta Challenge
+        {/* Top Header Information in Sky Blue Area */}
+        <section className="px-6 pt-1 pb-5 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-sky-100">
+                Latihan Refleks Cepat
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    Nama Lengkap / Panggilan
-                  </label>
-                  <input
-                    type="text"
-                    value={participantName}
-                    onChange={(e) => setParticipantName(e.target.value)}
-                    placeholder="Contoh: Budi Santoso"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 font-semibold focus:border-[#0876c9] focus:outline-none shadow-sm transition"
-                  />
+              <div className="text-xl font-black text-white mt-0.5">
+                {stage === "intro" ? "Kenali Trik Penipuan" : `Tahap: ${stage.replace("_", " ").toUpperCase()}`}
+              </div>
+            </div>
+
+            {timerActive && (
+              <div className="rounded-2xl bg-white/20 backdrop-blur-md px-3 py-1.5 border border-white/40 text-center">
+                <div className="text-[9px] uppercase font-bold text-sky-100">Sisa Waktu</div>
+                <div className="text-sm font-black text-white">{timeLeft} dtk</div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* BOTTOM SHEET */}
+        <main className="flex-1 bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] px-5 pt-5 space-y-4 shadow-2xl">
+          {/* Stage 0: Challenge Intro */}
+          {stage === "intro" && (
+            <section className="glass-card rounded-[28px] p-5 border border-white">
+              <h1 className="text-lg font-black leading-tight text-[#002554]">
+                2-Minute Scam Challenge
+              </h1>
+
+              <p className="mt-2 text-xs leading-relaxed text-slate-600">
+                Uji ketajaman refleks Anda menghadapi modus penipuan perbankan digital terbaru seperti CS Palsu via WhatsApp,
+                file APK berbahaya, link phishing, dan QRIS tempelan.
+              </p>
+
+              {/* Input Data Profil Peserta */}
+              <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
+                <div className="text-xs font-black uppercase tracking-wider text-[#0292fc] mb-3">
+                  Profil Peserta Challenge
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    Umur (Tahun)
-                  </label>
-                  <div className="relative">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      Nama Peserta
+                    </label>
+                    <input
+                      type="text"
+                      value={participantName}
+                      onChange={(e) => setParticipantName(e.target.value)}
+                      placeholder="Contoh: Budi"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 font-semibold focus:border-[#0292fc] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      Umur
+                    </label>
                     <input
                       type="number"
                       min="10"
                       max="100"
                       value={participantAge}
                       onChange={(e) => setParticipantAge(e.target.value ? parseInt(e.target.value, 10) : "")}
-                      placeholder="Contoh: 25"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-14 text-xs text-slate-800 font-semibold focus:border-[#0876c9] focus:outline-none shadow-sm transition"
+                      placeholder="25"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 font-semibold focus:border-[#0292fc] focus:outline-none"
                     />
-                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                      Tahun
-                    </span>
                   </div>
                 </div>
               </div>
-              <p className="mt-2 text-[11px] text-slate-400">
-                Data profil digunakan untuk analisis demografi & rekap evaluasi keamanan.
-              </p>
-            </div>
 
-            {/* Steps Info Cards */}
-            <div className="mt-6 grid gap-4 md:grid-cols-3">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-center gap-2 text-xs font-black text-[#102a54]">
-                  <span className="grid h-6 w-6 place-items-center rounded-full bg-[#102a54] text-white text-[11px]">
-                    1
-                  </span>
-                  Refleks Awal (1,5 Menit)
+              {/* 3 Simple Steps */}
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                <div className="rounded-2xl bg-white p-2.5 border border-slate-100 text-center">
+                  <div className="text-xs font-black text-[#0292fc]">1. Spontan</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">5 Kasus Awal</div>
                 </div>
-                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-                  Selesaikan 5 skenario nyata secara cepat dan spontan untuk mengetahui Safe Score awal Anda.
-                </p>
+                <div className="rounded-2xl bg-white p-2.5 border border-slate-100 text-center">
+                  <div className="text-xs font-black text-[#0292fc]">2. Edukasi</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Kunci Rahasia</div>
+                </div>
+                <div className="rounded-2xl bg-white p-2.5 border border-slate-100 text-center">
+                  <div className="text-xs font-black text-[#0292fc]">3. Akhir</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Safe Score</div>
+                </div>
               </div>
 
-              <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
-                <div className="flex items-center gap-2 text-xs font-black text-[#0876c9]">
-                  <span className="grid h-6 w-6 place-items-center rounded-full bg-[#0876c9] text-white text-[11px]">
-                    2
-                  </span>
-                  Kunci Pengamanan
-                </div>
-                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-                  Pelajari pola jebakan manipulasi psikologis dan 5 aturan penting perlindungan akun.
-                </p>
+              <div className="mt-5">
+                <button
+                  type="button"
+                  onClick={handleStartPreTest}
+                  className="w-full rounded-2xl bg-[#0292fc] py-3 text-xs font-black text-white shadow-md transition hover:bg-[#007ad6] active:scale-95"
+                >
+                  Mulai Challenge Sekarang →
+                </button>
               </div>
+            </section>
+          )}
 
-              <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4">
-                <div className="flex items-center gap-2 text-xs font-black text-emerald-700">
-                  <span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-600 text-white text-[11px]">
-                    3
+          {/* Stage 1: Pre-Test */}
+          {stage === "pre_test" && activePreScenario && (
+            <div className="space-y-3">
+              <div className="glass-card rounded-[28px] p-5 border border-white">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase text-[#0292fc] bg-blue-50 px-2.5 py-0.5 rounded-full">
+                    Skenario {currentStep + 1} dari {PRE_TEST_SCENARIOS.length}
                   </span>
-                  Tantangan Akhir (1,5 Menit)
-                </div>
-                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-                  Terapkan refleks keamanan Anda pada skenario baru dan peroleh Safe Score tertinggi.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={handleStartPreTest}
-                className="flex items-center gap-2 rounded-2xl bg-[#0876c9] px-6 py-3.5 text-sm font-black text-white shadow-md transition hover:bg-[#075da8]"
-              >
-                Mulai Challenge Sekarang
-                <Icon name="ArrowRight" size={17} />
-              </button>
-            </div>
-          </section>
-        )}
-
-        {/* Stage 1: Pre-Test */}
-        {stage === "pre_test" && activePreScenario && (
-          <div className="mt-6">
-            <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
-                    Tantangan Bagian 1
+                  <span className="text-[10px] font-bold text-slate-400">
+                    {activePreScenario.category}
                   </span>
-                  <h2 className="mt-1 text-base font-black text-[#102a54]">
-                    Skenario {currentStep + 1} dari {PRE_TEST_SCENARIOS.length}: {activePreScenario.category}
-                  </h2>
                 </div>
 
                 {/* 1.5-Minute Timer Display */}
-                <div className="flex items-center gap-2 rounded-xl bg-slate-100 border border-slate-200 px-3 py-1.5 font-mono text-xs font-black text-[#102a54]">
-                  <Icon name="Clock" size={15} className={timeLeft < 30 ? "text-red-500 animate-pulse" : "text-[#0876c9]"} />
-                  <span className={timeLeft < 30 ? "text-red-600" : "text-[#102a54]"}>
-                    {formatTimer(timeLeft)}
-                  </span>
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2 rounded-xl bg-slate-100 border border-slate-200 px-3 py-1.5 font-mono text-xs font-black text-[#102a54]">
+                    <Icon name="Clock" size={15} className={timeLeft < 30 ? "text-red-500 animate-pulse" : "text-[#0876c9]"} />
+                    <span className={timeLeft < 30 ? "text-red-600" : "text-[#102a54]"}>
+                      {formatTimer(timeLeft)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full bg-[#0876c9] transition-all duration-300"
+                    style={{ width: `${((currentStep + 1) / PRE_TEST_SCENARIOS.length) * 100}%` }}
+                  />
                 </div>
               </div>
-
-              {/* Progress Bar */}
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full bg-[#0876c9] transition-all duration-300"
-                  style={{ width: `${((currentStep + 1) / PRE_TEST_SCENARIOS.length) * 100}%` }}
-                />
-              </div>
-            </div>
 
             {/* Scenario Card */}
             <div className="mt-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
@@ -807,10 +798,11 @@ export default function ChallengePage() {
             </div>
           </div>
         )}
-      </main>
+          <BottomSpace />
+        </main>
 
-      <BottomSpace />
-      <BottomNav />
+        <BottomNav />
+      </div>
     </div>
   )
 }
