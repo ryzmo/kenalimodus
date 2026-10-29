@@ -111,7 +111,7 @@ export default function KeluargaPage() {
   return (
     <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff]">
       <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
-        
+
         <AppHeader title="Grup Keluarga" subtitle="Perlindungan Multi-Generasi" />
 
         {/* Top Family Summary Header */}
@@ -129,15 +129,6 @@ export default function KeluargaPage() {
               </div>
             </div>
 
-            <div className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center p-2 shadow-sm">
-              <Image
-                src="/3d-family-icon.png"
-                alt="Family Protection"
-                width={48}
-                height={48}
-                className="object-contain"
-              />
-            </div>
           </div>
 
           {/* Quick Actions in Header */}
@@ -161,7 +152,7 @@ export default function KeluargaPage() {
 
         {/* BOTTOM SHEET: Member List & Vulnerability Cards */}
         <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10"><div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-5">
-          
+
           {nudgedMember && (
             <div className="rounded-2xl bg-[#003882] text-white p-3 text-xs font-bold text-center animate-in fade-in">
               Pesan pengingat WhatsApp dikirimkan ke {nudgedMember}!
@@ -172,7 +163,7 @@ export default function KeluargaPage() {
             <span className="text-xs font-black uppercase tracking-wider text-[#002554]">
               Status Ketahanan Anggota
             </span>
-            <span className="text-[11px] text-slate-400">Deteksi Risiko Skenario</span>
+
           </div>
 
           <div className="space-y-3">
@@ -202,13 +193,12 @@ export default function KeluargaPage() {
                         <span className="text-xs font-bold text-slate-400">/100</span>
                       </div>
                       <span
-                        className={`inline-block mt-1 text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                          m.score >= 80
-                            ? "bg-emerald-50 text-emerald-600"
-                            : m.score >= 60
-                              ? "bg-amber-50 text-amber-600"
-                              : "bg-red-50 text-red-600"
-                        }`}
+                        className={`inline-block mt-1 text-[9px] font-bold px-2 py-0.5 rounded-full ${m.score >= 80
+                          ? "bg-emerald-50 text-emerald-600"
+                          : m.score >= 60
+                            ? "bg-amber-50 text-amber-600"
+                            : "bg-red-50 text-red-600"
+                          }`}
                       >
                         {m.status}
                       </span>
@@ -235,7 +225,7 @@ export default function KeluargaPage() {
           </div>
 
           <BottomSpace />
-          </div>
+        </div>
         </main>
 
         <div className="md:hidden"><BottomNav /></div>

@@ -387,7 +387,7 @@ export default function ChallengePage() {
                   onClick={handleStartPreTest}
                   className="w-full rounded-2xl bg-[#0292fc] py-3 text-xs font-black text-white shadow-md transition hover:bg-[#007ad6] active:scale-95"
                 >
-                  Mulai Challenge Sekarang →
+                  Mulai Challenge Sekarang
                 </button>
               </div>
             </section>
@@ -399,27 +399,17 @@ export default function ChallengePage() {
               <div className="glass-card rounded-[28px] p-5 border border-white">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#0292fc] bg-blue-50 px-3 py-1 rounded-full">
-                    Skenario {currentStep + 1} dari {PRE_TEST_SCENARIOS.length}
+                    {currentStep + 1} dari {PRE_TEST_SCENARIOS.length}
                   </span>
-                  
+
                   {/* Timer Pill */}
-                  <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-xs font-black border transition ${
-                    timeLeft < 30 
-                      ? "bg-red-50 text-red-600 border-red-200 animate-pulse" 
-                      : "bg-blue-50/80 text-[#003882] border-blue-100"
-                  }`}>
+                  <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-xs font-black border transition ${timeLeft < 30
+                    ? "bg-red-50 text-red-600 border-red-200 animate-pulse"
+                    : "bg-blue-50/80 text-[#003882] border-blue-100"
+                    }`}>
                     <Icon name="Clock3" size={13} />
                     <span>{formatTimer(timeLeft)}</span>
                   </div>
-                </div>
-
-                <div className="mt-2.5 flex items-center justify-between">
-                  <span className="text-xs font-black text-[#002554]">
-                    {activePreScenario.category}
-                  </span>
-                  <span className="text-[10px] font-bold text-slate-400">
-                    {Math.round(((currentStep + 1) / PRE_TEST_SCENARIOS.length) * 100)}% Selesai
-                  </span>
                 </div>
 
                 {/* Progress Bar */}
@@ -577,11 +567,10 @@ export default function ChallengePage() {
                   </span>
 
                   {/* Timer Pill */}
-                  <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-xs font-black border transition ${
-                    timeLeft < 30 
-                      ? "bg-red-50 text-red-600 border-red-200 animate-pulse" 
-                      : "bg-emerald-50 text-emerald-800 border-emerald-200"
-                  }`}>
+                  <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-xs font-black border transition ${timeLeft < 30
+                    ? "bg-red-50 text-red-600 border-red-200 animate-pulse"
+                    : "bg-emerald-50 text-emerald-800 border-emerald-200"
+                    }`}>
                     <Icon name="Clock3" size={13} />
                     <span>{formatTimer(timeLeft)}</span>
                   </div>

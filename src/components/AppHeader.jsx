@@ -32,11 +32,7 @@ export default function AppHeader({
           </Link>
         )}
         <div>
-          {subtitle && (
-            <div className="text-[10px] font-semibold text-white/80 uppercase tracking-wider leading-none">
-              {subtitle}
-            </div>
-          )}
+
           <h1 className="text-lg md:text-xl font-black text-white tracking-tight mt-0.5 leading-tight">
             {title}
           </h1>
@@ -52,11 +48,10 @@ export default function AppHeader({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3.5 py-1 rounded-full text-xs font-bold transition duration-150 ${
-                  isActive
+                className={`px-3.5 py-1 rounded-full text-xs font-bold transition duration-150 ${isActive
                     ? "bg-white text-[#003882] shadow-2xs"
                     : "text-white hover:bg-white/20"
-                }`}
+                  }`}
               >
                 {item.label}
               </Link>

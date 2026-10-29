@@ -77,7 +77,7 @@ export default function HasilPage() {
   return (
     <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff]">
       <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
-        
+
         <AppHeader title="Profil & Hasil" subtitle="Evaluasi Keputusan Keamanan" />
 
         {/* Top Score Banner */}
@@ -95,15 +95,6 @@ export default function HasilPage() {
               </div>
             </div>
 
-            <div className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center p-2 shadow-sm">
-              <Image
-                src="/3d-shield-icon.png"
-                alt="Security Shield"
-                width={48}
-                height={48}
-                className="object-contain"
-              />
-            </div>
           </div>
 
           <div className="mt-4 flex gap-2">
@@ -125,7 +116,7 @@ export default function HasilPage() {
 
         {/* BOTTOM SHEET: Impact & Detailed Feedback */}
         <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10"><div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-5">
-          
+
           {/* Behavioral Impact Metric Card */}
           <section className="glass-card rounded-[26px] p-4 border border-white">
             <div className="flex items-center justify-between">
@@ -183,7 +174,7 @@ export default function HasilPage() {
           </section>
 
           <BottomSpace />
-          </div>
+        </div>
         </main>
 
         <div className="md:hidden"><BottomNav /></div>
