@@ -29,7 +29,7 @@ export default function BottomNav() {
       icon: "UsersRound"
     },
     {
-      href: "/hasil",
+      href: "/profil",
       label: "Profil",
       icon: "UserRound"
     }

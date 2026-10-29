@@ -319,7 +319,7 @@ export default function ChallengePage() {
     }
 
     setIsSubmitting(false)
-    router.push("/hasil")
+    router.push("/profil")
   }
 
   return (
@@ -387,7 +387,7 @@ export default function ChallengePage() {
                   onClick={handleStartPreTest}
                   className="w-full rounded-2xl bg-[#0292fc] py-3 text-xs font-black text-white shadow-md transition hover:bg-[#007ad6] active:scale-95"
                 >
-                  Mulai Challenge Sekarang
+                  Mulai Challenge
                 </button>
               </div>
             </section>
