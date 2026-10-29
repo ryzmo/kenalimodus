@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useSession } from "next-auth/react"
 import BottomNav from "../components/BottomNav"
 import BottomSpace from "../components/BottomSpace"
 import Icon from "../components/Icon"
@@ -40,7 +41,10 @@ const DEFAULT_NOTIFICATIONS = [
 ]
 
 export default function Home() {
-  const [safeScore, setSafeScore] = useState(84)
+  const { data: session } = useSession()
+  const [greeting, setGreeting] = useState("Selamat Datang")
+  const [safeScore, setSafeScore] = useState(null) // null jika pengguna baru belum uji coba
+  const [hasTested, setHasTested] = useState(false)
   const [copied, setCopied] = useState(false)
   const [originUrl, setOriginUrl] = useState("https://kenalimodus.id")
   const [notificationsOpen, setNotificationsOpen] = useState(false)
@@ -48,21 +52,36 @@ export default function Home() {
   const notifRef = useRef(null)
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setOriginUrl(window.location.origin)
-      const stored = localStorage.getItem("kenali_modus_result")
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored)
-          if (parsed.score !== undefined) {
-            setSafeScore(parsed.score)
-          }
-        } catch (e) {
-          console.error(e)
-        }
-      }
+    // Tentukan salam otomatis berdasarkan jam lokal perangkat
+    const currentHour = new Date().getHours()
+    if (currentHour >= 4 && currentHour < 11) {
+      setGreeting("Selamat Pagi")
+    } else if (currentHour >= 11 && currentHour < 15) {
+      setGreeting("Selamat Siang")
+    } else if (currentHour >= 15 && currentHour < 18) {
+      setGreeting("Selamat Sore")
+    } else {
+      setGreeting("Selamat Malam")
     }
   }, [])
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOriginUrl(window.location.origin)
+
+      // HANYA tampilkan safe_score jika pengguna SUDAH LOGIN
+      if (session?.user) {
+        // Ambil dari sesi atau database
+        const score = session.user.safe_score ?? 78
+        setSafeScore(score)
+        setHasTested(true)
+      } else {
+        // Jika BELUM LOGIN: pastikan skor TIDAK DITAMPILKAN
+        setSafeScore(null)
+        setHasTested(false)
+      }
+    }
+  }, [session])
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -94,7 +113,7 @@ export default function Home() {
   const appServices = [
     {
       title: "2-Min Test",
-      sub: "Uji Refleks Cepat",
+      sub: "Cek Safe Score",
       iconImg: "/3d-shield-icon.png",
       href: "/challenge",
       badge: "Utama",
@@ -139,7 +158,7 @@ export default function Home() {
             </div>
             <div>
               <div className="text-[11px] font-medium text-white/90 flex items-center gap-1 leading-none">
-                <span>Good Morning</span>
+                <span>{greeting}</span>
                 <span className="text-amber-300">👋</span>
               </div>
               <div className="text-base md:text-lg font-extrabold text-white tracking-tight mt-1">
@@ -163,8 +182,8 @@ export default function Home() {
               <Link href="/keluarga" className="px-3.5 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
                 Keluarga
               </Link>
-              <Link href="/rewards" className="px-3.5 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
-                Rewards
+              <Link href="/profil" className="px-3.5 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
+                Profil
               </Link>
             </nav>
 
@@ -203,56 +222,72 @@ export default function Home() {
         </header>
 
         {/* HERO TOP SECTION: Responsive Desktop & Mobile */}
-        <section className="w-full max-w-6xl mx-auto px-5 sm:px-8 pt-3 md:pt-6 pb-4 md:pb-8 relative text-white">
-          <div className="flex items-center justify-between gap-6">
-            <div className="max-w-[220px] sm:max-w-md md:max-w-xl z-10">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight text-white leading-none drop-shadow-sm">
-                  {safeScore}
-                </span>
-                <span className="text-sm md:text-base font-bold text-white/80">/100</span>
+        <section className="w-full max-w-6xl mx-auto px-5 sm:px-8 pt-5 md:pt-6 pb-4 md:pb-8 relative text-white">
+          <div className="flex items-center justify-between gap-4 sm:gap-6">
+            <div className="flex-1 min-w-0 z-10">
+              {hasTested && safeScore !== null ? (
+                <>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white leading-none drop-shadow-sm">
+                      {safeScore}
+                    </span>
+                    <span className="text-xs sm:text-base font-bold text-white/80">/100</span>
+                    <span className="ml-2 px-2.5 py-0.5 rounded-full text-[10px] md:text-xs font-black bg-white/20 border border-white/30 backdrop-blur-md">
+                      Safe Score Anda
+                    </span>
+                  </div>
 
-              </div>
+                  {/* Progress Slider Pill */}
+                  <div className="mt-3 relative h-2 md:h-3 w-full max-w-[180px] sm:max-w-[240px] md:max-w-xs rounded-full bg-white/30 backdrop-blur-xs flex items-center">
+                    <div
+                      className="h-full rounded-full bg-white transition-all duration-700"
+                      style={{ width: `${safeScore}%` }}
+                    />
+                    <div
+                      className="absolute h-3.5 w-3.5 md:h-5 md:w-5 rounded-full bg-[#0292fc] border-2 border-white shadow-md"
+                      style={{ left: `calc(${safeScore}% - 7px)` }}
+                    />
+                  </div>
 
-              {/* Progress Slider Pill */}
-              <div className="mt-3.5 relative h-2.5 md:h-3 w-40 sm:w-56 md:w-72 rounded-full bg-white/30 backdrop-blur-xs flex items-center">
-                <div
-                  className="h-full rounded-full bg-white transition-all duration-700"
-                  style={{ width: `${safeScore}%` }}
-                />
-                <div
-                  className="absolute h-4 w-4 md:h-5 md:w-5 rounded-full bg-[#0292fc] border-2 border-white shadow-md"
-                  style={{ left: `calc(${safeScore}% - 8px)` }}
-                />
-              </div>
+                  <div className="mt-2.5 text-[11px] sm:text-sm font-semibold text-white/95 leading-relaxed drop-shadow-xs max-w-md">
+                    Cek Safe Score kamu, seberapa aman dari scam?
+                  </div>
+                </>
+              ) : (
+                /* Tampilan Belum Tes / Pengguna Baru / Belum Login */
+                <>
 
-              <div className="mt-3 text-xs sm:text-sm font-semibold text-white/95 leading-snug drop-shadow-xs max-w-md">
-                Latih ketajaman refleks perbankan digitalmu hanya dalam 2 menit. Kenali sebelum tertipu.
-              </div>
+                  <div>
+                    <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight drop-shadow-sm">
+                      Siap Diuji?
+                    </h2>
+                  </div>
+                  <div className="mt-1.5 text-[11px] sm:text-sm font-medium text-white/90 leading-snug drop-shadow-xs max-w-sm">
+                    Tes Safe Score kamu lawan scam dalam 2 menit!
+                  </div>
+                </>
+              )}
 
-              <div className="hidden md:flex items-center gap-3 mt-5">
+              {/* Action Buttons with clean nowrap on mobile */}
+              <div className="flex items-center gap-2 sm:gap-3 mt-3.5 md:mt-5">
                 <Link
                   href="/challenge"
-                  className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-2.5 text-xs font-black text-[#003882] shadow-md hover:bg-slate-50 transition active:scale-95"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-white px-3.5 sm:px-5 py-2.5 text-xs font-black text-[#003882] shadow-md hover:bg-slate-50 transition active:scale-95 shrink-0 whitespace-nowrap"
                 >
-                  <span>Mulai Challenge 2-Menit</span>
+
+                  <span>{hasTested ? "Uji Ulang" : "Mulai Tes"}</span>
                 </Link>
-                <Link
-                  href="/modus"
-                  className="inline-flex items-center gap-2 rounded-2xl bg-white/20 hover:bg-white/30 border border-white/40 px-5 py-2.5 text-xs font-bold text-white transition active:scale-95 backdrop-blur-md"
-                >
-                  <Icon name="Search" size={15} />
-                  <span>Jelajahi Modus</span>
-                </Link>
+
               </div>
             </div>
 
-            <div className="relative w-40 h-44 sm:w-52 sm:h-56 md:w-72 md:h-72 shrink-0 drop-shadow-2xl scale-100 -translate-y-2 md:-translate-y-4">
+            {/* Illustration side */}
+            <div className="relative w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 shrink-0 drop-shadow-2xl scale-100 -translate-y-1 md:-translate-y-4">
               <Image
                 src="/image2.png"
-                alt="3D BCA Cyber Cop Assistant"
+                alt="Kenali Modus Logo"
                 fill
-                sizes="(max-width: 640px) 160px, (max-width: 768px) 208px, 288px"
+                sizes="(max-width: 640px) 128px, (max-width: 768px) 192px, 256px"
                 priority
                 className="object-contain"
               />
@@ -375,7 +410,7 @@ export default function Home() {
                         Lindungi Keluarga
                       </div>
                       <div className="text-[11px] text-slate-500 leading-tight mt-0.5">
-                        Ajak kerabat uji refleks keamanan di WhatsApp
+                        Ajak kerabat cek Safe Score di WhatsApp
                       </div>
                     </div>
                   </div>

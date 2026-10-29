@@ -327,7 +327,7 @@ export default function ChallengePage() {
       {/* iOS App Frame */}
       <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
 
-        <AppHeader title="Kenali Trik Penipuan" subtitle="Simulasi Refleks Digital" />
+        <AppHeader title="Kenali Trik Penipuan" subtitle="Simulasi Safe Score Digital" />
 
         {/* BOTTOM SHEET */}
         <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10"><div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-5">
@@ -339,7 +339,7 @@ export default function ChallengePage() {
               </h1>
 
               <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                Uji refleks Anda mengenali modus penipuan digital, seperti CS palsu, APK berbahaya, phishing, dan QRIS palsu.
+                Uji Safe Score Anda mengenali modus penipuan digital, seperti CS palsu, APK berbahaya, phishing, dan QRIS palsu.
               </p>
 
               {/* Input Data Profil Peserta */}
@@ -710,7 +710,7 @@ export default function ChallengePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-[10px] font-black uppercase tracking-wider text-[#0876c9] bg-blue-50 px-2.5 py-1 rounded-full">
-                      Evaluasi Refleks & Kebiasaan
+                      Evaluasi Safe Score & Kebiasaan
                     </span>
                     <h2 className="mt-1 text-base font-black text-[#102a54]">
                       {activeAriQuestion.title} ({currentAriStep + 1} dari {ARI_SURVEY_QUESTIONS.length})

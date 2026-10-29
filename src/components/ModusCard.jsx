@@ -41,7 +41,7 @@ export default function ModusCard({
       </p>
 
       <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-[#0055b8]">
-        <span>Pelajari & Uji Refleks</span>
+        <span>Pelajari & Cek Safe Score</span>
         <Icon name="ArrowRight" size={14} />
       </div>
     </Link>

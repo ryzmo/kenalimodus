@@ -116,20 +116,12 @@ export default function KeluargaPage() {
     <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff]">
       <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
 
-        <AppHeader 
-          title="Grup Keluarga" 
+        <AppHeader
+          title="Grup Keluarga"
           subtitle="Bank BCA #AwasModus"
           showBack={true}
           backHref="/"
-          rightElement={
-            <button
-              type="button"
-              onClick={() => setShowAddModal(true)}
-              className="rounded-full bg-white px-3.5 py-1 text-xs font-bold text-[#003882] shadow-2xs hover:bg-slate-50 transition active:scale-95"
-            >
-              + Anggota
-            </button>
-          }
+
         />
 
         {/* HERO TOP SECTION: Clean, Visual, Balanced */}
@@ -137,7 +129,7 @@ export default function KeluargaPage() {
           <div className="flex items-center justify-between gap-6">
             <div className="max-w-md">
               <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold tracking-wider text-sky-100 uppercase backdrop-blur-xs">
-                {groupName} • {members.length} Anggota
+                {groupName}
               </span>
 
               <div className="flex items-baseline gap-2 mt-2">
@@ -145,19 +137,18 @@ export default function KeluargaPage() {
                   {averageScore}
                 </span>
                 <span className="text-base font-bold text-white/80">/100</span>
-                <span className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                  averageScore >= 80 
-                    ? "bg-emerald-400/25 text-emerald-100 border border-emerald-300/40" 
-                    : averageScore >= 60 
-                      ? "bg-amber-400/25 text-amber-100 border border-amber-300/40" 
-                      : "bg-red-400/25 text-red-100 border border-red-300/40"
-                }`}>
-                  {averageScore >= 80 ? "🛡️ Sangat Aman" : averageScore >= 60 ? "⚡ Cukup Waspada" : "⚠️ Butuh Edukasi"}
+                <span className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-bold ${averageScore >= 80
+                  ? "bg-emerald-400/25 text-emerald-100 border border-emerald-300/40"
+                  : averageScore >= 60
+                    ? "bg-amber-400/25 text-amber-100 border border-amber-300/40"
+                    : "bg-red-400/25 text-red-100 border border-red-300/40"
+                  }`}>
+                  {averageScore >= 80 ? "Sangat Aman" : averageScore >= 60 ? "Cukup Waspada" : "Butuh Edukasi"}
                 </span>
               </div>
 
               <p className="text-xs sm:text-sm text-white/90 mt-2 max-w-sm leading-relaxed">
-                {vulnerableCount > 0 
+                {vulnerableCount > 0
                   ? `Ada ${vulnerableCount} anggota keluarga yang terdeteksi rentan penipuan online. Yuk ingatkan mereka!`
                   : "Hebat! Seluruh anggota keluarga memiliki ketahanan refleks yang baik terhadap fraud."}
               </p>
@@ -171,14 +162,6 @@ export default function KeluargaPage() {
                 >
                   <Icon name="Share2" size={14} />
                   <span>{copiedInvite ? "Link Tersalin!" : "Undang Keluarga"}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(true)}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 px-3.5 py-2 text-xs font-bold text-white transition active:scale-95 backdrop-blur-md"
-                >
-                  <Icon name="UsersRound" size={14} />
-                  <span>Tambah Manual</span>
                 </button>
               </div>
             </div>
@@ -211,14 +194,11 @@ export default function KeluargaPage() {
             {/* Section Header with Quick Status Filter */}
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-[#0292fc] animate-ping" />
+
                 <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-[#002554]">
                   Anggota Keluarga ({members.length})
                 </h2>
               </div>
-              <span className="text-[11px] text-slate-400">
-                Pantau refleks & ingatkan kerabat
-              </span>
             </div>
 
             {/* Responsive Family Members Grid */}
@@ -244,13 +224,12 @@ export default function KeluargaPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
                         {/* Avatar */}
-                        <div className={`h-11 w-11 shrink-0 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-2xs ${
-                          m.id === "saya" 
-                            ? "bg-[#0292fc]" 
-                            : isVulnerable 
-                              ? "bg-rose-500" 
-                              : "bg-slate-700"
-                        }`}>
+                        <div className={`h-11 w-11 shrink-0 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-2xs ${m.id === "saya"
+                          ? "bg-[#0292fc]"
+                          : isVulnerable
+                            ? "bg-rose-500"
+                            : "bg-slate-700"
+                          }`}>
                           {m.name.charAt(0)}
                         </div>
 
@@ -293,9 +272,8 @@ export default function KeluargaPage() {
                       {/* Mini Score Bar */}
                       <div className="mt-2 h-1.5 w-full rounded-full bg-slate-200/80 overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all duration-500 ${
-                            isStrong ? "bg-emerald-500" : isModerate ? "bg-amber-500" : "bg-rose-500"
-                          }`}
+                          className={`h-full rounded-full transition-all duration-500 ${isStrong ? "bg-emerald-500" : isModerate ? "bg-amber-500" : "bg-rose-500"
+                            }`}
                           style={{ width: `${m.score}%` }}
                         />
                       </div>
@@ -334,7 +312,7 @@ export default function KeluargaPage() {
             {/* Tips Perlindungan Multi-Generasi */}
             <section className="glass-card rounded-[28px] p-5 border border-white mt-6">
               <div className="flex items-center gap-2 text-[#003882]">
-                <Icon name="Shield" size={18} />
+
                 <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider">
                   Tips Melindungi Orang Tua & Keluarga
                 </h3>

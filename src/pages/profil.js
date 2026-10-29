@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useSession, signOut } from "next-auth/react"
 import AppHeader from "../components/AppHeader"
 import BottomNav from "../components/BottomNav"
 import BottomSpace from "../components/BottomSpace"
@@ -11,6 +12,7 @@ import {
 } from "../data/modusData"
 
 export default function ProfilPage() {
+  const { data: session } = useSession()
   const [participantName, setParticipantName] = useState("Nasabah BCA")
   const [participantAge, setParticipantAge] = useState(25)
   const [copied, setCopied] = useState(false)
@@ -35,9 +37,48 @@ export default function ProfilPage() {
   })
 
   useEffect(() => {
+    if (session?.user?.name) {
+      setParticipantName(session.user.name)
+
+      // Sinkronisasi otomatis dari localStorage ke Cloud Neon jika login
+      const storedPoints = localStorage.getItem("kenali_points_data")
+      const storedResult = localStorage.getItem("kenali_modus_result")
+      let currentPoints = 1250
+      let currentScore = resultData.score
+
+      if (storedPoints) {
+        try {
+          const parsedPts = JSON.parse(storedPoints)
+          if (parsedPts.totalPoints) currentPoints = parsedPts.totalPoints
+        } catch (e) {}
+      }
+
+      if (storedResult) {
+        try {
+          const parsedRes = JSON.parse(storedResult)
+          if (parsedRes.score) currentScore = parsedRes.score
+        } catch (e) {}
+      }
+
+      if (session.user.id) {
+        fetch("/api/user/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: session.user.id,
+            safeScore: currentScore,
+            totalPoints: currentPoints,
+            currentStreak: 1
+          })
+        }).catch((err) => console.log("Auto sync notice:", err))
+      }
+    }
+  }, [session])
+
+  useEffect(() => {
     if (typeof window !== "undefined") {
       setOriginUrl(window.location.origin)
-      
+
       const storedName = localStorage.getItem("kenali_participant_name")
       if (storedName) setParticipantName(storedName)
 
@@ -93,8 +134,8 @@ export default function ProfilPage() {
     <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff]">
       <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
 
-        <AppHeader 
-          title="Profil & Hasil" 
+        <AppHeader
+          title="Profil"
           subtitle="Bank BCA #AwasModus"
           showBack={true}
           backHref="/"
@@ -106,8 +147,7 @@ export default function ProfilPage() {
             <div className="max-w-md">
               {/* Profile Chip */}
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-sky-100 backdrop-blur-xs">
-                <span>👤 {participantName}</span>
-                <span>•</span>
+
                 <span>{participantAge} Tahun</span>
               </div>
 
@@ -117,14 +157,13 @@ export default function ProfilPage() {
                   {resultData.score}
                 </span>
                 <span className="text-base font-bold text-white/80">/100</span>
-                <span className={`ml-2 px-3 py-0.5 rounded-full text-xs font-bold ${
-                  resultData.score >= 80
-                    ? "bg-emerald-400/25 text-emerald-100 border border-emerald-300/40"
-                    : resultData.score >= 60
-                      ? "bg-amber-400/25 text-amber-100 border border-amber-300/40"
-                      : "bg-red-400/25 text-red-100 border border-red-300/40"
-                }`}>
-                  {resultData.score >= 80 ? "🛡️ " : resultData.score >= 60 ? "⚡ " : "⚠️ "}
+                <span className={`ml-2 px-3 py-0.5 rounded-full text-xs font-bold ${resultData.score >= 80
+                  ? "bg-emerald-400/25 text-emerald-100 border border-emerald-300/40"
+                  : resultData.score >= 60
+                    ? "bg-amber-400/25 text-amber-100 border border-amber-300/40"
+                    : "bg-red-400/25 text-red-100 border border-red-300/40"
+                  }`}>
+
                   {statusLabel}
                 </span>
               </div>
@@ -134,22 +173,39 @@ export default function ProfilPage() {
               </p>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-2.5 mt-4">
+              <div className="flex flex-wrap items-center gap-2.5 mt-4">
                 <Link
                   href="/challenge"
                   className="inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-xs font-bold text-[#003882] shadow-sm hover:bg-slate-50 transition active:scale-95"
                 >
-                  <Icon name="Zap" size={14} />
                   <span>Uji Ulang</span>
                 </Link>
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 px-3.5 py-2 text-xs font-bold text-white transition active:scale-95 backdrop-blur-md"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 px-3.5 py-2 text-xs font-bold text-white transition active:scale-95 backdrop-blur-md cursor-pointer"
                 >
                   <Icon name="Share2" size={14} />
-                  <span>{copied ? "Link Tersalin!" : "Bagikan Hasil"}</span>
+                  <span>{copied ? "Link Tersalin!" : "Bagikan"}</span>
                 </button>
+                {session ? (
+                  <button
+                    type="button"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-300/40 px-3.5 py-2 text-xs font-bold text-rose-100 transition active:scale-95 backdrop-blur-md cursor-pointer"
+                  >
+                    <Icon name="LogOut" size={14} />
+                    <span>Keluar</span>
+                  </button>
+                ) : (
+                  <Link
+                    href="/auth/login"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-amber-400 text-[#002554] hover:bg-amber-300 px-3.5 py-2 text-xs font-black transition active:scale-95 shadow-sm"
+                  >
+                    <Icon name="CloudUpload" size={14} />
+                    <span>Cadangkan Skor ke Akun</span>
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -172,7 +228,7 @@ export default function ProfilPage() {
 
             {/* Top Grid: Lencana Keamanan + Evaluasi Resiko */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
+
               {/* Lencana Penghargaan */}
               <section className="glass-card rounded-[26px] p-5 border border-white flex flex-col justify-between">
                 <div>
@@ -243,7 +299,7 @@ export default function ProfilPage() {
             {/* Kunci Emas Perlindungan BCA */}
             <section className="glass-card rounded-[28px] p-5 border border-white">
               <div className="flex items-center gap-2 text-[#002554] mb-3">
-                <Icon name="Shield" size={18} className="text-[#0292fc]" />
+
                 <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider">
                   3 Aturan Emas Keamanan Transaksi
                 </h3>
@@ -299,3 +355,4 @@ export default function ProfilPage() {
     </div>
   )
 }
+

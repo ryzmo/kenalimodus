@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { useSession, signOut } from "next-auth/react"
 import Icon from "./Icon"
 
 export default function AppHeader({
@@ -10,13 +11,14 @@ export default function AppHeader({
   rightElement = null
 }) {
   const router = useRouter()
+  const { data: session } = useSession()
 
   const navItems = [
     { href: "/", label: "Beranda" },
     { href: "/modus", label: "Katalog Modus" },
     { href: "/challenge", label: "Challenge" },
     { href: "/keluarga", label: "Keluarga" },
-    { href: "/rewards", label: "Rewards" }
+    { href: "/profil", label: "Profil" }
   ]
 
   return (
@@ -49,8 +51,8 @@ export default function AppHeader({
                 key={item.href}
                 href={item.href}
                 className={`px-3.5 py-1 rounded-full text-xs font-bold transition duration-150 ${isActive
-                    ? "bg-white text-[#003882] shadow-2xs"
-                    : "text-white hover:bg-white/20"
+                  ? "bg-white text-[#003882] shadow-2xs"
+                  : "text-white hover:bg-white/20"
                   }`}
               >
                 {item.label}
@@ -58,6 +60,23 @@ export default function AppHeader({
             )
           })}
         </nav>
+
+        {/* User Account Button jika sudah login */}
+        {session && (
+          <Link
+            href="/profil"
+            className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-md py-1 px-2.5 rounded-full border border-white/30 transition text-xs font-bold text-white shadow-2xs"
+          >
+            <div className="h-6 w-6 rounded-full bg-amber-400 text-[#002554] flex items-center justify-center font-black text-[11px] overflow-hidden">
+              {session.user?.image ? (
+                <img src={session.user.image} alt={session.user.name} className="h-full w-full object-cover" />
+              ) : (
+                session.user?.name?.charAt(0) || "U"
+              )}
+            </div>
+            <span className="hidden sm:inline max-w-[100px] truncate">{session.user?.name || "Profil"}</span>
+          </Link>
+        )}
 
         {rightElement && <div>{rightElement}</div>}
       </div>
