@@ -125,7 +125,7 @@ export default function Home() {
   ]
 
   return (
-    <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-[#0292fc]">
+    <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff]">
       {/* WRAPPER: Full width in desktop, mobile-framed in small viewports */}
       <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
 
@@ -338,7 +338,7 @@ export default function Home() {
 
             {/* 3. DESKTOP SPLIT GRID: Left (Rumus B-C-A & Keluarga) vs Right (Modus Sedang Ramai) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 md:gap-6">
-              
+
               {/* Left Column (5 Cols on Desktop): Rumus B-C-A & Lindungi Keluarga */}
               <div className="lg:col-span-5 space-y-5">
                 {/* Rumus B-C-A Pill Card */}
