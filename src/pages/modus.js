@@ -71,34 +71,34 @@ export default function ModusPage() {
         
         <AppHeader title="Katalog Modus" subtitle="Bank BCA #AwasModus" />
 
-        {/* Top Header Summary in Sky Blue area */}
-        <section className="px-6 pt-1 pb-5 text-white">
-          <p className="text-xs font-semibold text-white/95 leading-relaxed">
-            Kenali pola kejahatan perbankan digital terkini sebelum Anda menjadi sasaran berikutnya.
-          </p>
-
-          {/* Search Box with Glassmorphism */}
-          <div className="mt-3 relative">
+        {/* BOTTOM SHEET: Pure White Curved Content Panel */}
+        <main className="flex-1 bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] px-5 pt-6 space-y-4 shadow-2xl">
+          
+          {/* Search Box in Content Area */}
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+              <Icon name="Search" size={16} />
+            </div>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari modus (APK, Link, QRIS, CS)..."
-              className="w-full rounded-2xl bg-white/25 backdrop-blur-md border border-white/40 px-4 py-2.5 text-xs font-bold text-white placeholder:text-white/70 shadow-sm focus:outline-none focus:bg-white/35"
+              className="w-full rounded-2xl bg-white border border-slate-200/80 py-2.5 pl-10 pr-9 text-xs font-semibold text-[#002554] placeholder:text-slate-400 shadow-2xs focus:border-[#0292fc] focus:outline-none"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-2.5 text-xs text-white/80"
+                className="absolute right-3 top-2.5 text-xs text-slate-400 hover:text-slate-600"
               >
                 ✕
               </button>
             )}
           </div>
 
-          {/* Category Filter Pills */}
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
+          {/* Category Filter Pills in Content Area */}
+          <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
             {["Semua", "Video Edukasi", "Artikel", ...MODUS_CATEGORIES.filter((c) => c !== "Semua")].map((category) => {
               const active = selectedCategory === category
               return (
@@ -106,10 +106,10 @@ export default function ModusPage() {
                   key={category}
                   type="button"
                   onClick={() => setSelectedCategory(category)}
-                  className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black transition ${
+                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-[11px] font-bold transition ${
                     active
-                      ? "bg-white text-[#003882] shadow-sm"
-                      : "bg-white/20 text-white hover:bg-white/30"
+                      ? "bg-[#0292fc] text-white shadow-xs"
+                      : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200/80"
                   }`}
                 >
                   {category}
@@ -117,10 +117,6 @@ export default function ModusPage() {
               )
             })}
           </div>
-        </section>
-
-        {/* BOTTOM SHEET: Pure White Curved Content Panel */}
-        <main className="flex-1 bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] px-5 pt-5 space-y-4 shadow-2xl">
           
           {/* Main Video Highlight Card if in Semua / Video */}
           {(selectedCategory === "Semua" || selectedCategory === "Video Edukasi") && mainVideo && (
