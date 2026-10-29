@@ -323,7 +323,7 @@ export default function ChallengePage() {
   }
 
   return (
-    <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff]">
+    <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-[#0292fc]">
       {/* iOS App Frame */}
       <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
 
