@@ -66,7 +66,7 @@ export default function ModusPage() {
   const mainVideo = BCA_EDU_VIDEOS[0]
 
   return (
-    <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-[#0292fc] md:bg-gradient-to-b md:from-[#0292fc] md:via-[#66baff] md:to-[#edf5fc]">
+    <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff]">
       {/* Full width container across desktop and mobile */}
       <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
 
