@@ -329,19 +329,6 @@ export default function ChallengePage() {
 
         <AppHeader title="Kenali Trik Penipuan" subtitle="Simulasi Refleks Digital" />
 
-        {/* Top Header Information in Sky Blue Area */}
-        <section className="w-full max-w-5xl mx-auto px-5 sm:px-8 pt-1 pb-5 text-white">
-          <div className="flex items-center justify-between">
-
-            {timerActive && (
-              <div className="rounded-2xl bg-white/20 backdrop-blur-md px-3 py-1.5 border border-white/40 text-center">
-                <div className="text-[9px] uppercase font-bold text-sky-100">Sisa Waktu</div>
-                <div className="text-sm font-black text-white">{timeLeft} dtk</div>
-              </div>
-            )}
-          </div>
-        </section>
-
         {/* BOTTOM SHEET */}
         <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10"><div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-5">
           {/* Stage 0: Challenge Intro */}
@@ -352,28 +339,15 @@ export default function ChallengePage() {
               </h1>
 
               <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                Uji ketajaman refleks Anda menghadapi modus penipuan perbankan digital terbaru seperti CS Palsu via WhatsApp,
-                file APK berbahaya, link phishing, dan QRIS tempelan.
+                Uji refleks Anda mengenali modus penipuan digital, seperti CS palsu, APK berbahaya, phishing, dan QRIS palsu.
               </p>
 
               {/* Input Data Profil Peserta */}
               <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
                 <div className="text-xs font-black uppercase tracking-wider text-[#0292fc] mb-3">
-                  Profil Peserta Challenge
+                  Profil Peserta
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                      Nama Peserta
-                    </label>
-                    <input
-                      type="text"
-                      value={participantName}
-                      onChange={(e) => setParticipantName(e.target.value)}
-                      placeholder="Contoh: Budi"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 font-semibold focus:border-[#0292fc] focus:outline-none"
-                    />
-                  </div>
                   <div>
                     <label className="block text-[11px] font-bold text-slate-700 mb-1">
                       Umur
@@ -424,28 +398,34 @@ export default function ChallengePage() {
             <div className="space-y-3">
               <div className="glass-card rounded-[28px] p-5 border border-white">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase text-[#0292fc] bg-blue-50 px-2.5 py-0.5 rounded-full">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[#0292fc] bg-blue-50 px-3 py-1 rounded-full">
                     Skenario {currentStep + 1} dari {PRE_TEST_SCENARIOS.length}
                   </span>
-                  <span className="text-[10px] font-bold text-slate-400">
-                    {activePreScenario.category}
-                  </span>
-                </div>
-
-                {/* 1.5-Minute Timer Display */}
-                <div className="mt-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2 rounded-xl bg-slate-100 border border-slate-200 px-3 py-1.5 font-mono text-xs font-black text-[#102a54]">
-                    <Icon name="Clock" size={15} className={timeLeft < 30 ? "text-red-500 animate-pulse" : "text-[#0876c9]"} />
-                    <span className={timeLeft < 30 ? "text-red-600" : "text-[#102a54]"}>
-                      {formatTimer(timeLeft)}
-                    </span>
+                  
+                  {/* Timer Pill */}
+                  <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-xs font-black border transition ${
+                    timeLeft < 30 
+                      ? "bg-red-50 text-red-600 border-red-200 animate-pulse" 
+                      : "bg-blue-50/80 text-[#003882] border-blue-100"
+                  }`}>
+                    <Icon name="Clock3" size={13} />
+                    <span>{formatTimer(timeLeft)}</span>
                   </div>
                 </div>
 
+                <div className="mt-2.5 flex items-center justify-between">
+                  <span className="text-xs font-black text-[#002554]">
+                    {activePreScenario.category}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400">
+                    {Math.round(((currentStep + 1) / PRE_TEST_SCENARIOS.length) * 100)}% Selesai
+                  </span>
+                </div>
+
                 {/* Progress Bar */}
-                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full bg-[#0876c9] transition-all duration-300"
+                    className="h-full bg-[#0292fc] transition-all duration-300 rounded-full"
                     style={{ width: `${((currentStep + 1) / PRE_TEST_SCENARIOS.length) * 100}%` }}
                   />
                 </div>
@@ -589,31 +569,37 @@ export default function ChallengePage() {
 
           {/* Stage 3: Post-Test */}
           {stage === "post_test" && activePostScenario && (
-            <div className="mt-6">
-              <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100">
+            <div className="space-y-3">
+              <div className="glass-card rounded-[28px] p-5 border border-white">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">
-                      Tantangan Bagian 2
-                    </span>
-                    <h2 className="mt-1 text-base font-black text-[#102a54]">
-                      Skenario {currentStep + 1} dari {POST_TEST_SCENARIOS.length}: {activePostScenario.category}
-                    </h2>
-                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
+                    Skenario {currentStep + 1} dari {POST_TEST_SCENARIOS.length}
+                  </span>
 
-                  {/* 1.5-Minute Timer Display */}
-                  <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-1.5 font-mono text-xs font-black text-emerald-800">
-                    <Icon name="Clock" size={15} className={timeLeft < 30 ? "text-red-500 animate-pulse" : "text-emerald-600"} />
-                    <span className={timeLeft < 30 ? "text-red-600" : "text-emerald-800"}>
-                      {formatTimer(timeLeft)}
-                    </span>
+                  {/* Timer Pill */}
+                  <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-xs font-black border transition ${
+                    timeLeft < 30 
+                      ? "bg-red-50 text-red-600 border-red-200 animate-pulse" 
+                      : "bg-emerald-50 text-emerald-800 border-emerald-200"
+                  }`}>
+                    <Icon name="Clock3" size={13} />
+                    <span>{formatTimer(timeLeft)}</span>
                   </div>
                 </div>
 
+                <div className="mt-2.5 flex items-center justify-between">
+                  <span className="text-xs font-black text-[#002554]">
+                    {activePostScenario.category}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400">
+                    {Math.round(((currentStep + (showFeedback ? 1 : 0)) / POST_TEST_SCENARIOS.length) * 100)}% Selesai
+                  </span>
+                </div>
+
                 {/* Progress Bar */}
-                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full bg-emerald-500 transition-all duration-300"
+                    className="h-full bg-emerald-500 transition-all duration-300 rounded-full"
                     style={{ width: `${((currentStep + (showFeedback ? 1 : 0)) / POST_TEST_SCENARIOS.length) * 100}%` }}
                   />
                 </div>
@@ -791,7 +777,7 @@ export default function ChallengePage() {
             </div>
           )}
           <BottomSpace />
-          </div>
+        </div>
         </main>
 
         <div className="md:hidden"><BottomNav /></div>
