@@ -323,23 +323,15 @@ export default function ChallengePage() {
   }
 
   return (
-    <div className="app-shell flex justify-center bg-[#e7eff6] min-h-screen text-[#002554]">
+    <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-[#0292fc] md:bg-gradient-to-b md:from-[#0292fc] md:via-[#66baff] md:to-[#edf5fc]">
       {/* iOS App Frame */}
-      <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl min-h-screen md:min-h-0 md:my-5 md:rounded-[44px] shadow-2xl bg-gradient-to-b from-[#0292fc] via-[#85caff] to-[#f4faff] flex flex-col relative overflow-hidden border border-white/60 pb-safe">
-        
-        <AppHeader title="2-Min Challenge" subtitle="Simulasi Refleks Digital" />
+      <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
+
+        <AppHeader title="Kenali Trik Penipuan" subtitle="Simulasi Refleks Digital" />
 
         {/* Top Header Information in Sky Blue Area */}
-        <section className="px-6 pt-1 pb-5 text-white">
+        <section className="w-full max-w-5xl mx-auto px-5 sm:px-8 pt-1 pb-5 text-white">
           <div className="flex items-center justify-between">
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-sky-100">
-                Latihan Refleks Cepat
-              </div>
-              <div className="text-xl font-black text-white mt-0.5">
-                {stage === "intro" ? "Kenali Trik Penipuan" : `Tahap: ${stage.replace("_", " ").toUpperCase()}`}
-              </div>
-            </div>
 
             {timerActive && (
               <div className="rounded-2xl bg-white/20 backdrop-blur-md px-3 py-1.5 border border-white/40 text-center">
@@ -351,7 +343,7 @@ export default function ChallengePage() {
         </section>
 
         {/* BOTTOM SHEET */}
-        <main className="flex-1 bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] px-5 pt-5 space-y-4 shadow-2xl">
+        <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10"><div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-5">
           {/* Stage 0: Challenge Intro */}
           {stage === "intro" && (
             <section className="glass-card rounded-[28px] p-5 border border-white">
@@ -459,349 +451,350 @@ export default function ChallengePage() {
                 </div>
               </div>
 
-            {/* Scenario Card */}
-            <div className="mt-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
-              <div className="text-xs font-bold text-slate-500 mb-2">
-                {activePreScenario.context}
-              </div>
+              {/* Scenario Card */}
+              <div className="mt-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
+                <div className="text-xs font-bold text-slate-500 mb-2">
+                  {activePreScenario.context}
+                </div>
 
-              {/* Chat / Mock Interface */}
-              <div className="my-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5">
-                  <div className="grid h-7 w-7 place-items-center rounded-full bg-blue-100 text-[#0876c9]">
-                    <Icon name={activePreScenario.mockType === "sms" ? "MessageSquare" : activePreScenario.mockType === "qris" ? "QrCode" : "PhoneCall"} size={14} />
+                {/* Chat / Mock Interface */}
+                <div className="my-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5">
+                    <div className="grid h-7 w-7 place-items-center rounded-full bg-blue-100 text-[#0876c9]">
+                      <Icon name={activePreScenario.mockType === "sms" ? "MessageSquare" : activePreScenario.mockType === "qris" ? "QrCode" : "PhoneCall"} size={14} />
+                    </div>
+                    <span className="text-xs font-black text-[#102a54]">
+                      {activePreScenario.sender}
+                    </span>
                   </div>
-                  <span className="text-xs font-black text-[#102a54]">
-                    {activePreScenario.sender}
-                  </span>
+
+                  <div className="mt-3 text-xs leading-relaxed text-slate-700 bg-white p-3 rounded-xl border border-slate-100 font-medium">
+                    {activePreScenario.message}
+                  </div>
                 </div>
 
-                <div className="mt-3 text-xs leading-relaxed text-slate-700 bg-white p-3 rounded-xl border border-slate-100 font-medium">
-                  {activePreScenario.message}
-                </div>
-              </div>
+                {/* Question */}
+                <h3 className="text-sm font-black text-[#102a54] mb-3">
+                  {activePreScenario.question}
+                </h3>
 
-              {/* Question */}
-              <h3 className="text-sm font-black text-[#102a54] mb-3">
-                {activePreScenario.question}
-              </h3>
-
-              {/* Options */}
-              <div className="space-y-2.5">
-                {activePreScenario.options.map((opt) => {
-                  const isSelected = selectedOption?.id === opt.id
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => handleSelectPreOption(opt)}
-                      className={`w-full text-left rounded-2xl border p-4 text-xs font-bold transition-all duration-150 flex items-start gap-3 ${isSelected
-                        ? "border-[#0876c9] bg-blue-50 text-[#0876c9] shadow-sm"
-                        : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                        }`}
-                    >
-                      <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-bold ${isSelected ? "bg-[#0876c9] text-white border-[#0876c9]" : "border-slate-300"
-                        }`}>
-                        {opt.id.toUpperCase()}
-                      </span>
-                      <span className="flex-1 leading-snug">{opt.text}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Stage 2: 5 Golden Rules Intervention */}
-        {stage === "intervention" && (
-          <div className="mt-6">
-            <div className="rounded-3xl bg-white p-6 shadow-soft md:p-8">
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700">
-                Kunci Pengamanan Akun
-              </span>
-
-              <h2 className="mt-3 text-xl font-black text-[#102a54] md:text-2xl">
-                5 Golden Rules Keamanan Finansial Digital
-              </h2>
-
-              <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-                Anda telah menyelesaikan 5 skenario pertama. Sebelum lanjut ke tantangan penentu berikutnya, perhatikan 5 prinsip keamanan mutlak berikut:
-              </p>
-
-              {/* 5 Core Rules */}
-              <div className="mt-5 space-y-3">
-                {[
-                  {
-                    num: "1",
-                    title: "Kerahasiaan Data:",
-                    desc: "Jangan pernah membagikan OTP, PIN, CVV, atau password kepada siapa pun termasuk pihak bank."
-                  },
-                  {
-                    num: "2",
-                    title: "Waspada File .APK:",
-                    desc: (
-                      <>
-                        Jangan pernah membuka atau menginstal file berakhiran{" "}
-                        <code className="rounded bg-slate-200/80 px-1 py-0.5 font-mono text-[11px] text-slate-800">
-                          .apk
-                        </code>{" "}
-                        dari WhatsApp atau Telegram.
-                      </>
+                {/* Options */}
+                <div className="space-y-2.5">
+                  {activePreScenario.options.map((opt) => {
+                    const isSelected = selectedOption?.id === opt.id
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => handleSelectPreOption(opt)}
+                        className={`w-full text-left rounded-2xl border p-4 text-xs font-bold transition-all duration-150 flex items-start gap-3 ${isSelected
+                          ? "border-[#0876c9] bg-blue-50 text-[#0876c9] shadow-sm"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                          }`}
+                      >
+                        <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-bold ${isSelected ? "bg-[#0876c9] text-white border-[#0876c9]" : "border-slate-300"
+                          }`}>
+                          {opt.id.toUpperCase()}
+                        </span>
+                        <span className="flex-1 leading-snug">{opt.text}</span>
+                      </button>
                     )
-                  },
-                  {
-                    num: "3",
-                    title: "Periksa Domain URL:",
-                    desc: "Jangan klik link SMS. Ketik manual alamat portal resmi bank di browser Anda."
-                  },
-                  {
-                    num: "4",
-                    title: "Tolak Syarat Deposit:",
-                    desc: "Tawaran kerja paruh waktu yang meminta deposit uang terlebih dahulu adalah penipuan."
-                  },
-                  {
-                    num: "5",
-                    title: "Verifikasi Nama QRIS:",
-                    desc: "Selalu periksa kesesuaian nama merchant di layar m-banking sebelum menginput PIN transaksi."
-                  }
-                ].map((item) => (
-                  <div
-                    key={item.num}
-                    className="flex items-start gap-3.5 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 transition hover:border-blue-100 hover:bg-blue-50/30"
-                  >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#102a54] text-xs font-black text-white shadow-xs">
-                      {item.num}
-                    </div>
-                    <div className="text-xs leading-relaxed text-slate-700">
-                      <strong className="font-black text-[#102a54] mr-1.5">{item.title}</strong>
-                      {item.desc}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleStartPostTest}
-                  className="flex items-center gap-2 rounded-2xl bg-[#0876c9] px-6 py-3.5 text-xs font-black text-white shadow-md transition hover:bg-[#075da8]"
-                >
-                  Mulai Tantangan Bagian 2 (2 Menit)
-                  <Icon name="ArrowRight" size={16} />
-                </button>
+                  })}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Stage 3: Post-Test */}
-        {stage === "post_test" && activePostScenario && (
-          <div className="mt-6">
-            <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">
-                    Tantangan Bagian 2
-                  </span>
-                  <h2 className="mt-1 text-base font-black text-[#102a54]">
-                    Skenario {currentStep + 1} dari {POST_TEST_SCENARIOS.length}: {activePostScenario.category}
-                  </h2>
-                </div>
-
-                {/* 1.5-Minute Timer Display */}
-                <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-1.5 font-mono text-xs font-black text-emerald-800">
-                  <Icon name="Clock" size={15} className={timeLeft < 30 ? "text-red-500 animate-pulse" : "text-emerald-600"} />
-                  <span className={timeLeft < 30 ? "text-red-600" : "text-emerald-800"}>
-                    {formatTimer(timeLeft)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full bg-emerald-500 transition-all duration-300"
-                  style={{ width: `${((currentStep + (showFeedback ? 1 : 0)) / POST_TEST_SCENARIOS.length) * 100}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Scenario Card */}
-            <div className="mt-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
-              <div className="text-xs font-bold text-slate-500 mb-2">
-                {activePostScenario.context}
-              </div>
-
-              {/* Chat / Mock Interface */}
-              <div className="my-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5">
-                  <div className="grid h-7 w-7 place-items-center rounded-full bg-emerald-100 text-emerald-700">
-                    <Icon name={activePostScenario.mockType === "sms" ? "MessageSquare" : activePostScenario.mockType === "qris" ? "QrCode" : "PhoneCall"} size={14} />
-                  </div>
-                  <span className="text-xs font-black text-[#102a54]">
-                    {activePostScenario.sender}
-                  </span>
-                </div>
-
-                <div className="mt-3 text-xs leading-relaxed text-slate-700 bg-white p-3 rounded-xl border border-slate-100 font-medium">
-                  {activePostScenario.message}
-                </div>
-              </div>
-
-              {/* Question */}
-              <h3 className="text-sm font-black text-[#102a54] mb-3">
-                {activePostScenario.question}
-              </h3>
-
-              {/* Options */}
-              <div className="space-y-2.5">
-                {activePostScenario.options.map((opt) => {
-                  const isSelected = selectedOption?.id === opt.id
-                  let btnStyle = "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-
-                  if (showFeedback) {
-                    if (opt.isCorrect) {
-                      btnStyle = "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-sm"
-                    } else if (isSelected && !opt.isCorrect) {
-                      btnStyle = "border-red-400 bg-red-50 text-red-800 shadow-sm"
-                    } else {
-                      btnStyle = "border-slate-200 bg-slate-50 text-slate-400 opacity-60"
-                    }
-                  }
-
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      disabled={showFeedback}
-                      onClick={() => handleSelectPostOption(opt)}
-                      className={`w-full text-left rounded-2xl border p-4 text-xs font-bold transition-all duration-150 flex items-start gap-3 ${btnStyle}`}
-                    >
-                      <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-bold ${showFeedback && opt.isCorrect ? "bg-emerald-600 text-white border-emerald-600" : "border-slate-300"
-                        }`}>
-                        {opt.id.toUpperCase()}
-                      </span>
-                      <span className="flex-1 leading-snug">{opt.text}</span>
-                    </button>
-                  )
-                })}
-              </div>
-
-              {/* Instant Feedback Panel */}
-              {showFeedback && selectedOption && (
-                <div className={`mt-5 rounded-2xl p-4 border transition-all ${selectedOption.isCorrect ? "bg-emerald-50/80 border-emerald-200" : "bg-red-50/80 border-red-200"
-                  }`}>
-                  <div className="flex items-center gap-2">
-                    <Icon
-                      name={selectedOption.isCorrect ? "CheckCircle2" : "AlertTriangle"}
-                      size={18}
-                      className={selectedOption.isCorrect ? "text-emerald-600" : "text-red-600"}
-                    />
-                    <span className={`text-xs font-black ${selectedOption.isCorrect ? "text-emerald-800" : "text-red-800"}`}>
-                      {selectedOption.isCorrect ? "Tindakan Aman & Tepat (+20 Poin)" : "Tindakan Berisiko (-20 Poin)"}
-                    </span>
-                  </div>
-
-                  <p className="mt-2 text-xs text-slate-700 leading-relaxed font-medium">
-                    {selectedOption.feedbackReason}
-                  </p>
-
-                  <div className="mt-3 rounded-xl bg-white/80 p-2.5 border border-slate-200/60 text-[11px] text-slate-600">
-                    <strong>Aturan Keamanan:</strong> {activePostScenario.goldenRule}
-                  </div>
-
-                  <div className="mt-4 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={handleNextPostStep}
-                      className="flex items-center gap-2 rounded-2xl bg-[#102a54] px-5 py-2.5 text-xs font-black text-white transition hover:bg-[#1a3e75]"
-                    >
-                      {currentStep < POST_TEST_SCENARIOS.length - 1 ? (
-                        <>
-                          Skenario Berikutnya
-                          <Icon name="ArrowRight" size={15} />
-                        </>
-                      ) : (
-                        <>
-                          Lanjut ke Evaluasi Refleks
-                          <Icon name="ArrowRight" size={15} />
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Stage 4: ARI Survey */}
-        {stage === "ari_survey" && activeAriQuestion && (
-          <div className="mt-6">
-            <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[#0876c9] bg-blue-50 px-2.5 py-1 rounded-full">
-                    Evaluasi Refleks & Kebiasaan
-                  </span>
-                  <h2 className="mt-1 text-base font-black text-[#102a54]">
-                    {activeAriQuestion.title} ({currentAriStep + 1} dari {ARI_SURVEY_QUESTIONS.length})
-                  </h2>
-                </div>
-                <span className="text-xs font-bold text-slate-400">
-                  Pilar: {activeAriQuestion.pillar}
+          {/* Stage 2: 5 Golden Rules Intervention */}
+          {stage === "intervention" && (
+            <div className="mt-6">
+              <div className="rounded-3xl bg-white p-6 shadow-soft md:p-8">
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700">
+                  Kunci Pengamanan Akun
                 </span>
-              </div>
 
-              {/* Progress Bar */}
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full bg-[#0876c9] transition-all duration-300"
-                  style={{ width: `${((currentAriStep + 1) / ARI_SURVEY_QUESTIONS.length) * 100}%` }}
-                />
-              </div>
-            </div>
+                <h2 className="mt-3 text-xl font-black text-[#102a54] md:text-2xl">
+                  5 Golden Rules Keamanan Finansial Digital
+                </h2>
 
-            {/* Question Card */}
-            <div className="mt-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
-              <h3 className="text-sm font-bold leading-relaxed text-[#102a54] mb-4">
-                {activeAriQuestion.question}
-              </h3>
+                <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+                  Anda telah menyelesaikan 5 skenario pertama. Sebelum lanjut ke tantangan penentu berikutnya, perhatikan 5 prinsip keamanan mutlak berikut:
+                </p>
 
-              {/* Option Likert Cards */}
-              <div className="space-y-2.5">
-                {activeAriQuestion.options.map((opt) => (
-                  <button
-                    key={opt.score}
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={() => handleSelectAriScore(opt.score)}
-                    className="w-full text-left rounded-2xl border border-slate-200 bg-white p-4 text-xs font-bold transition-all hover:border-[#0876c9] hover:bg-blue-50/50 flex items-start gap-3"
-                  >
-                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-slate-100 text-[#102a54] text-xs font-bold">
-                      {opt.score}
-                    </span>
-                    <div className="flex-1">
-                      <div className="text-slate-900 font-bold">{opt.label}</div>
-                      <div className="text-[11px] text-slate-400 font-normal mt-0.5">{opt.desc}</div>
+                {/* 5 Core Rules */}
+                <div className="mt-5 space-y-3">
+                  {[
+                    {
+                      num: "1",
+                      title: "Kerahasiaan Data:",
+                      desc: "Jangan pernah membagikan OTP, PIN, CVV, atau password kepada siapa pun termasuk pihak bank."
+                    },
+                    {
+                      num: "2",
+                      title: "Waspada File .APK:",
+                      desc: (
+                        <>
+                          Jangan pernah membuka atau menginstal file berakhiran{" "}
+                          <code className="rounded bg-slate-200/80 px-1 py-0.5 font-mono text-[11px] text-slate-800">
+                            .apk
+                          </code>{" "}
+                          dari WhatsApp atau Telegram.
+                        </>
+                      )
+                    },
+                    {
+                      num: "3",
+                      title: "Periksa Domain URL:",
+                      desc: "Jangan klik link SMS. Ketik manual alamat portal resmi bank di browser Anda."
+                    },
+                    {
+                      num: "4",
+                      title: "Tolak Syarat Deposit:",
+                      desc: "Tawaran kerja paruh waktu yang meminta deposit uang terlebih dahulu adalah penipuan."
+                    },
+                    {
+                      num: "5",
+                      title: "Verifikasi Nama QRIS:",
+                      desc: "Selalu periksa kesesuaian nama merchant di layar m-banking sebelum menginput PIN transaksi."
+                    }
+                  ].map((item) => (
+                    <div
+                      key={item.num}
+                      className="flex items-start gap-3.5 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 transition hover:border-blue-100 hover:bg-blue-50/30"
+                    >
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#102a54] text-xs font-black text-white shadow-xs">
+                        {item.num}
+                      </div>
+                      <div className="text-xs leading-relaxed text-slate-700">
+                        <strong className="font-black text-[#102a54] mr-1.5">{item.title}</strong>
+                        {item.desc}
+                      </div>
                     </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleStartPostTest}
+                    className="flex items-center gap-2 rounded-2xl bg-[#0876c9] px-6 py-3.5 text-xs font-black text-white shadow-md transition hover:bg-[#075da8]"
+                  >
+                    Mulai Tantangan Bagian 2 (2 Menit)
+                    <Icon name="ArrowRight" size={16} />
                   </button>
-                ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Stage 3: Post-Test */}
+          {stage === "post_test" && activePostScenario && (
+            <div className="mt-6">
+              <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">
+                      Tantangan Bagian 2
+                    </span>
+                    <h2 className="mt-1 text-base font-black text-[#102a54]">
+                      Skenario {currentStep + 1} dari {POST_TEST_SCENARIOS.length}: {activePostScenario.category}
+                    </h2>
+                  </div>
+
+                  {/* 1.5-Minute Timer Display */}
+                  <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-1.5 font-mono text-xs font-black text-emerald-800">
+                    <Icon name="Clock" size={15} className={timeLeft < 30 ? "text-red-500 animate-pulse" : "text-emerald-600"} />
+                    <span className={timeLeft < 30 ? "text-red-600" : "text-emerald-800"}>
+                      {formatTimer(timeLeft)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full bg-emerald-500 transition-all duration-300"
+                    style={{ width: `${((currentStep + (showFeedback ? 1 : 0)) / POST_TEST_SCENARIOS.length) * 100}%` }}
+                  />
+                </div>
               </div>
 
-              {isSubmitting && (
-                <div className="mt-4 text-center text-xs font-bold text-[#0876c9] animate-pulse">
-                  Menyimpan hasil evaluasi ke database...
+              {/* Scenario Card */}
+              <div className="mt-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
+                <div className="text-xs font-bold text-slate-500 mb-2">
+                  {activePostScenario.context}
                 </div>
-              )}
+
+                {/* Chat / Mock Interface */}
+                <div className="my-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5">
+                    <div className="grid h-7 w-7 place-items-center rounded-full bg-emerald-100 text-emerald-700">
+                      <Icon name={activePostScenario.mockType === "sms" ? "MessageSquare" : activePostScenario.mockType === "qris" ? "QrCode" : "PhoneCall"} size={14} />
+                    </div>
+                    <span className="text-xs font-black text-[#102a54]">
+                      {activePostScenario.sender}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 text-xs leading-relaxed text-slate-700 bg-white p-3 rounded-xl border border-slate-100 font-medium">
+                    {activePostScenario.message}
+                  </div>
+                </div>
+
+                {/* Question */}
+                <h3 className="text-sm font-black text-[#102a54] mb-3">
+                  {activePostScenario.question}
+                </h3>
+
+                {/* Options */}
+                <div className="space-y-2.5">
+                  {activePostScenario.options.map((opt) => {
+                    const isSelected = selectedOption?.id === opt.id
+                    let btnStyle = "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+
+                    if (showFeedback) {
+                      if (opt.isCorrect) {
+                        btnStyle = "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-sm"
+                      } else if (isSelected && !opt.isCorrect) {
+                        btnStyle = "border-red-400 bg-red-50 text-red-800 shadow-sm"
+                      } else {
+                        btnStyle = "border-slate-200 bg-slate-50 text-slate-400 opacity-60"
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        disabled={showFeedback}
+                        onClick={() => handleSelectPostOption(opt)}
+                        className={`w-full text-left rounded-2xl border p-4 text-xs font-bold transition-all duration-150 flex items-start gap-3 ${btnStyle}`}
+                      >
+                        <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-bold ${showFeedback && opt.isCorrect ? "bg-emerald-600 text-white border-emerald-600" : "border-slate-300"
+                          }`}>
+                          {opt.id.toUpperCase()}
+                        </span>
+                        <span className="flex-1 leading-snug">{opt.text}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {/* Instant Feedback Panel */}
+                {showFeedback && selectedOption && (
+                  <div className={`mt-5 rounded-2xl p-4 border transition-all ${selectedOption.isCorrect ? "bg-emerald-50/80 border-emerald-200" : "bg-red-50/80 border-red-200"
+                    }`}>
+                    <div className="flex items-center gap-2">
+                      <Icon
+                        name={selectedOption.isCorrect ? "CheckCircle2" : "AlertTriangle"}
+                        size={18}
+                        className={selectedOption.isCorrect ? "text-emerald-600" : "text-red-600"}
+                      />
+                      <span className={`text-xs font-black ${selectedOption.isCorrect ? "text-emerald-800" : "text-red-800"}`}>
+                        {selectedOption.isCorrect ? "Tindakan Aman & Tepat (+20 Poin)" : "Tindakan Berisiko (-20 Poin)"}
+                      </span>
+                    </div>
+
+                    <p className="mt-2 text-xs text-slate-700 leading-relaxed font-medium">
+                      {selectedOption.feedbackReason}
+                    </p>
+
+                    <div className="mt-3 rounded-xl bg-white/80 p-2.5 border border-slate-200/60 text-[11px] text-slate-600">
+                      <strong>Aturan Keamanan:</strong> {activePostScenario.goldenRule}
+                    </div>
+
+                    <div className="mt-4 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={handleNextPostStep}
+                        className="flex items-center gap-2 rounded-2xl bg-[#102a54] px-5 py-2.5 text-xs font-black text-white transition hover:bg-[#1a3e75]"
+                      >
+                        {currentStep < POST_TEST_SCENARIOS.length - 1 ? (
+                          <>
+                            Skenario Berikutnya
+                            <Icon name="ArrowRight" size={15} />
+                          </>
+                        ) : (
+                          <>
+                            Lanjut ke Evaluasi Refleks
+                            <Icon name="ArrowRight" size={15} />
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Stage 4: ARI Survey */}
+          {stage === "ari_survey" && activeAriQuestion && (
+            <div className="mt-6">
+              <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-[#0876c9] bg-blue-50 px-2.5 py-1 rounded-full">
+                      Evaluasi Refleks & Kebiasaan
+                    </span>
+                    <h2 className="mt-1 text-base font-black text-[#102a54]">
+                      {activeAriQuestion.title} ({currentAriStep + 1} dari {ARI_SURVEY_QUESTIONS.length})
+                    </h2>
+                  </div>
+                  <span className="text-xs font-bold text-slate-400">
+                    Pilar: {activeAriQuestion.pillar}
+                  </span>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full bg-[#0876c9] transition-all duration-300"
+                    style={{ width: `${((currentAriStep + 1) / ARI_SURVEY_QUESTIONS.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Question Card */}
+              <div className="mt-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
+                <h3 className="text-sm font-bold leading-relaxed text-[#102a54] mb-4">
+                  {activeAriQuestion.question}
+                </h3>
+
+                {/* Option Likert Cards */}
+                <div className="space-y-2.5">
+                  {activeAriQuestion.options.map((opt) => (
+                    <button
+                      key={opt.score}
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() => handleSelectAriScore(opt.score)}
+                      className="w-full text-left rounded-2xl border border-slate-200 bg-white p-4 text-xs font-bold transition-all hover:border-[#0876c9] hover:bg-blue-50/50 flex items-start gap-3"
+                    >
+                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-slate-100 text-[#102a54] text-xs font-bold">
+                        {opt.score}
+                      </span>
+                      <div className="flex-1">
+                        <div className="text-slate-900 font-bold">{opt.label}</div>
+                        <div className="text-[11px] text-slate-400 font-normal mt-0.5">{opt.desc}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {isSubmitting && (
+                  <div className="mt-4 text-center text-xs font-bold text-[#0876c9] animate-pulse">
+                    Menyimpan hasil evaluasi ke database...
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           <BottomSpace />
+          </div>
         </main>
 
-        <BottomNav />
+        <div className="md:hidden"><BottomNav /></div>
       </div>
     </div>
   )

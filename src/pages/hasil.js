@@ -75,13 +75,13 @@ export default function HasilPage() {
         : BADGES_DATA[2]
 
   return (
-    <div className="app-shell flex justify-center bg-[#e7eff6] min-h-screen text-[#002554]">
-      <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl min-h-screen md:min-h-0 md:my-5 md:rounded-[44px] shadow-2xl bg-gradient-to-b from-[#0292fc] via-[#85caff] to-[#f4faff] flex flex-col relative overflow-hidden border border-white/60 pb-safe">
+    <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-[#0292fc] md:bg-gradient-to-b md:from-[#0292fc] md:via-[#66baff] md:to-[#edf5fc]">
+      <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
         
         <AppHeader title="Profil & Hasil" subtitle="Evaluasi Keputusan Keamanan" />
 
         {/* Top Score Banner */}
-        <section className="px-6 pt-1 pb-5 text-white">
+        <section className="w-full max-w-5xl mx-auto px-5 sm:px-8 pt-1 pb-5 text-white">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-[10px] font-bold uppercase tracking-wider text-sky-100">
@@ -124,7 +124,7 @@ export default function HasilPage() {
         </section>
 
         {/* BOTTOM SHEET: Impact & Detailed Feedback */}
-        <main className="flex-1 bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] px-5 pt-5 space-y-4 shadow-2xl">
+        <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10"><div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-5">
           
           {/* Behavioral Impact Metric Card */}
           <section className="glass-card rounded-[26px] p-4 border border-white">
@@ -183,9 +183,10 @@ export default function HasilPage() {
           </section>
 
           <BottomSpace />
+          </div>
         </main>
 
-        <BottomNav />
+        <div className="md:hidden"><BottomNav /></div>
       </div>
     </div>
   )
