@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import AppHeader from "../components/AppHeader"
 import BottomNav from "../components/BottomNav"
 import BottomSpace from "../components/BottomSpace"
@@ -68,12 +69,49 @@ export default function ModusPage() {
     <div className="app-shell flex justify-center bg-[#e7eff6] min-h-screen text-[#002554]">
       {/* iOS App Shell matching Home UI */}
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl min-h-screen md:min-h-0 md:my-5 md:rounded-[44px] shadow-2xl bg-gradient-to-b from-[#0292fc] via-[#85caff] to-[#f4faff] flex flex-col relative overflow-hidden border border-white/60 pb-safe">
-        
-        <AppHeader title="Katalog Modus" subtitle="Bank BCA #AwasModus" />
+
+        {/* Top App Header with Back Button and Quick Count Badge */}
+        <AppHeader 
+          title="Katalog Modus" 
+          subtitle="Bank BCA #AwasModus"
+          showBack={true}
+          backHref="/"
+          rightElement={
+            <div className="rounded-full bg-white/20 backdrop-blur-md px-3 py-1 border border-white/30 text-right">
+              <span className="text-[11px] font-bold text-white tracking-wide">
+                {MODUS_LIST.length} Modus
+              </span>
+            </div>
+          }
+        />
+
+        {/* Hero Banner in Sky Blue Header Area */}
+        <section className="px-6 pt-1 pb-4 text-white">
+          <div className="flex items-center justify-between gap-4">
+            <div className="max-w-[210px] sm:max-w-xs">
+              <span className="inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-sky-100 uppercase backdrop-blur-xs">
+                Database Kejahatan
+              </span>
+              <h2 className="text-xl font-black text-white mt-1 leading-tight tracking-tight">
+                Pola Penipuan Digital Terkini
+              </h2>
+            </div>
+            
+            <div className="h-16 w-16 shrink-0 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center p-2 shadow-sm">
+              <Image
+                src="/3d-alert-icon.png"
+                alt="Waspada Modus"
+                width={50}
+                height={50}
+                className="object-contain drop-shadow-md"
+              />
+            </div>
+          </div>
+        </section>
 
         {/* BOTTOM SHEET: Pure White Curved Content Panel */}
         <main className="flex-1 bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] px-5 pt-6 space-y-4 shadow-2xl">
-          
+
           {/* Search Box in Content Area */}
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
@@ -106,18 +144,17 @@ export default function ModusPage() {
                   key={category}
                   type="button"
                   onClick={() => setSelectedCategory(category)}
-                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-[11px] font-bold transition ${
-                    active
+                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-[11px] font-bold transition ${active
                       ? "bg-[#0292fc] text-white shadow-xs"
                       : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200/80"
-                  }`}
+                    }`}
                 >
                   {category}
                 </button>
               )
             })}
           </div>
-          
+
           {/* Main Video Highlight Card if in Semua / Video */}
           {(selectedCategory === "Semua" || selectedCategory === "Video Edukasi") && mainVideo && (
             <div className="glass-card rounded-[26px] p-4 border border-white">
@@ -139,152 +176,177 @@ export default function ModusPage() {
 
               <button
                 type="button"
-                onClick={() => {
-                  setActiveVideoModal(mainVideo)
-                  handleClaimEduPoints(mainVideo.id, mainVideo.rewardPoints, mainVideo.title)
-                }}
-                className="mt-3 w-full rounded-xl bg-[#0292fc] py-2 text-xs font-bold text-white shadow-xs hover:bg-[#007ad6] transition"
+                onClick={() => setActiveVideoModal(mainVideo)}
+                className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-[#0292fc] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-[#0081e3] transition active:scale-95"
               >
-                Tonton Video Edukasi
+                <span>Tonton Video</span>
+                <Icon name="ArrowRight" size={13} />
               </button>
             </div>
           )}
 
-          {/* List Modus Cards */}
+          {/* List of Modus Items */}
           <div className="space-y-2.5">
             <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-black uppercase tracking-wider text-[#002554]">
+              <span className="text-xs font-bold text-[#002554]">
                 Daftar Modus ({filteredModus.length})
+              </span>
+              <span className="text-[11px] text-slate-400">
+                Pilih untuk detail pencegahan
               </span>
             </div>
 
-            {filteredModus.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => setActiveModusModal(item)}
-                className="glass-card rounded-[22px] p-3.5 flex items-center justify-between gap-3 active:scale-98 transition cursor-pointer hover:border-blue-200 border border-white"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`h-10 w-10 shrink-0 rounded-2xl flex items-center justify-center font-black text-xs ${
-                      item.level === "Tinggi"
-                        ? "bg-red-50 text-red-600 border border-red-100"
-                        : "bg-amber-50 text-amber-600 border border-amber-100"
-                    }`}
-                  >
-                    <Icon name="AlertTriangle" size={18} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[9px] font-extrabold uppercase tracking-wide text-[#0292fc]">
-                        {item.tag}
-                      </span>
-                      <span className="text-[8px] text-slate-300">•</span>
-                      <span
-                        className={`text-[9px] font-bold ${
-                          item.level === "Tinggi" ? "text-red-500" : "text-amber-500"
-                        }`}
-                      >
-                        {item.level === "Tinggi" ? "Risiko Tinggi" : "Waspada"}
-                      </span>
-                    </div>
-                    <h3 className="text-xs font-black text-[#002554] line-clamp-1">
-                      {item.title}
-                    </h3>
-                    <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
-                      {item.desc}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="h-7 w-7 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 shrink-0">
-                  <Icon name="ChevronRight" size={15} />
-                </div>
+            {filteredModus.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center bg-white/50">
+                <p className="text-xs font-semibold text-slate-500">
+                  Tidak ditemukan modus dengan kata kunci &quot;{searchQuery}&quot;
+                </p>
               </div>
-            ))}
+            ) : (
+              filteredModus.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => setActiveModusModal(item)}
+                  className="glass-card rounded-[22px] p-3.5 border border-white flex items-center justify-between gap-3 cursor-pointer hover:border-blue-200 transition active:scale-[0.99]"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 shrink-0 rounded-2xl bg-blue-50/80 text-[#0292fc] flex items-center justify-center">
+                      <Icon name={item.icon || "AlertTriangle"} size={18} />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-black text-[#002554] leading-snug">
+                        {item.title}
+                      </h3>
+                      <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="h-7 w-7 shrink-0 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                    <Icon name="ChevronRight" size={14} />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
+
+          {/* Educational Articles if Selected */}
+          {(selectedCategory === "Semua" || selectedCategory === "Artikel") && (
+            <div className="space-y-2.5 pt-2">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs font-bold text-[#002554]">
+                  Artikel Resmi #AwasModus
+                </span>
+                <span className="text-[11px] text-slate-400">Baca & Pahami</span>
+              </div>
+
+              {BCA_EDU_ARTICLES.map((art) => (
+                <div
+                  key={art.id}
+                  onClick={() => setActiveArticleModal(art)}
+                  className="glass-card rounded-[22px] p-3.5 border border-white flex items-center justify-between gap-3 cursor-pointer hover:border-blue-200 transition active:scale-[0.99]"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 shrink-0 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center">
+                      <Icon name="BookOpen" size={18} />
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold text-amber-600">
+                        {art.readTime}
+                      </div>
+                      <h4 className="text-xs font-black text-[#002554] leading-snug">
+                        {art.title}
+                      </h4>
+                    </div>
+                  </div>
+
+                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">
+                    +{art.rewardPoints} Poin
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
 
           <BottomSpace />
         </main>
 
-        <BottomNav />
-
-        {/* Modal Modus Detail */}
+        {/* MODAL: Modus Detail */}
         {activeModusModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-2xs animate-in fade-in">
-            <div className="w-full max-w-sm rounded-[32px] bg-white p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in">
+            <div className="w-full max-w-md rounded-t-[32px] sm:rounded-[32px] bg-white p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
               <div className="flex items-center justify-between">
-                <span className="rounded-md bg-blue-50 text-[#0292fc] px-2.5 py-0.5 text-[10px] font-black uppercase">
+                <span className="rounded-full bg-blue-50 text-[#0292fc] px-3 py-1 text-[10px] font-black uppercase">
                   {activeModusModal.tag}
                 </span>
                 <button
                   type="button"
                   onClick={() => setActiveModusModal(null)}
-                  className="h-7 w-7 rounded-full bg-slate-100 text-xs font-bold text-slate-500"
+                  className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"
                 >
                   ✕
                 </button>
               </div>
 
-              <h2 className="mt-3 text-base font-black text-[#002554]">
+              <h3 className="mt-3 text-base font-black text-[#002554]">
                 {activeModusModal.title}
-              </h2>
-              <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+              </h3>
+              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
                 {activeModusModal.desc}
               </p>
 
-              <div className="mt-4 rounded-2xl bg-red-50 border border-red-100 p-3">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-red-700">
-                  Trik Manipulasi & Red Flag
+              <div className="mt-4 rounded-2xl bg-amber-50/70 border border-amber-200/60 p-3.5">
+                <div className="text-[11px] font-bold text-amber-800 flex items-center gap-1.5">
+                  <Icon name="AlertTriangle" size={14} />
+                  <span>Ciri-ciri Utama Penipuan:</span>
                 </div>
-                <div className="text-xs text-red-950 mt-1 font-semibold">
-                  {activeModusModal.psychology}
-                </div>
+                <ul className="mt-1.5 space-y-1 text-xs text-amber-900/90 pl-4 list-disc">
+                  {activeModusModal.traits?.map((t, idx) => (
+                    <li key={idx}>{t}</li>
+                  )) || <li>Menggunakan nomor acak tidak resmi / kontak palsu.</li>}
+                </ul>
               </div>
 
-              <div className="mt-3 rounded-2xl bg-blue-50 border border-blue-100 p-3">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-[#0292fc]">
-                  Langkah Penanganan Resmi
+              <div className="mt-3 rounded-2xl bg-blue-50/70 border border-blue-200/60 p-3.5">
+                <div className="text-[11px] font-bold text-[#003882] flex items-center gap-1.5">
+                  <Icon name="Shield" size={14} />
+                  <span>Langkah Pencegahan BCA:</span>
                 </div>
-                <div className="text-xs text-[#002554] mt-1 font-medium">
-                  {activeModusModal.action}
-                </div>
+                <p className="mt-1 text-xs text-[#003882]/90 leading-relaxed">
+                  {activeModusModal.prevention || "Jangan pernah memberikan kode OTP, PIN, atau mengklik tautan / file dari nomor tak dikenal."}
+                </p>
               </div>
 
-              <div className="mt-5 flex gap-2">
-                <Link
-                  href="/challenge"
-                  className="flex-1 rounded-xl bg-[#0292fc] py-2.5 text-center text-xs font-bold text-white shadow-xs"
-                >
-                  Uji di Challenge
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setActiveModusModal(null)}
-                  className="rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-600"
-                >
-                  Tutup
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setActiveModusModal(null)}
+                className="mt-5 w-full rounded-2xl bg-[#0292fc] py-3 text-xs font-black text-white shadow-md hover:bg-[#0081e3] transition active:scale-98"
+              >
+                Saya Sudah Paham
+              </button>
             </div>
           </div>
         )}
 
-        {/* Video Player Modal */}
+        {/* MODAL: Video Player */}
         {activeVideoModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-2xs animate-in fade-in">
-            <div className="w-full max-w-sm rounded-[32px] bg-white p-4 shadow-2xl">
-              <div className="flex items-center justify-between pb-2">
-                <span className="text-xs font-bold text-[#002554]">Video Resmi BCA</span>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in">
+            <div className="w-full max-w-md rounded-[32px] bg-white p-5 shadow-2xl">
+              <div className="flex items-center justify-between pb-3">
+                <span className="text-xs font-bold text-[#003882]">
+                  Video Edukasi BCA
+                </span>
                 <button
                   type="button"
                   onClick={() => setActiveVideoModal(null)}
-                  className="h-7 w-7 rounded-full bg-slate-100 text-xs font-bold text-slate-500"
+                  className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"
                 >
                   ✕
                 </button>
               </div>
-              <div className="aspect-video w-full rounded-2xl overflow-hidden bg-slate-900">
+
+              <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-900 shadow-inner">
                 <iframe
                   className="w-full h-full"
                   src={`https://www.youtube.com/embed/${activeVideoModal.youtubeId}?autoplay=1`}
@@ -293,12 +355,70 @@ export default function ModusPage() {
                   allowFullScreen
                 />
               </div>
-              <div className="mt-3 text-xs font-bold text-[#002554]">
-                {activeVideoModal.title}
+
+              <div className="mt-3">
+                <h4 className="text-xs font-black text-[#002554]">
+                  {activeVideoModal.title}
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
+                  {activeVideoModal.desc}
+                </p>
               </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  handleClaimEduPoints(activeVideoModal.id, activeVideoModal.rewardPoints, activeVideoModal.title)
+                  setActiveVideoModal(null)
+                }}
+                className="mt-4 w-full rounded-2xl bg-emerald-500 py-2.5 text-xs font-black text-white shadow-md hover:bg-emerald-600 transition active:scale-98"
+              >
+                Selesai Menonton & Klaim +{activeVideoModal.rewardPoints} Poin
+              </button>
             </div>
           </div>
         )}
+
+        {/* MODAL: Article Reader */}
+        {activeArticleModal && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in">
+            <div className="w-full max-w-md rounded-t-[32px] sm:rounded-[32px] bg-white p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
+              <div className="flex items-center justify-between">
+                <span className="rounded-full bg-amber-50 text-amber-700 px-3 py-1 text-[10px] font-black uppercase">
+                  {activeArticleModal.readTime}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveArticleModal(null)}
+                  className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <h3 className="mt-3 text-base font-black text-[#002554]">
+                {activeArticleModal.title}
+              </h3>
+
+              <div className="mt-3 text-xs text-slate-600 leading-relaxed space-y-2 whitespace-pre-line">
+                {activeArticleModal.content}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  handleClaimEduPoints(activeArticleModal.id, activeArticleModal.rewardPoints, activeArticleModal.title)
+                  setActiveArticleModal(null)
+                }}
+                className="mt-5 w-full rounded-2xl bg-emerald-500 py-3 text-xs font-black text-white shadow-md hover:bg-emerald-600 transition active:scale-98"
+              >
+                Selesai Membaca & Klaim +{activeArticleModal.rewardPoints} Poin
+              </button>
+            </div>
+          </div>
+        )}
+
+        <BottomNav />
       </div>
     </div>
   )
