@@ -71,44 +71,17 @@ export default function ModusPage() {
       <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
 
         {/* Top App Header with Back Button and Quick Count Badge */}
-        <AppHeader 
-          title="Katalog Modus" 
+        <AppHeader
+          title="Katalog Modus"
           subtitle="Bank BCA #AwasModus"
           showBack={true}
           backHref="/"
-          rightElement={
-            <div className="rounded-full bg-white/20 backdrop-blur-md px-3.5 py-1 border border-white/30 text-right">
-              <span className="text-xs font-bold text-white tracking-wide">
-                {MODUS_LIST.length} Modus
-              </span>
-            </div>
-          }
-        />
 
-        {/* Hero Banner in Sky Blue Header Area */}
-        <section className="w-full max-w-6xl mx-auto px-5 sm:px-8 pt-2 pb-6 text-white">
+        />
+        <section className="w-full max-w-6xl mx-auto px-5 sm:px-8 pt-2 text-white">
           <div className="flex items-center justify-between gap-4">
-            <div className="max-w-md">
-              <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold tracking-wider text-sky-100 uppercase backdrop-blur-xs">
-                Database Penipuan Digital
-              </span>
-              <h2 className="text-2xl md:text-3xl font-black text-white mt-1.5 leading-tight tracking-tight">
-                Pola Penipuan Digital Terkini
-              </h2>
-              <p className="text-xs sm:text-sm text-white/90 mt-1 max-w-lg leading-relaxed">
-                Pelajari ragam modus operandi perbankan digital, tonton video edukasi resmi, dan kenali langkah pencegahannya.
-              </p>
-            </div>
-            
-            <div className="hidden sm:flex h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-3xl bg-white/20 backdrop-blur-md border border-white/30 items-center justify-center p-3 shadow-sm">
-              <Image
-                src="/3d-alert-icon.png"
-                alt="Waspada Modus"
-                width={70}
-                height={70}
-                className="object-contain drop-shadow-md"
-              />
-            </div>
+
+
           </div>
         </section>
 
@@ -150,8 +123,8 @@ export default function ModusPage() {
                       type="button"
                       onClick={() => setSelectedCategory(category)}
                       className={`shrink-0 rounded-full px-3.5 py-1.5 text-[11px] font-bold transition ${active
-                          ? "bg-[#0292fc] text-white shadow-xs"
-                          : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200/80"
+                        ? "bg-[#0292fc] text-white shadow-xs"
+                        : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200/80"
                         }`}
                     >
                       {category}
@@ -199,10 +172,7 @@ export default function ModusPage() {
             <div>
               <div className="flex items-center justify-between px-1 mb-3">
                 <span className="text-xs sm:text-sm font-bold text-[#002554]">
-                  Daftar Modus ({filteredModus.length})
-                </span>
-                <span className="text-[11px] text-slate-400">
-                  Pilih kartu untuk panduan pencegahan lengkap
+                  Daftar Modus
                 </span>
               </div>
 
@@ -250,7 +220,6 @@ export default function ModusPage() {
                   <span className="text-xs sm:text-sm font-bold text-[#002554]">
                     Artikel Resmi #AwasModus
                   </span>
-                  <span className="text-[11px] text-slate-400">Baca & Pahami</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

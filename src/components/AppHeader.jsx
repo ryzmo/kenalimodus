@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { useRouter } from "next/router"
 import Icon from "./Icon"
 
 export default function AppHeader({
@@ -8,6 +9,16 @@ export default function AppHeader({
   backHref = "/",
   rightElement = null
 }) {
+  const router = useRouter()
+
+  const navItems = [
+    { href: "/", label: "Beranda" },
+    { href: "/modus", label: "Katalog Modus" },
+    { href: "/challenge", label: "Challenge" },
+    { href: "/keluarga", label: "Keluarga" },
+    { href: "/rewards", label: "Rewards" }
+  ]
+
   return (
     <header className="w-full max-w-6xl mx-auto px-5 sm:px-8 pt-5 md:pt-7 pb-2 flex items-center justify-between text-white z-20">
       <div className="flex items-center gap-3">
@@ -33,23 +44,24 @@ export default function AppHeader({
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Desktop Quick Nav */}
-        <nav className="hidden md:flex items-center gap-1.5 bg-white/15 backdrop-blur-md rounded-full px-3 py-1 border border-white/25">
-          <Link href="/" className="px-3 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
-            Beranda
-          </Link>
-          <Link href="/modus" className="px-3 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
-            Katalog
-          </Link>
-          <Link href="/challenge" className="px-3 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
-            Challenge
-          </Link>
-          <Link href="/keluarga" className="px-3 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
-            Keluarga
-          </Link>
-          <Link href="/rewards" className="px-3 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
-            Rewards
-          </Link>
+        {/* Desktop Quick Nav with Active State */}
+        <nav className="hidden md:flex items-center gap-1.5 bg-white/15 backdrop-blur-md rounded-full p-1 border border-white/25">
+          {navItems.map((item) => {
+            const isActive = router.pathname === item.href
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`px-3.5 py-1 rounded-full text-xs font-bold transition duration-150 ${
+                  isActive
+                    ? "bg-white text-[#003882] shadow-2xs"
+                    : "text-white hover:bg-white/20"
+                }`}
+              >
+                {item.label}
+              </Link>
+            )
+          })}
         </nav>
 
         {rightElement && <div>{rightElement}</div>}

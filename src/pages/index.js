@@ -150,20 +150,20 @@ export default function Home() {
 
           {/* Desktop Navigation Links & Mobile Bell Button */}
           <div className="flex items-center gap-3">
-            <nav className="hidden md:flex items-center gap-2 bg-white/15 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/25">
-              <Link href="/" className="px-3 py-1 rounded-full text-xs font-bold bg-white text-[#003882] shadow-2xs">
+            <nav className="hidden md:flex items-center gap-1.5 bg-white/15 backdrop-blur-md rounded-full p-1 border border-white/25">
+              <Link href="/" className="px-3.5 py-1 rounded-full text-xs font-bold bg-white text-[#003882] shadow-2xs">
                 Beranda
               </Link>
-              <Link href="/modus" className="px-3 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
+              <Link href="/modus" className="px-3.5 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
                 Katalog Modus
               </Link>
-              <Link href="/challenge" className="px-3 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
-                2-Min Test
+              <Link href="/challenge" className="px-3.5 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
+                Challenge
               </Link>
-              <Link href="/keluarga" className="px-3 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
+              <Link href="/keluarga" className="px-3.5 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
                 Keluarga
               </Link>
-              <Link href="/rewards" className="px-3 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
+              <Link href="/rewards" className="px-3.5 py-1 rounded-full text-xs font-bold text-white hover:bg-white/20 transition">
                 Rewards
               </Link>
             </nav>
@@ -211,9 +211,7 @@ export default function Home() {
                   {safeScore}
                 </span>
                 <span className="text-sm md:text-base font-bold text-white/80">/100</span>
-                <span className="hidden sm:inline-block ml-3 px-3 py-1 rounded-full bg-white/20 text-xs font-bold text-sky-100 backdrop-blur-xs">
-                  {safeScore >= 80 ? "🛡️ Sangat Waspada" : safeScore >= 60 ? "⚡ Cukup Siap" : "⚠️ Butuh Latihan"}
-                </span>
+
               </div>
 
               {/* Progress Slider Pill */}
@@ -237,7 +235,6 @@ export default function Home() {
                   href="/challenge"
                   className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-2.5 text-xs font-black text-[#003882] shadow-md hover:bg-slate-50 transition active:scale-95"
                 >
-                  <Icon name="Zap" size={15} />
                   <span>Mulai Challenge 2-Menit</span>
                 </Link>
                 <Link
@@ -269,9 +266,6 @@ export default function Home() {
             {/* 1. EMERGENCY SCAM CALLOUT */}
             <section className="glass-card rounded-[26px] p-4 flex items-center justify-between gap-4 shadow-soft border border-white/90">
               <div className="flex items-center gap-3.5">
-                <div className="h-11 w-11 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center border border-red-100 shrink-0">
-                  <Icon name="AlertTriangle" size={20} />
-                </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs sm:text-sm font-black text-[#002554]">
@@ -282,7 +276,7 @@ export default function Home() {
                     </span>
                   </div>
                   <div className="text-[11px] sm:text-xs text-slate-500 font-medium leading-tight mt-0.5">
-                    Hubungi resmi Halo BCA sekarang jika mencurigai adanya transaksi tidak dikenal atau pemblokiran rekening.
+                    Segera hubungi Halo BCA jika ada transaksi mencurigakan atau rekening terblokir.
                   </div>
                 </div>
               </div>
@@ -326,9 +320,6 @@ export default function Home() {
                     <div className="mt-4">
                       <div className="text-xs sm:text-sm font-black text-[#002554] leading-tight">
                         {service.title}
-                      </div>
-                      <div className="text-[10px] sm:text-[11px] text-slate-400 font-medium mt-0.5">
-                        {service.sub}
                       </div>
                     </div>
                   </Link>
@@ -395,7 +386,7 @@ export default function Home() {
                       className="flex h-9 items-center gap-1.5 rounded-xl bg-[#0292fc] px-4 text-xs font-bold text-white shadow-xs hover:bg-[#007ad6] active:scale-95 transition"
                     >
                       <Icon name="Send" size={13} />
-                      <span>Kirim</span>
+
                     </a>
                     <button
                       type="button"

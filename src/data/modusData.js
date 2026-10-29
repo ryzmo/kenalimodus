@@ -12,68 +12,116 @@ export const MODUS_CATEGORIES = [
 
 export const MODUS_LIST = [
   {
-    id: "cs-palsu-wa",
-    category: "Impersonation",
-    title: "Customer Service Palsu",
-    description: "Penipu menyamar sebagai customer service melalui WhatsApp atau telepon.",
-    icon: "📞",
-    difficulty: "Sulit"
+    "id": "cs-palsu-wa",
+    "category": "Impersonation",
+    "title": "Customer Service Palsu",
+    "description": "Penipu menyamar sebagai haloBCA via nomor WhatsApp acak atau telepon tak resmi meminta verifikasi.",
+    "icon": "PhoneCall",
+    "difficulty": "Sulit",
+    "traits": [
+      "Nomor tidak terverifikasi (tanpa centang hijau resmi BCA).",
+      "Meminta kode OTP 6-digit atau PIN m-BCA dengan alasan pembaruan sistem.",
+      "Mendesak korban agar segera melakukan konfirmasi pembatalan transaksi."
+    ],
+    "prevention": "Halo BCA resmi hanya diakses via 1500888 atau app haloBCA. Petugas resmi TIDAK PERNAH meminta OTP, PIN, atau CVV."
   },
   {
-    id: "apk-berbahaya",
-    category: "APK Berbahaya",
-    title: "APK Berbahaya",
-    description: "File APK dikirim dengan berbagai alasan seperti undangan, resi, atau tilang.",
-    icon: "📱",
-    difficulty: "Sulit"
+    "id": "apk-berbahaya",
+    "category": "APK Berbahaya",
+    "title": "APK Berbahaya",
+    "description": "File instalasi .apk disamarkan sebagai surat undangan pernikahan, resi kurir, atau tilang elektronik.",
+    "icon": "Smartphone",
+    "difficulty": "Sulit",
+    "traits": [
+      "File berekstensi .apk dikirim melalui chat WhatsApp atau Telegram.",
+      "Meminta izin akses SMS dan notifikasi saat diinstal.",
+      "Membaca SMS OTP secara diam-diam untuk membobol akun perbankan."
+    ],
+    "prevention": "Jangan pernah klik atau buka file .apk dari chat. Matikan izin instalasi aplikasi tidak dikenal di pengaturan HP."
   },
   {
-    id: "phishing-link",
-    category: "Phishing",
-    title: "Phishing Link",
-    description: "Tautan palsu digunakan untuk mengarahkan korban ke halaman atau layanan tiruan.",
-    icon: "🔗",
-    difficulty: "Sulit"
+    "id": "phishing-link",
+    "category": "Phishing",
+    "title": "Phishing Link",
+    "description": "Tautan web palsu yang menyerupai internet banking resmi KlikBCA untuk mencuri kredensial login.",
+    "icon": "ExternalLink",
+    "difficulty": "Sulit",
+    "traits": [
+      "Alamat URL salah/typo (misal: klik-bca-login.com, bca-info.id).",
+      "Sering dipromosikan lewat Google Ads atau SMS blast.",
+      "Halaman meminta username, PIN, dan kode respon KeyBCA sekaligus."
+    ],
+    "prevention": "Terapkan mantra B-C-A: Buka dengan ketik manual bca.co.id, Cek keaslian SSL gembok hijau, dan Ayo bintangin/bookmark."
   },
   {
-    id: "social-engineering",
-    category: "Social Engineering",
-    title: "Social Engineering",
-    description: "Pelaku memanfaatkan tekanan, urgensi, atau manipulasi psikologis untuk memperoleh informasi atau tindakan korban.",
-    icon: "🧠",
-    difficulty: "Sangat Sulit"
+    "id": "social-engineering",
+    "category": "Social Engineering",
+    "title": "Social Engineering",
+    "description": "Pelaku memanipulasi emosi, rasa panik, atau iming-iming hadiah agar korban bertindak tanpa berpikir jernih.",
+    "icon": "AlertTriangle",
+    "difficulty": "Sangat Sulit",
+    "traits": [
+      "Menciptakan kondisi darurat palsu (keluarga kecelakaan, rekening diblokir).",
+      "Menuntut tindakan cepat dalam hitungan menit agar korban panik.",
+      "Memandu transfer uang ke virtual account atau e-wallet penipu."
+    ],
+    "prevention": "Tarik napas, jangan panik. Tutup telepon dan hubungi kerabat atau bank melalui kanal resmi independen."
   },
   {
-    id: "qris-palsu",
-    category: "Quishing (QRIS)",
-    title: "QRIS Palsu",
-    description: "QRIS dimanipulasi atau diganti sehingga pembayaran masuk ke rekening penerima yang tidak semestinya.",
-    icon: "▦",
-    difficulty: "Sulit"
+    "id": "qris-palsu",
+    "category": "Quishing (QRIS)",
+    "title": "QRIS Palsu (Quishing)",
+    "description": "Stiker QRIS merchant resmi ditimpa stiker palsu sehingga pembayaran masuk ke rekening pelaku.",
+    "icon": "QrCode",
+    "difficulty": "Sulit",
+    "traits": [
+      "Stiker QRIS terlihat bertumpuk atau mencurigakan di meja kasir.",
+      "Nama merchant yang muncul di layar pembayaran berbeda dengan nama toko.",
+      "Sering ditempel di kotak amal, rumah ibadah, atau kasir tanpa pengawasan."
+    ],
+    "prevention": "Selalu cocokkan nama merchant di layar ponsel dengan nama toko fisik sebelum menekan konfirmasi bayar."
   },
   {
-    id: "account-takeover",
-    category: "Account Takeover",
-    title: "Account Takeover",
-    description: "Pelaku mengambil alih akun korban melalui kombinasi manipulasi, kredensial, atau akses perangkat.",
-    icon: "🔐",
-    difficulty: "Sangat Sulit"
+    "id": "account-takeover",
+    "category": "Account Takeover",
+    "title": "Account Takeover (SIM Swap)",
+    "description": "Pelaku mengambil alih kartu SIM atau nomor ponsel korban untuk membajak verifikasi SMS OTP.",
+    "icon": "LockKeyhole",
+    "difficulty": "Sangat Sulit",
+    "traits": [
+      "Ponsel tiba-tiba kehilangan sinyal secara permanen di area biasanya normal.",
+      "Muncul notifikasi login atau perubahan password email dan m-banking.",
+      "Pelaku memanfaatkan KTP palsu untuk menduplikasi SIM card di gerai operator."
+    ],
+    "prevention": "Bila nomor mendadak hilang sinyal tanpa sebab, segera hubungi operator seluler dan blokir rekening bank sementara."
   },
   {
-    id: "recovery-scam",
-    category: "Recovery Scam",
-    title: "Recovery Scam",
-    description: "Pelaku menawarkan bantuan palsu untuk mengembalikan dana atau akun yang sebelumnya bermasalah.",
-    icon: "🛡️",
-    difficulty: "Sangat Sulit"
+    "id": "recovery-scam",
+    "category": "Recovery Scam",
+    "title": "Recovery Scam (Bantuan Palsu)",
+    "description": "Pelaku mengaku sebagai tim investigasi atau hacker putih yang bisa mengembalikan dana korban penipuan.",
+    "icon": "Shield",
+    "difficulty": "Sangat Sulit",
+    "traits": [
+      "Menghubungi korban yang baru saja curhat kehilangan uang di media sosial.",
+      "Menjanjikan dana kembali 100% dengan syarat membayar uang jasa/admin di awal.",
+      "Menggunakan testimoni palsu dan akun rekayasa."
+    ],
+    "prevention": "Tidak ada pihak selain penegak hukum dan bank resmi yang dapat memproses tindak lanjut penipuan. Jangan bayar biaya recovery."
   },
   {
-    id: "investment-scam",
-    category: "Investment Scam",
-    title: "Investment Scam",
-    description: "Pelaku menggunakan identitas perusahaan, komunitas, atau peluang investasi untuk meyakinkan korban.",
-    icon: "💰",
-    difficulty: "Sangat Sulit"
+    "id": "investment-scam",
+    "category": "Investment Scam",
+    "title": "Investasi Bodong & Tugas Freelance",
+    "description": "Penipuan berbasis imbal hasil tidak masuk akal atau misi harian menyukai video yang berakhir deposit fiktif.",
+    "icon": "Briefcase",
+    "difficulty": "Sangat Sulit",
+    "traits": [
+      "Menjanjikan return profit tinggi tanpa risiko dalam waktu singkat.",
+      "Mengundang korban ke grup Telegram tertutup dengan admin yang persuasif.",
+      "Awalnya memberi komisi kecil, lalu menuntut deposit jutaan rupiah yang tidak bisa ditarik."
+    ],
+    "prevention": "Cek legalitas platform di situs resmi OJK (ojk.go.id). Ingat prinsip 2L: Legal dan Logis."
   }
 ];
 // Pool lengkap 10 Skenario Dunia Nyata
