@@ -252,6 +252,7 @@ export default function Home() {
                 src="/image2.png"
                 alt="3D BCA Cyber Cop Assistant"
                 fill
+                sizes="(max-width: 640px) 160px, (max-width: 768px) 208px, 288px"
                 priority
                 className="object-contain"
               />
@@ -305,6 +306,7 @@ export default function Home() {
                           src={service.iconImg}
                           alt={service.title}
                           fill
+                          sizes="48px"
                           className="object-contain"
                         />
                       </div>
