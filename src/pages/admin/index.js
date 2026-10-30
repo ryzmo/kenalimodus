@@ -371,26 +371,13 @@ export default function AdminDashboardPage() {
           title={currentMenu === "menu" ? "Admin Control Center" : adminMenuItems.find((m) => m.id === currentMenu)?.title || "Admin"}
           subtitle="Sistem Manajemen Konten Terpadu BCA"
           showBack={currentMenu !== "menu"}
-          backHref="#"
+          onBack={() => setCurrentMenu("menu")}
         />
-
-        {/* Override Action Back saat berada di submenu */}
-        {currentMenu !== "menu" && (
-          <div className="w-full max-w-6xl mx-auto px-5 sm:px-8 -mt-1 mb-2">
-            <button
-              onClick={() => setCurrentMenu("menu")}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs backdrop-blur-md border border-white/30 transition cursor-pointer active:scale-95"
-            >
-              <Icon name="ArrowLeft" size={14} />
-              <span>Kembali ke Menu Utama Admin</span>
-            </button>
-          </div>
-        )}
 
         {/* BOTTOM SHEET / DESKTOP FULL CONTENT BODY */}
         <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-12 mt-2">
           <div className="max-w-6xl mx-auto px-5 sm:px-8 space-y-6">
-            
+
             {/* Toast Notifikasi */}
             {toastMsg && (
               <div className="fixed top-6 right-6 z-50 bg-[#002554] text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 border border-blue-400 animate-fade-in">
@@ -407,10 +394,7 @@ export default function AdminDashboardPage() {
                 {/* Banner Sambutan Admin */}
                 <div className="glass-card rounded-[28px] p-6 border border-white shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#0292fc] border border-blue-200 text-[11px] font-black mb-2">
-                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span>Administrator Server Active</span>
-                    </div>
+
                     <h1 className="text-xl sm:text-2xl font-black text-[#002554] tracking-tight">
                       Pusat Pengaturan Ekosistem
                     </h1>
@@ -430,37 +414,30 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                {/* Grid Menu Kotak-Kotak Serasi dengan Halaman Utama (3D Icon) */}
+                {/* Grid Menu Kotak-Kotak Tanpa Icon (Clean Minimalist Modern) */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                   {adminMenuItems.map((menu) => {
                     const CardInner = (
-                      <div className="flex flex-col items-center justify-between h-full p-4 text-center">
-                        <div className="relative h-14 w-14 sm:h-16 sm:w-16 flex items-center justify-center shrink-0 drop-shadow-md group-hover:scale-105 transition-transform duration-300">
-                          <Image
-                            src={menu.iconImg}
-                            alt={menu.title}
-                            width={56}
-                            height={56}
-                            className="object-contain"
-                          />
+                      <div className="flex flex-col justify-between h-full p-4 sm:p-5 text-left">
+                        <div>
                           {menu.badge && (
-                            <span className={`absolute -top-1.5 -right-1 text-[9px] font-black uppercase text-white px-1.5 py-0.5 rounded-full shadow-2xs ${menu.badgeColor || "bg-[#0292fc]"}`}>
-                              {menu.badge}
-                            </span>
+                            <div className="mb-3">
+                              <span className={`inline-block text-[10px] font-black uppercase tracking-wider text-white px-2 py-0.5 rounded-md shadow-2xs ${menu.badgeColor || "bg-[#0292fc]"}`}>
+                                {menu.badge}
+                              </span>
+                            </div>
                           )}
-                        </div>
 
-                        <div className="mt-3 min-w-0 w-full">
-                          <h3 className="text-xs sm:text-sm font-black text-[#002554] leading-tight truncate">
+                          <h3 className="text-sm font-black text-[#002554] leading-snug group-hover:text-[#0292fc] transition-colors">
                             {menu.title}
                           </h3>
-                          <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">
+                          <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
                             {menu.desc}
                           </p>
                         </div>
 
-                        <div className="mt-3 pt-2 w-full border-t border-slate-100 flex items-center justify-center">
-                          <span className="text-[10px] font-black text-[#0292fc] bg-blue-50/80 px-2 py-0.5 rounded-full border border-blue-100">
+                        <div className="mt-4 pt-3 w-full border-t border-slate-100 flex items-center justify-start">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-[#0292fc] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">
                             {menu.count !== undefined ? `${menu.count} Data` : "Buka"}
                           </span>
                         </div>
@@ -493,598 +470,592 @@ export default function AdminDashboardPage() {
               </div>
             )}
 
-        {/* ==================================================== */}
-        {/* SUBMENU 1: KATALOG MODUS */}
-        {/* ==================================================== */}
-        {currentMenu === "modus" && (
-          <div className="space-y-4">
-            <div className="glass-card rounded-[24px] p-4 border border-white flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-black text-[#002554]">Manajemen Katalog Modus</h2>
-                <p className="text-xs text-slate-500">Daftar tipologi penipuan yang muncul di halaman Katalog</p>
-              </div>
-              <button
-                onClick={() => setShowModal(true)}
-                className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
-              >
-                <Icon name="Plus" size={15} />
-                <span>Tambah Modus</span>
-              </button>
-            </div>
-
-            {modusList.length === 0 ? (
-              <div className="glass-card rounded-[24px] p-8 text-center border border-white text-slate-400">
-                Belum ada modus kustom. Silakan tambahkan.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {modusList.map((item) => (
-                  <div key={item.id} className="glass-card rounded-[22px] p-4 border border-white flex flex-col justify-between">
-                    <div>
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-50 text-[#0292fc]">
-                        {item.category}
-                      </span>
-                      <h4 className="text-sm font-black text-[#002554] mt-1.5">{item.title}</h4>
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">{item.description}</p>
-                    </div>
-                    <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-400">ID #{item.id}</span>
-                      <button
-                        onClick={() => handleDelete("modus", item.id)}
-                        className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ==================================================== */}
-        {/* SUBMENU 2: BANK SOAL SIMULASI */}
-        {/* ==================================================== */}
-        {currentMenu === "soal" && (
-          <div className="space-y-4">
-            <div className="glass-card rounded-[24px] p-4 border border-white flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-black text-[#002554]">Manajemen Soal Skenario</h2>
-                <p className="text-xs text-slate-500">Studi kasus yang disajikan pada 2-Minute Challenge</p>
-              </div>
-              <button
-                onClick={() => setShowModal(true)}
-                className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
-              >
-                <Icon name="Plus" size={15} />
-                <span>Tambah Soal</span>
-              </button>
-            </div>
-
-            {scenarioList.length === 0 ? (
-              <div className="glass-card rounded-[24px] p-8 text-center border border-white text-slate-400">
-                Belum ada soal kustom. Silakan tambahkan.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {scenarioList.map((item) => (
-                  <div key={item.id} className="glass-card rounded-[22px] p-4 border border-white flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
-                          {item.sender}
-                        </span>
-                        <span className="text-[10px] text-slate-400">{item.modus_type}</span>
-                      </div>
-                      <h4 className="text-sm font-black text-[#002554] mt-1.5">{item.title}</h4>
-                      <p className="text-xs italic bg-slate-50 p-2 rounded-xl mt-1 text-slate-600">
-                        &quot;{item.message}&quot;
-                      </p>
-                      <p className="text-xs font-bold text-slate-700 mt-2">{item.question}</p>
-                    </div>
-                    <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-400">ID #{item.id}</span>
-                      <button
-                        onClick={() => handleDelete("scenario", item.id)}
-                        className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ==================================================== */}
-        {/* SUBMENU 3: ARTIKEL & REWARD POIN */}
-        {/* ==================================================== */}
-        {currentMenu === "articles" && (
-          <div className="space-y-4">
-            <div className="glass-card rounded-[24px] p-4 border border-white flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-black text-[#002554]">Artikel Edukasi & Nilai Poin</h2>
-                <p className="text-xs text-slate-500">Tentukan artikel dan berapa reward poin yang didapat nasabah setelah membaca</p>
-              </div>
-              <button
-                onClick={() => setShowModal(true)}
-                className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
-              >
-                <Icon name="Plus" size={15} />
-                <span>Tambah Artikel</span>
-              </button>
-            </div>
-
-            {articleList.length === 0 ? (
-              <div className="glass-card rounded-[24px] p-8 text-center border border-white text-slate-400">
-                Belum ada artikel kustom. Silakan klik Tambah Artikel.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {articleList.map((item) => (
-                  <div key={item.id} className="glass-card rounded-[22px] p-4 border border-white flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-700">
-                          {item.reading_time || "3 Menit"}
-                        </span>
-                        <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                          +{item.reward_points} Poin
-                        </span>
-                      </div>
-                      <h4 className="text-sm font-black text-[#002554] mt-2">{item.title}</h4>
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">{item.summary}</p>
-                      <p className="text-[10px] text-slate-400 mt-1">Penulis: {item.author}</p>
-                    </div>
-                    <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-400">ID #{item.id}</span>
-                      <button
-                        onClick={() => handleDelete("article", item.id)}
-                        className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ==================================================== */}
-        {/* SUBMENU 4: REWARDS & PENUKARAN */}
-        {/* ==================================================== */}
-        {currentMenu === "rewards" && (
-          <div className="space-y-4">
-            <div className="glass-card rounded-[24px] p-4 border border-white flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-black text-[#002554]">Katalog Hadiah & Poin Penukaran</h2>
-                <p className="text-xs text-slate-500">Atur harga poin dan sisa stok voucher hadiah</p>
-              </div>
-              <button
-                onClick={() => setShowModal(true)}
-                className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
-              >
-                <Icon name="Plus" size={15} />
-                <span>Tambah Reward</span>
-              </button>
-            </div>
-
-            {rewardList.length === 0 ? (
-              <div className="glass-card rounded-[24px] p-8 text-center border border-white text-slate-400">
-                Belum ada reward kustom. Silakan tambahkan.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {rewardList.map((item) => (
-                  <div key={item.id} className="glass-card rounded-[22px] p-4 border border-white flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
-                          {item.partner}
-                        </span>
-                        <span className="text-xs font-black text-amber-600">
-                          {item.cost} Poin
-                        </span>
-                      </div>
-                      <h4 className="text-sm font-black text-[#002554] mt-2">{item.title}</h4>
-                      <p className="text-xs text-slate-500 mt-1">Stok: {item.stock} unit</p>
-                    </div>
-                    <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-400">ID #{item.id}</span>
-                      <button
-                        onClick={() => handleDelete("reward", item.id)}
-                        className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ==================================================== */}
-        {/* SUBMENU 5: ATURAN POIN & PENGATURAN SISTEM */}
-        {/* ==================================================== */}
-        {currentMenu === "settings" && (
-          <div className="space-y-4">
-            <div className="glass-card rounded-[24px] p-4 border border-white">
-              <h2 className="text-lg font-black text-[#002554]">Konfigurasi Aturan Poin & Keamanan</h2>
-              <p className="text-xs text-slate-500">Ubah nilai perolehan poin per aktivitas dan parameter perlindungan sistem</p>
-            </div>
-
-            <form onSubmit={handleSaveSettings} className="glass-card rounded-[28px] p-6 border border-white shadow-sm space-y-4">
+            {/* ==================================================== */}
+            {/* SUBMENU 1: KATALOG MODUS */}
+            {/* ==================================================== */}
+            {currentMenu === "modus" && (
               <div className="space-y-4">
-                {editableSettings.map((item, idx) => (
-                  <div key={item.setting_key} className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="max-w-md">
-                      <div className="text-xs font-black text-[#002554]">
-                        {item.setting_key.replace(/_/g, " ").toUpperCase()}
+                <div className="glass-card rounded-[24px] p-4 border border-white flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-black text-[#002554]">Manajemen Katalog Modus</h2>
+                    <p className="text-xs text-slate-500">Daftar tipologi penipuan yang muncul di halaman Katalog</p>
+                  </div>
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs shadow-sm cursor-pointer hover:bg-[#002b66] transition active:scale-95"
+                  >
+                    <span>Tambah Modus</span>
+                  </button>
+                </div>
+
+                {modusList.length === 0 ? (
+                  <div className="glass-card rounded-[24px] p-8 text-center border border-white text-slate-400">
+                    Belum ada modus kustom. Silakan tambahkan.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {modusList.map((item) => (
+                      <div key={item.id} className="glass-card rounded-[22px] p-4 border border-white flex flex-col justify-between">
+                        <div>
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-50 text-[#0292fc]">
+                            {item.category}
+                          </span>
+                          <h4 className="text-sm font-black text-[#002554] mt-1.5">{item.title}</h4>
+                          <p className="text-xs text-slate-500 mt-1 line-clamp-2">{item.description}</p>
+                        </div>
+                        <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                          <span className="text-[11px] text-slate-400">ID #{item.id}</span>
+                          <button
+                            onClick={() => handleDelete("modus", item.id)}
+                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
+                          >
+                            Hapus
+                          </button>
+                        </div>
                       </div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">
-                        {item.description}
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ==================================================== */}
+            {/* SUBMENU 2: BANK SOAL SIMULASI */}
+            {/* ==================================================== */}
+            {currentMenu === "soal" && (
+              <div className="space-y-4">
+                <div className="glass-card rounded-[24px] p-4 border border-white flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-black text-[#002554]">Manajemen Soal Skenario</h2>
+                    <p className="text-xs text-slate-500">Studi kasus yang disajikan pada 2-Minute Challenge</p>
+                  </div>
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs shadow-sm cursor-pointer hover:bg-[#002b66] transition active:scale-95"
+                  >
+                    <span>Tambah Soal</span>
+                  </button>
+                </div>
+
+                {scenarioList.length === 0 ? (
+                  <div className="glass-card rounded-[24px] p-8 text-center border border-white text-slate-400">
+                    Belum ada soal kustom. Silakan tambahkan.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {scenarioList.map((item) => (
+                      <div key={item.id} className="glass-card rounded-[22px] p-4 border border-white flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+                              {item.sender}
+                            </span>
+                            <span className="text-[10px] text-slate-400">{item.modus_type}</span>
+                          </div>
+                          <h4 className="text-sm font-black text-[#002554] mt-1.5">{item.title}</h4>
+                          <p className="text-xs italic bg-slate-50 p-2 rounded-xl mt-1 text-slate-600">
+                            &quot;{item.message}&quot;
+                          </p>
+                          <p className="text-xs font-bold text-slate-700 mt-2">{item.question}</p>
+                        </div>
+                        <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                          <span className="text-[11px] text-slate-400">ID #{item.id}</span>
+                          <button
+                            onClick={() => handleDelete("scenario", item.id)}
+                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
+                          >
+                            Hapus
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        required
-                        value={item.setting_value}
-                        onChange={(e) => {
-                          const updated = [...editableSettings]
-                          updated[idx].setting_value = e.target.value
-                          setEditableSettings(updated)
-                        }}
-                        className="w-24 p-2 text-center text-xs font-black rounded-xl border border-slate-300 bg-white focus:border-[#0292fc] focus:outline-hidden"
-                      />
-                      <span className="text-xs font-bold text-slate-400">
-                        {item.setting_key.includes("duration") ? "Detik" : "Poin"}
-                      </span>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
+            )}
 
-              <div className="pt-3">
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-2xl bg-[#003882] hover:bg-[#002554] text-white font-black text-xs shadow-md transition active:scale-95 cursor-pointer"
-                >
-                  Simpan Seluruh Pengaturan
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {/* ==================================================== */}
-        {/* MODAL FORM INPUT POPUP */}
-        {/* ==================================================== */}
-        {showModal && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="w-full max-w-lg bg-white rounded-[32px] p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h2 className="text-base font-black text-[#002554]">
-                  {currentMenu === "modus" && "Formulir Modus Baru"}
-                  {currentMenu === "soal" && "Formulir Soal Simulasi Baru"}
-                  {currentMenu === "rewards" && "Formulir Reward Baru"}
-                  {currentMenu === "articles" && "Formulir Artikel Edukasi Baru"}
-                </h2>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"
-                >
-                  <Icon name="X" size={16} />
-                </button>
-              </div>
-
-              {/* FORM MODUS */}
-              {currentMenu === "modus" && (
-                <form onSubmit={handleSubmitModus} className="mt-4 space-y-3 text-xs">
+            {/* ==================================================== */}
+            {/* SUBMENU 3: ARTIKEL & REWARD POIN */}
+            {/* ==================================================== */}
+            {currentMenu === "articles" && (
+              <div className="space-y-4">
+                <div className="glass-card rounded-[24px] p-4 border border-white flex items-center justify-between">
                   <div>
-                    <label className="font-bold text-slate-700">Judul Modus</label>
-                    <input
-                      type="text"
-                      required
-                      value={modusForm.title}
-                      onChange={(e) => setModusForm({ ...modusForm, title: e.target.value })}
-                      placeholder="Contoh: Modus Quishing QRIS Palsu"
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
+                    <h2 className="text-lg font-black text-[#002554]">Artikel Edukasi & Nilai Poin</h2>
+                    <p className="text-xs text-slate-500">Tentukan artikel dan berapa reward poin yang didapat nasabah setelah membaca</p>
                   </div>
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs shadow-sm cursor-pointer hover:bg-[#002b66] transition active:scale-95"
+                  >
+                    <span>Tambah Artikel</span>
+                  </button>
+                </div>
+
+                {articleList.length === 0 ? (
+                  <div className="glass-card rounded-[24px] p-8 text-center border border-white text-slate-400">
+                    Belum ada artikel kustom. Silakan klik Tambah Artikel.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {articleList.map((item) => (
+                      <div key={item.id} className="glass-card rounded-[22px] p-4 border border-white flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-700">
+                              {item.reading_time || "3 Menit"}
+                            </span>
+                            <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                              +{item.reward_points} Poin
+                            </span>
+                          </div>
+                          <h4 className="text-sm font-black text-[#002554] mt-2">{item.title}</h4>
+                          <p className="text-xs text-slate-500 mt-1 line-clamp-2">{item.summary}</p>
+                          <p className="text-[10px] text-slate-400 mt-1">Penulis: {item.author}</p>
+                        </div>
+                        <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                          <span className="text-[11px] text-slate-400">ID #{item.id}</span>
+                          <button
+                            onClick={() => handleDelete("article", item.id)}
+                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ==================================================== */}
+            {/* SUBMENU 4: REWARDS & PENUKARAN */}
+            {/* ==================================================== */}
+            {currentMenu === "rewards" && (
+              <div className="space-y-4">
+                <div className="glass-card rounded-[24px] p-4 border border-white flex items-center justify-between">
                   <div>
-                    <label className="font-bold text-slate-700">Kategori</label>
-                    <select
-                      value={modusForm.category}
-                      onChange={(e) => setModusForm({ ...modusForm, category: e.target.value })}
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                    <h2 className="text-lg font-black text-[#002554]">Katalog Hadiah & Poin Penukaran</h2>
+                    <p className="text-xs text-slate-500">Atur harga poin dan sisa stok voucher hadiah</p>
+                  </div>
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs shadow-sm cursor-pointer hover:bg-[#002b66] transition active:scale-95"
+                  >
+                    <span>Tambah Reward</span>
+                  </button>
+                </div>
+
+                {rewardList.length === 0 ? (
+                  <div className="glass-card rounded-[24px] p-8 text-center border border-white text-slate-400">
+                    Belum ada reward kustom. Silakan tambahkan.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {rewardList.map((item) => (
+                      <div key={item.id} className="glass-card rounded-[22px] p-4 border border-white flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+                              {item.partner}
+                            </span>
+                            <span className="text-xs font-black text-amber-600">
+                              {item.cost} Poin
+                            </span>
+                          </div>
+                          <h4 className="text-sm font-black text-[#002554] mt-2">{item.title}</h4>
+                          <p className="text-xs text-slate-500 mt-1">Stok: {item.stock} unit</p>
+                        </div>
+                        <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                          <span className="text-[11px] text-slate-400">ID #{item.id}</span>
+                          <button
+                            onClick={() => handleDelete("reward", item.id)}
+                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ==================================================== */}
+            {/* SUBMENU 5: ATURAN POIN & PENGATURAN SISTEM */}
+            {/* ==================================================== */}
+            {currentMenu === "settings" && (
+              <div className="space-y-4">
+                <div className="glass-card rounded-[24px] p-4 border border-white">
+                  <h2 className="text-lg font-black text-[#002554]">Konfigurasi Aturan Poin & Keamanan</h2>
+                  <p className="text-xs text-slate-500">Ubah nilai perolehan poin per aktivitas dan parameter perlindungan sistem</p>
+                </div>
+
+                <form onSubmit={handleSaveSettings} className="glass-card rounded-[28px] p-6 border border-white shadow-sm space-y-4">
+                  <div className="space-y-4">
+                    {editableSettings.map((item, idx) => (
+                      <div key={item.setting_key} className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="max-w-md">
+                          <div className="text-xs font-black text-[#002554]">
+                            {item.setting_key.replace(/_/g, " ").toUpperCase()}
+                          </div>
+                          <div className="text-[11px] text-slate-500 mt-0.5">
+                            {item.description}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            required
+                            value={item.setting_value}
+                            onChange={(e) => {
+                              const updated = [...editableSettings]
+                              updated[idx].setting_value = e.target.value
+                              setEditableSettings(updated)
+                            }}
+                            className="w-24 p-2 text-center text-xs font-black rounded-xl border border-slate-300 bg-white focus:border-[#0292fc] focus:outline-hidden"
+                          />
+                          <span className="text-xs font-bold text-slate-400">
+                            {item.setting_key.includes("duration") ? "Detik" : "Poin"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-3">
+                    <button
+                      type="submit"
+                      className="w-full sm:w-auto px-6 py-2.5 rounded-2xl bg-[#003882] hover:bg-[#002554] text-white font-black text-xs shadow-md transition active:scale-95 cursor-pointer"
                     >
-                      <option value="Social Engineering">Social Engineering</option>
-                      <option value="Phishing">Phishing & Malware</option>
-                      <option value="APK Berbahaya">APK Berbahaya</option>
-                      <option value="Quishing">QRIS / Quishing</option>
-                    </select>
+                      Simpan Seluruh Pengaturan
+                    </button>
                   </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Deskripsi Kasus</label>
-                    <textarea
-                      required
-                      rows={3}
-                      value={modusForm.description}
-                      onChange={(e) => setModusForm({ ...modusForm, description: e.target.value })}
-                      placeholder="Jelaskan alur penipuan..."
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Poin Indikasi Bahaya (Pemisah baris)</label>
-                    <textarea
-                      rows={2}
-                      value={modusForm.redFlags}
-                      onChange={(e) => setModusForm({ ...modusForm, redFlags: e.target.value })}
-                      placeholder="Nomor rekening tidak cocok&#10;Mendesak transfer"
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Panduan Mitigasi (Pemisah baris)</label>
-                    <textarea
-                      rows={2}
-                      value={modusForm.tips}
-                      onChange={(e) => setModusForm({ ...modusForm, tips: e.target.value })}
-                      placeholder="Hubungi Halo BCA 1500888&#10;Jangan bagikan OTP"
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
-                  >
-                    Simpan Modus ke Cloud Neon
-                  </button>
                 </form>
-              )}
+              </div>
+            )}
 
-              {/* FORM SOAL */}
-              {currentMenu === "soal" && (
-                <form onSubmit={handleSubmitScenario} className="mt-4 space-y-3 text-xs">
-                  <div>
-                    <label className="font-bold text-slate-700">Judul Kasus</label>
-                    <input
-                      type="text"
-                      required
-                      value={scenarioForm.title}
-                      onChange={(e) => setScenarioForm({ ...scenarioForm, title: e.target.value })}
-                      placeholder="Contoh: Chat Undangan APK via WhatsApp"
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="font-bold text-slate-700">Nama Pengirim</label>
-                      <input
-                        type="text"
-                        value={scenarioForm.sender}
-                        onChange={(e) => setScenarioForm({ ...scenarioForm, sender: e.target.value })}
-                        className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                      />
-                    </div>
-                    <div>
-                      <label className="font-bold text-slate-700">Tipe Modus</label>
-                      <input
-                        type="text"
-                        value={scenarioForm.modusType}
-                        onChange={(e) => setScenarioForm({ ...scenarioForm, modusType: e.target.value })}
-                        className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Isi Chat Tiruan</label>
-                    <textarea
-                      required
-                      rows={2}
-                      value={scenarioForm.message}
-                      onChange={(e) => setScenarioForm({ ...scenarioForm, message: e.target.value })}
-                      placeholder="Mohon unduh lampiran undangan pernikahan surat.apk berikut..."
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Pertanyaan</label>
-                    <input
-                      type="text"
-                      required
-                      value={scenarioForm.question}
-                      onChange={(e) => setScenarioForm({ ...scenarioForm, question: e.target.value })}
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Pilihan A</label>
-                    <input
-                      type="text"
-                      required
-                      value={scenarioForm.optionA}
-                      onChange={(e) => setScenarioForm({ ...scenarioForm, optionA: e.target.value })}
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Pilihan B</label>
-                    <input
-                      type="text"
-                      required
-                      value={scenarioForm.optionB}
-                      onChange={(e) => setScenarioForm({ ...scenarioForm, optionB: e.target.value })}
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Kunci Jawaban Tepat</label>
-                    <select
-                      value={scenarioForm.correctOption}
-                      onChange={(e) => setScenarioForm({ ...scenarioForm, correctOption: e.target.value })}
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+            {/* ==================================================== */}
+            {/* MODAL FORM INPUT POPUP */}
+            {/* ==================================================== */}
+            {showModal && (
+              <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+                <div className="w-full max-w-lg bg-white rounded-[32px] p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h2 className="text-base font-black text-[#002554]">
+                      {currentMenu === "modus" && "Formulir Modus Baru"}
+                      {currentMenu === "soal" && "Formulir Soal Simulasi Baru"}
+                      {currentMenu === "rewards" && "Formulir Reward Baru"}
+                      {currentMenu === "articles" && "Formulir Artikel Edukasi Baru"}
+                    </h2>
+                    <button
+                      onClick={() => setShowModal(false)}
+                      className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"
                     >
-                      <option value="A">Pilihan A</option>
-                      <option value="B">Pilihan B</option>
-                    </select>
+                      <Icon name="X" size={16} />
+                    </button>
                   </div>
-                  <button
-                    type="submit"
-                    className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
-                  >
-                    Simpan Soal ke Cloud Neon
-                  </button>
-                </form>
-              )}
 
-              {/* FORM ARTIKEL */}
-              {currentMenu === "articles" && (
-                <form onSubmit={handleSubmitArticle} className="mt-4 space-y-3 text-xs">
-                  <div>
-                    <label className="font-bold text-slate-700">Judul Artikel Edukasi</label>
-                    <input
-                      type="text"
-                      required
-                      value={articleForm.title}
-                      onChange={(e) => setArticleForm({ ...articleForm, title: e.target.value })}
-                      placeholder="Contoh: Mengapa Bank Tidak Pernah Meminta PIN & OTP"
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="font-bold text-slate-700">Reward Poin Didapat</label>
-                      <input
-                        type="number"
-                        required
-                        value={articleForm.rewardPoints}
-                        onChange={(e) => setArticleForm({ ...articleForm, rewardPoints: e.target.value })}
-                        className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                      />
-                    </div>
-                    <div>
-                      <label className="font-bold text-slate-700">Estimasi Baca</label>
-                      <input
-                        type="text"
-                        value={articleForm.readingTime}
-                        onChange={(e) => setArticleForm({ ...articleForm, readingTime: e.target.value })}
-                        placeholder="Contoh: 3 Menit"
-                        className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Ringkasan / Sinopsis Singkat</label>
-                    <textarea
-                      required
-                      rows={2}
-                      value={articleForm.summary}
-                      onChange={(e) => setArticleForm({ ...articleForm, summary: e.target.value })}
-                      placeholder="Ringkasan poin penting..."
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Isi Lengkap Artikel (Opsional)</label>
-                    <textarea
-                      rows={4}
-                      value={articleForm.fullContent}
-                      onChange={(e) => setArticleForm({ ...articleForm, fullContent: e.target.value })}
-                      placeholder="Isi materi edukasi..."
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Link Referensi Resmi / Video (Opsional)</label>
-                    <input
-                      type="url"
-                      value={articleForm.externalUrl}
-                      onChange={(e) => setArticleForm({ ...articleForm, externalUrl: e.target.value })}
-                      placeholder="https://bca.co.id/awasmodus"
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
-                  >
-                    Simpan Artikel & Atur Poin
-                  </button>
-                </form>
-              )}
+                  {/* FORM MODUS */}
+                  {currentMenu === "modus" && (
+                    <form onSubmit={handleSubmitModus} className="mt-4 space-y-3 text-xs">
+                      <div>
+                        <label className="font-bold text-slate-700">Judul Modus</label>
+                        <input
+                          type="text"
+                          required
+                          value={modusForm.title}
+                          onChange={(e) => setModusForm({ ...modusForm, title: e.target.value })}
+                          placeholder="Contoh: Modus Quishing QRIS Palsu"
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Kategori</label>
+                        <select
+                          value={modusForm.category}
+                          onChange={(e) => setModusForm({ ...modusForm, category: e.target.value })}
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        >
+                          <option value="Social Engineering">Social Engineering</option>
+                          <option value="Phishing">Phishing & Malware</option>
+                          <option value="APK Berbahaya">APK Berbahaya</option>
+                          <option value="Quishing">QRIS / Quishing</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Deskripsi Kasus</label>
+                        <textarea
+                          required
+                          rows={3}
+                          value={modusForm.description}
+                          onChange={(e) => setModusForm({ ...modusForm, description: e.target.value })}
+                          placeholder="Jelaskan alur penipuan..."
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Poin Indikasi Bahaya (Pemisah baris)</label>
+                        <textarea
+                          rows={2}
+                          value={modusForm.redFlags}
+                          onChange={(e) => setModusForm({ ...modusForm, redFlags: e.target.value })}
+                          placeholder="Nomor rekening tidak cocok&#10;Mendesak transfer"
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Panduan Mitigasi (Pemisah baris)</label>
+                        <textarea
+                          rows={2}
+                          value={modusForm.tips}
+                          onChange={(e) => setModusForm({ ...modusForm, tips: e.target.value })}
+                          placeholder="Hubungi Halo BCA 1500888&#10;Jangan bagikan OTP"
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
+                      >
+                        Simpan Modus ke Cloud Neon
+                      </button>
+                    </form>
+                  )}
 
-              {/* FORM REWARD */}
-              {currentMenu === "rewards" && (
-                <form onSubmit={handleSubmitReward} className="mt-4 space-y-3 text-xs">
-                  <div>
-                    <label className="font-bold text-slate-700">Nama Hadiah</label>
-                    <input
-                      type="text"
-                      required
-                      value={rewardForm.title}
-                      onChange={(e) => setRewardForm({ ...rewardForm, title: e.target.value })}
-                      placeholder="Contoh: Voucher Diskon Rp 50.000"
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="font-bold text-slate-700">Harga Poin</label>
-                      <input
-                        type="number"
-                        required
-                        value={rewardForm.cost}
-                        onChange={(e) => setRewardForm({ ...rewardForm, cost: e.target.value })}
-                        className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                      />
-                    </div>
-                    <div>
-                      <label className="font-bold text-slate-700">Stok</label>
-                      <input
-                        type="number"
-                        required
-                        value={rewardForm.stock}
-                        onChange={(e) => setRewardForm({ ...rewardForm, stock: e.target.value })}
-                        className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-700">Partner / Mitra</label>
-                    <input
-                      type="text"
-                      value={rewardForm.partner}
-                      onChange={(e) => setRewardForm({ ...rewardForm, partner: e.target.value })}
-                      placeholder="BCA / Alfamart / Grab"
-                      className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
-                  >
-                    Simpan Reward ke Cloud Neon
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-        )}
+                  {/* FORM SOAL */}
+                  {currentMenu === "soal" && (
+                    <form onSubmit={handleSubmitScenario} className="mt-4 space-y-3 text-xs">
+                      <div>
+                        <label className="font-bold text-slate-700">Judul Kasus</label>
+                        <input
+                          type="text"
+                          required
+                          value={scenarioForm.title}
+                          onChange={(e) => setScenarioForm({ ...scenarioForm, title: e.target.value })}
+                          placeholder="Contoh: Chat Undangan APK via WhatsApp"
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="font-bold text-slate-700">Nama Pengirim</label>
+                          <input
+                            type="text"
+                            value={scenarioForm.sender}
+                            onChange={(e) => setScenarioForm({ ...scenarioForm, sender: e.target.value })}
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-700">Tipe Modus</label>
+                          <input
+                            type="text"
+                            value={scenarioForm.modusType}
+                            onChange={(e) => setScenarioForm({ ...scenarioForm, modusType: e.target.value })}
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Isi Chat Tiruan</label>
+                        <textarea
+                          required
+                          rows={2}
+                          value={scenarioForm.message}
+                          onChange={(e) => setScenarioForm({ ...scenarioForm, message: e.target.value })}
+                          placeholder="Mohon unduh lampiran undangan pernikahan surat.apk berikut..."
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Pertanyaan</label>
+                        <input
+                          type="text"
+                          required
+                          value={scenarioForm.question}
+                          onChange={(e) => setScenarioForm({ ...scenarioForm, question: e.target.value })}
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Pilihan A</label>
+                        <input
+                          type="text"
+                          required
+                          value={scenarioForm.optionA}
+                          onChange={(e) => setScenarioForm({ ...scenarioForm, optionA: e.target.value })}
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Pilihan B</label>
+                        <input
+                          type="text"
+                          required
+                          value={scenarioForm.optionB}
+                          onChange={(e) => setScenarioForm({ ...scenarioForm, optionB: e.target.value })}
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Kunci Jawaban Tepat</label>
+                        <select
+                          value={scenarioForm.correctOption}
+                          onChange={(e) => setScenarioForm({ ...scenarioForm, correctOption: e.target.value })}
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        >
+                          <option value="A">Pilihan A</option>
+                          <option value="B">Pilihan B</option>
+                        </select>
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
+                      >
+                        Simpan Soal ke Cloud Neon
+                      </button>
+                    </form>
+                  )}
+
+                  {/* FORM ARTIKEL */}
+                  {currentMenu === "articles" && (
+                    <form onSubmit={handleSubmitArticle} className="mt-4 space-y-3 text-xs">
+                      <div>
+                        <label className="font-bold text-slate-700">Judul Artikel Edukasi</label>
+                        <input
+                          type="text"
+                          required
+                          value={articleForm.title}
+                          onChange={(e) => setArticleForm({ ...articleForm, title: e.target.value })}
+                          placeholder="Contoh: Mengapa Bank Tidak Pernah Meminta PIN & OTP"
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="font-bold text-slate-700">Reward Poin Didapat</label>
+                          <input
+                            type="number"
+                            required
+                            value={articleForm.rewardPoints}
+                            onChange={(e) => setArticleForm({ ...articleForm, rewardPoints: e.target.value })}
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-700">Estimasi Baca</label>
+                          <input
+                            type="text"
+                            value={articleForm.readingTime}
+                            onChange={(e) => setArticleForm({ ...articleForm, readingTime: e.target.value })}
+                            placeholder="Contoh: 3 Menit"
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Ringkasan / Sinopsis Singkat</label>
+                        <textarea
+                          required
+                          rows={2}
+                          value={articleForm.summary}
+                          onChange={(e) => setArticleForm({ ...articleForm, summary: e.target.value })}
+                          placeholder="Ringkasan poin penting..."
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Isi Lengkap Artikel (Opsional)</label>
+                        <textarea
+                          rows={4}
+                          value={articleForm.fullContent}
+                          onChange={(e) => setArticleForm({ ...articleForm, fullContent: e.target.value })}
+                          placeholder="Isi materi edukasi..."
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Link Referensi Resmi / Video (Opsional)</label>
+                        <input
+                          type="url"
+                          value={articleForm.externalUrl}
+                          onChange={(e) => setArticleForm({ ...articleForm, externalUrl: e.target.value })}
+                          placeholder="https://bca.co.id/awasmodus"
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
+                      >
+                        Simpan Artikel & Atur Poin
+                      </button>
+                    </form>
+                  )}
+
+                  {/* FORM REWARD */}
+                  {currentMenu === "rewards" && (
+                    <form onSubmit={handleSubmitReward} className="mt-4 space-y-3 text-xs">
+                      <div>
+                        <label className="font-bold text-slate-700">Nama Hadiah</label>
+                        <input
+                          type="text"
+                          required
+                          value={rewardForm.title}
+                          onChange={(e) => setRewardForm({ ...rewardForm, title: e.target.value })}
+                          placeholder="Contoh: Voucher Diskon Rp 50.000"
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="font-bold text-slate-700">Harga Poin</label>
+                          <input
+                            type="number"
+                            required
+                            value={rewardForm.cost}
+                            onChange={(e) => setRewardForm({ ...rewardForm, cost: e.target.value })}
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-700">Stok</label>
+                          <input
+                            type="number"
+                            required
+                            value={rewardForm.stock}
+                            onChange={(e) => setRewardForm({ ...rewardForm, stock: e.target.value })}
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Partner / Mitra</label>
+                        <input
+                          type="text"
+                          value={rewardForm.partner}
+                          onChange={(e) => setRewardForm({ ...rewardForm, partner: e.target.value })}
+                          placeholder="BCA / Alfamart / Grab"
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
+                      >
+                        Simpan Reward ke Cloud Neon
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>
-
-      <BottomSpace />
     </div>
   )
 }

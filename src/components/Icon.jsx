@@ -45,7 +45,8 @@ import {
   Crown,
   Target,
   Sparkles,
-  Medal
+  Medal,
+  Plus
 } from "lucide-react"
 
 const icons = {
@@ -57,6 +58,8 @@ const icons = {
   Share2,
   RotateCcw,
   CheckCircle2,
+  CheckCircle: CheckCircle2,
+  ShieldAlert: AlertTriangle,
   XCircle,
   AlertTriangle,
   Search,
@@ -95,11 +98,13 @@ const icons = {
   Crown,
   Target,
   Sparkles,
-  Medal
+  Medal,
+  Plus
 }
 
 export default function Icon({ name, className = "", size = 20, strokeWidth = 2, ...props }) {
-  const IconComponent = icons[name] || ArrowRight
+  const IconComponent = icons[name]
+  if (!IconComponent) return null
 
   return <IconComponent size={size} strokeWidth={strokeWidth} className={className} {...props} />
 }

@@ -8,6 +8,7 @@ export default function AppHeader({
   subtitle = "Bank BCA #AwasModus",
   showBack = true,
   backHref = "/",
+  onBack = null,
   rightElement = null
 }) {
   const router = useRouter()
@@ -25,13 +26,24 @@ export default function AppHeader({
     <header className="w-full max-w-6xl mx-auto px-5 sm:px-8 pt-5 md:pt-7 pb-2 flex items-center justify-between text-white z-20">
       <div className="flex items-center gap-3">
         {showBack && (
-          <Link
-            href={backHref}
-            className="h-9 w-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 flex items-center justify-center text-white transition active:scale-95 shadow-2xs"
-            aria-label="Kembali"
-          >
-            <Icon name="ChevronLeft" size={20} />
-          </Link>
+          onBack ? (
+            <button
+              type="button"
+              onClick={onBack}
+              className="h-9 w-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 flex items-center justify-center text-white transition active:scale-95 shadow-2xs cursor-pointer"
+              aria-label="Kembali"
+            >
+              <Icon name="ChevronLeft" size={20} />
+            </button>
+          ) : (
+            <Link
+              href={backHref}
+              className="h-9 w-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 flex items-center justify-center text-white transition active:scale-95 shadow-2xs"
+              aria-label="Kembali"
+            >
+              <Icon name="ChevronLeft" size={20} />
+            </Link>
+          )
         )}
         <div>
 

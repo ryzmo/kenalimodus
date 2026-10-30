@@ -342,8 +342,6 @@ export default function AdminImpactPage() {
           )}
         </div>
       </main>
-
-      <BottomSpace />
     </div>
   )
 }

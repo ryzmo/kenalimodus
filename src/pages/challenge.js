@@ -457,11 +457,16 @@ export default function ChallengePage() {
               </div>
             )}
           </div>
-        </main>
-      </div>
 
-      <BottomNav />
-      <BottomSpace />
+          <div className="md:hidden">
+            <BottomSpace />
+          </div>
+        </main>
+
+        <div className="md:hidden">
+          <BottomNav />
+        </div>
+      </div>
     </div>
   )
 }
