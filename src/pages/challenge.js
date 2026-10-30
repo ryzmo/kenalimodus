@@ -1,47 +1,29 @@
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/router"
 import Link from "next/link"
+import Image from "next/image"
 import AppHeader from "../components/AppHeader"
 import BottomNav from "../components/BottomNav"
 import BottomSpace from "../components/BottomSpace"
 import Icon from "../components/Icon"
 import {
-  PRE_TEST_SCENARIOS,
   POST_TEST_SCENARIOS,
-  ARI_SURVEY_QUESTIONS,
-  calculateRiskyActionRate,
-  calculateBehavioralImpact,
-  calculateRelativeReduction,
-  calculatePotentialLossAvoided1k,
   DEFAULT_FAMILY_MEMBERS
 } from "../data/modusData"
 
 export default function ChallengePage() {
   const router = useRouter()
 
-  // Stages: 'intro' -> 'pre_test' -> 'intervention' -> 'post_test' -> 'ari_survey'
+  // Stages: 'intro' -> 'test'
   const [stage, setStage] = useState("intro")
   const [participantName, setParticipantName] = useState("Nasabah")
   const [participantAge, setParticipantAge] = useState(25)
-  const [sessionId, setSessionId] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Step indices
   const [currentStep, setCurrentStep] = useState(0)
   const [selectedOption, setSelectedOption] = useState(null)
   const [showFeedback, setShowFeedback] = useState(false)
-
-  // Answers State
-  const [preAnswers, setPreAnswers] = useState([])
-  const [postAnswers, setPostAnswers] = useState([])
-
-  // Attention, Repetition, Intention (ARI) Answers (Default 5)
-  const [ariAnswers, setAriAnswers] = useState({
-    ari_attention: 5,
-    ari_repetition: 5,
-    ari_intention: 5
-  })
-  const [currentAriStep, setCurrentAriStep] = useState(0)
+  const [answers, setAnswers] = useState([])
 
   // 2-Minute Timer State (120 seconds)
   const [timeLeft, setTimeLeft] = useState(120)
@@ -57,7 +39,6 @@ export default function ChallengePage() {
       if (existingAge) {
         setParticipantAge(Number(existingAge) || 25)
       }
-      setSessionId(`km_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`)
     }
   }, [])
 
@@ -69,17 +50,10 @@ export default function ChallengePage() {
       }, 1000)
     } else if (timeLeft <= 0 && timerActive) {
       clearInterval(timerRef.current)
-      if (stage === "pre_test") {
-        setTimerActive(false)
-        setStage("intervention")
-      } else if (stage === "post_test") {
-        setTimerActive(false)
-        setStage("ari_survey")
-        setCurrentAriStep(0)
-      }
+      handleFinishTest()
     }
     return () => clearInterval(timerRef.current)
-  }, [timerActive, timeLeft, stage])
+  }, [timerActive, timeLeft])
 
   const formatTimer = (seconds) => {
     const mins = Math.floor(seconds / 60)
@@ -87,189 +61,78 @@ export default function ChallengePage() {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
   }
 
-  // Start Pre-Test (Phase 1)
-  const handleStartPreTest = () => {
+  // Mulai Test Langsung
+  const handleStartTest = () => {
     if (typeof window !== "undefined") {
       localStorage.setItem("kenali_participant_name", participantName || "Nasabah")
       localStorage.setItem("kenali_participant_age", String(participantAge || 25))
     }
-    setStage("pre_test")
+    setStage("test")
     setCurrentStep(0)
     setSelectedOption(null)
     setShowFeedback(false)
-    setPreAnswers([])
+    setAnswers([])
     setTimeLeft(120)
     setTimerActive(true)
   }
 
-  // Pre-Test handling
-  const activePreScenario = PRE_TEST_SCENARIOS[currentStep] || PRE_TEST_SCENARIOS[0]
+  const activeScenario = POST_TEST_SCENARIOS[currentStep] || POST_TEST_SCENARIOS[0]
 
-  const handleSelectPreOption = (option) => {
-    if (selectedOption) return
-    setSelectedOption(option)
-
-    const updated = [
-      ...preAnswers,
-      {
-        scenarioId: activePreScenario.id,
-        category: activePreScenario.category,
-        modusType: activePreScenario.modusType,
-        title: activePreScenario.title,
-        optionId: option.id,
-        isCorrect: option.isCorrect,
-        isRisky: !!option.isRisky,
-        scoreImpact: option.scoreImpact,
-        chosenText: option.text,
-        reason: option.feedbackReason,
-        goldenRule: activePreScenario.goldenRule
-      }
-    ]
-    setPreAnswers(updated)
-
-    setTimeout(() => {
-      if (currentStep < PRE_TEST_SCENARIOS.length - 1) {
-        setCurrentStep((prev) => prev + 1)
-        setSelectedOption(null)
-      } else {
-        setTimerActive(false)
-        setStage("intervention")
-      }
-    }, 400)
-  }
-
-  // Calculate Pre-Test stats
-  const preTotal = PRE_TEST_SCENARIOS.length
-  const preRiskyCount = preAnswers.filter((a) => a.isRisky).length
-  const preRiskyRate = calculateRiskyActionRate(preRiskyCount, preTotal)
-  const preCorrectCount = preAnswers.filter((a) => a.isCorrect).length
-  const preScore = Math.round((preCorrectCount / preTotal) * 100)
-
-  // Start Post-Test (Phase 2)
-  const handleStartPostTest = () => {
-    setStage("post_test")
-    setCurrentStep(0)
-    setSelectedOption(null)
-    setShowFeedback(false)
-    setPostAnswers([])
-    setTimeLeft(120)
-    setTimerActive(true)
-  }
-
-  // Post-Test handling with Instant Feedback
-  const activePostScenario = POST_TEST_SCENARIOS[currentStep] || POST_TEST_SCENARIOS[0]
-
-  const handleSelectPostOption = (option) => {
-    if (showFeedback || !activePostScenario) return
+  // Pilih Jawaban & Munculkan Feedback Seketika
+  const handleSelectOption = (option) => {
+    if (showFeedback || !activeScenario) return
     setSelectedOption(option)
     setShowFeedback(true)
 
     const updated = [
-      ...postAnswers,
+      ...answers,
       {
-        scenarioId: activePostScenario.id,
-        category: activePostScenario.category,
-        modusType: activePostScenario.modusType,
-        title: activePostScenario.title,
+        scenarioId: activeScenario.id,
+        category: activeScenario.category,
+        modusType: activeScenario.modusType,
+        title: activeScenario.title,
         optionId: option.id,
         isCorrect: option.isCorrect,
         isRisky: !!option.isRisky,
         scoreImpact: option.scoreImpact,
         chosenText: option.text,
         reason: option.feedbackReason,
-        goldenRule: activePostScenario.goldenRule
+        goldenRule: activeScenario.goldenRule
       }
     ]
-    setPostAnswers(updated)
+    setAnswers(updated)
   }
 
-  const handleNextPostStep = () => {
+  // Lanjut ke Soal Berikutnya atau Selesai
+  const handleNextStep = () => {
     if (currentStep < POST_TEST_SCENARIOS.length - 1) {
       setCurrentStep((prev) => prev + 1)
       setSelectedOption(null)
       setShowFeedback(false)
     } else {
-      // Selesai Post-Test -> Lanjut ke Pertanyaan Attention, Repetition, Intention
-      setTimerActive(false)
-      setStage("ari_survey")
-      setCurrentAriStep(0)
+      handleFinishTest()
     }
   }
 
-  // Handle ARI option select
-  const activeAriQuestion = ARI_SURVEY_QUESTIONS[currentAriStep] || ARI_SURVEY_QUESTIONS[0]
+  const handleFinishTest = () => {
+    setTimerActive(false)
+    const total = POST_TEST_SCENARIOS.length
+    const correctCount = answers.filter((a) => a.isCorrect).length
+    const calculatedScore = Math.round((correctCount / total) * 100)
 
-  const handleSelectAriScore = (scoreVal) => {
-    const updatedAri = {
-      ...ariAnswers,
-      [activeAriQuestion.id]: scoreVal
-    }
-    setAriAnswers(updatedAri)
-
-    if (currentAriStep < ARI_SURVEY_QUESTIONS.length - 1) {
-      setCurrentAriStep((prev) => prev + 1)
-    } else {
-      // Selesai semua tahap -> Submit final data
-      handleFinalSubmission(updatedAri)
-    }
-  }
-
-  const handleFinalSubmission = async (finalAri) => {
-    setIsSubmitting(true)
-
-    const postTotal = POST_TEST_SCENARIOS.length
-    const postRiskyCount = postAnswers.filter((a) => a.isRisky).length
-    const postRiskyRate = calculateRiskyActionRate(postRiskyCount, postTotal)
-    const postCorrectCount = postAnswers.filter((a) => a.isCorrect).length
-    const calculatedPostScore = Math.round((postCorrectCount / postTotal) * 100)
-
-    const behavioralImpact = calculateBehavioralImpact(preRiskyRate, postRiskyRate)
-    const relativeReduction = calculateRelativeReduction(preRiskyRate, postRiskyRate)
-    const potentialLossAvoided1k = calculatePotentialLossAvoided1k(relativeReduction)
-
-    const att = finalAri.ari_attention || 5
-    const rep = finalAri.ari_repetition || 5
-    const intn = finalAri.ari_intention || 5
-    const ariAvg = Number(((att + rep + intn) / 3).toFixed(2))
-
-    const payload = {
-      sessionId,
-      participantName: participantName || "Nasabah",
-      participantAge: Number(participantAge) || 25,
-      preTotalQuestions: preTotal,
-      preRiskyCount,
-      preRiskyRate,
-      postTotalQuestions: postTotal,
-      postRiskyCount,
-      postRiskyRate,
-      behavioralImpact,
-      relativeReduction,
-      potentialLossAvoided1k,
-      preScore,
-      postScore: calculatedPostScore,
-      attentionScore: att,
-      repetitionScore: rep,
-      intentionScore: intn,
-      ariAverage: ariAvg,
-      preAnswers,
-      postAnswers,
-      completedAt: new Date().toISOString()
-    }
-
-    // 1. Simpan ke LocalStorage
     if (typeof window !== "undefined") {
-      localStorage.setItem("kenali_impact_result", JSON.stringify(payload))
+      const completedAt = new Date().toISOString()
       localStorage.setItem("kenali_modus_result", JSON.stringify({
-        score: calculatedPostScore,
-        totalQuestions: postTotal,
-        correctCount: postCorrectCount,
+        score: calculatedScore,
+        totalQuestions: total,
+        correctCount,
         player: "saya",
         participantAge: Number(participantAge) || 25,
-        answers: postAnswers,
-        completedAt: payload.completedAt
+        answers,
+        completedAt
       }))
 
-      // Update Family Group Storage
+      // Update Family Group Storage jika ada
       const storedGroup = localStorage.getItem("kenali_family_group")
       let currentMembers = DEFAULT_FAMILY_MEMBERS
       let currentGroupName = "Keluarga Sejahtera"
@@ -288,11 +151,11 @@ export default function ChallengePage() {
         m.id === "saya"
           ? {
             ...m,
-            score: calculatedPostScore,
+            score: calculatedScore,
             status:
-              calculatedPostScore >= 80
+              calculatedScore >= 80
                 ? "Tinggi (Waspada)"
-                : calculatedPostScore >= 60
+                : calculatedScore >= 60
                   ? "Cukup Waspada"
                   : "Rentan",
             lastActive: "Baru saja",
@@ -301,476 +164,304 @@ export default function ChallengePage() {
           : m
       )
 
-      localStorage.setItem(
-        "kenali_family_group",
-        JSON.stringify({ groupName: currentGroupName, members: updatedMembers })
-      )
+      localStorage.setItem("kenali_family_group", JSON.stringify({
+        groupName: currentGroupName,
+        members: updatedMembers
+      }))
+
+      // Tambahkan poin reward ke storage lokal
+      const storedPoints = localStorage.getItem("kenali_points_data")
+      let currentTotalPoints = 1250
+      let currentStreak = 3
+      let historyLog = []
+
+      if (storedPoints) {
+        try {
+          const parsed = JSON.parse(storedPoints)
+          if (parsed.totalPoints !== undefined) currentTotalPoints = parsed.totalPoints
+          if (parsed.streakCount !== undefined) currentStreak = parsed.streakCount
+          if (parsed.historyLog) historyLog = parsed.historyLog
+        } catch (e) {
+          console.error(e)
+        }
+      }
+
+      const pointsEarned = calculatedScore >= 80 ? 30 : 20
+      const newPoints = currentTotalPoints + pointsEarned
+      const newLog = [
+        {
+          id: `log-${Date.now()}`,
+          title: "Menyelesaikan 2-Minute Challenge",
+          date: "Hari ini",
+          pts: `+${pointsEarned} Poin`,
+          type: "earn"
+        },
+        ...historyLog
+      ]
+
+      localStorage.setItem("kenali_points_data", JSON.stringify({
+        totalPoints: newPoints,
+        streakCount: currentStreak + 1,
+        redeemed: [],
+        historyLog: newLog
+      }))
     }
 
-    // 2. Kirim ke API NeonDB
-    try {
-      await fetch("/api/impact/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
-    } catch (err) {
-      console.error("Gagal mengirim ke server:", err)
-    }
-
-    setIsSubmitting(false)
     router.push("/profil")
   }
 
   return (
     <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff]">
-      {/* iOS App Frame */}
+      {/* Frame Container */}
       <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
 
         <AppHeader title="Kenali Trik Penipuan" subtitle="Simulasi Safe Score Digital" />
 
         {/* BOTTOM SHEET */}
-        <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10"><div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-5">
-          {/* Stage 0: Challenge Intro */}
-          {stage === "intro" && (
-            <section className="glass-card rounded-[28px] p-5 border border-white">
-              <h1 className="text-lg font-black leading-tight text-[#002554]">
-                2-Minute Scam Challenge
-              </h1>
-
-              <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                Uji Safe Score Anda mengenali modus penipuan digital, seperti CS palsu, APK berbahaya, phishing, dan QRIS palsu.
-              </p>
-
-              {/* Input Data Profil Peserta */}
-              <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
-                <div className="text-xs font-black uppercase tracking-wider text-[#0292fc] mb-3">
-                  Profil Peserta
+        <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10">
+          <div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-5">
+            
+            {/* Stage 0: Challenge Intro */}
+            {stage === "intro" && (
+              <section className="glass-card rounded-[28px] p-6 sm:p-8 border border-white bg-white/95 shadow-sm space-y-6">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold text-[#003882] bg-blue-50 border border-blue-100">
+                    <span className="w-2 h-2 rounded-full bg-[#0292fc]" />
+                    Simulasi Refleks Finansial
+                  </div>
+                  <h1 className="text-xl sm:text-2xl font-black text-[#002554] tracking-tight mt-3">
+                    2-Minute Scam Challenge
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+                    Uji ketajaman dan refleks Anda dalam menghadapi skenario penipuan digital nyata: manipulasi customer service palsu, file APK berbahaya, phishing perbankan, dan QRIS manipulatif.
+                  </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                      Umur
-                    </label>
-                    <input
-                      type="number"
-                      min="10"
-                      max="100"
-                      value={participantAge}
-                      onChange={(e) => setParticipantAge(e.target.value ? parseInt(e.target.value, 10) : "")}
-                      placeholder="25"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 font-semibold focus:border-[#0292fc] focus:outline-none"
+
+                {/* 3 Parameter Metrik */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="rounded-2xl bg-slate-50/80 border border-slate-200/80 p-3.5 text-center">
+                    <div className="text-base sm:text-lg font-black text-[#003882]">
+                      {POST_TEST_SCENARIOS.length}
+                    </div>
+                    <div className="text-[11px] font-semibold text-slate-700 mt-0.5">Skenario</div>
+                    <div className="text-[10px] text-slate-400">Kasus Riil</div>
+                  </div>
+                  <div className="rounded-2xl bg-slate-50/80 border border-slate-200/80 p-3.5 text-center">
+                    <div className="text-base sm:text-lg font-black text-[#0292fc]">
+                      120s
+                    </div>
+                    <div className="text-[11px] font-semibold text-slate-700 mt-0.5">Durasi</div>
+                    <div className="text-[10px] text-slate-400">Batas Waktu</div>
+                  </div>
+                  <div className="rounded-2xl bg-slate-50/80 border border-slate-200/80 p-3.5 text-center">
+                    <div className="text-base sm:text-lg font-black text-emerald-600">
+                      Instan
+                    </div>
+                    <div className="text-[11px] font-semibold text-slate-700 mt-0.5">Feedback</div>
+                    <div className="text-[10px] text-slate-400">Analisis Langsung</div>
+                  </div>
+                </div>
+
+                {/* Panduan Singkat */}
+                <div className="rounded-2xl bg-blue-50/50 border border-blue-100/80 p-4 space-y-2">
+                  <div className="text-xs font-bold text-[#003882] tracking-wider uppercase">
+                    Petunjuk Pelaksanaan
+                  </div>
+                  <ul className="text-xs text-slate-600 space-y-2 leading-relaxed list-disc list-inside">
+                    <li>Baca dengan cermat setiap kasus komunikasi yang ditampilkan di layar.</li>
+                    <li>Pilih opsi respons paling aman sebelum batas waktu berakhir.</li>
+                    <li>Penjelasan detail dan Golden Rule keamanan perbankan akan langsung diberikan setelah Anda memilih jawaban.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleStartTest}
+                    className="w-full rounded-2xl bg-[#0292fc] hover:bg-[#007ad6] py-3.5 px-6 text-sm font-bold text-white shadow-md transition active:scale-[0.99] cursor-pointer"
+                  >
+                    Mulai Challenge
+                  </button>
+                </div>
+              </section>
+            )}
+
+            {/* Stage: Test dengan Instant Feedback */}
+            {stage === "test" && activeScenario && (
+              <div className="space-y-3">
+                <div className="glass-card rounded-[28px] p-5 border border-white">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                      Skenario {currentStep + 1} dari {POST_TEST_SCENARIOS.length}
+                    </span>
+
+                    {/* Timer Pill */}
+                    <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-xs font-black border transition ${
+                      timeLeft < 30
+                        ? "bg-red-50 text-red-600 border-red-200 animate-pulse"
+                        : "bg-emerald-50 text-emerald-800 border-emerald-200"
+                    }`}>
+                      <Icon name="Clock3" size={13} />
+                      <span>{formatTimer(timeLeft)}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-2.5 flex items-center justify-between">
+                    <span className="text-xs font-black text-[#002554]">
+                      {activeScenario.category}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-400">
+                      {Math.round(((currentStep + (showFeedback ? 1 : 0)) / POST_TEST_SCENARIOS.length) * 100)}% Selesai
+                    </span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className="h-full bg-emerald-500 transition-all duration-300 rounded-full"
+                      style={{ width: `${((currentStep + (showFeedback ? 1 : 0)) / POST_TEST_SCENARIOS.length) * 100}%` }}
                     />
                   </div>
                 </div>
-              </div>
 
-              {/* 3 Simple Steps */}
-              <div className="mt-4 grid grid-cols-3 gap-2">
-                <div className="rounded-2xl bg-white p-2.5 border border-slate-100 text-center">
-                  <div className="text-xs font-black text-[#0292fc]">1. Spontan</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">5 Kasus Awal</div>
-                </div>
-                <div className="rounded-2xl bg-white p-2.5 border border-slate-100 text-center">
-                  <div className="text-xs font-black text-[#0292fc]">2. Edukasi</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Kunci Rahasia</div>
-                </div>
-                <div className="rounded-2xl bg-white p-2.5 border border-slate-100 text-center">
-                  <div className="text-xs font-black text-[#0292fc]">3. Akhir</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Safe Score</div>
-                </div>
-              </div>
-
-              <div className="mt-5">
-                <button
-                  type="button"
-                  onClick={handleStartPreTest}
-                  className="w-full rounded-2xl bg-[#0292fc] py-3 text-xs font-black text-white shadow-md transition hover:bg-[#007ad6] active:scale-95"
-                >
-                  Mulai Challenge
-                </button>
-              </div>
-            </section>
-          )}
-
-          {/* Stage 1: Pre-Test */}
-          {stage === "pre_test" && activePreScenario && (
-            <div className="space-y-3">
-              <div className="glass-card rounded-[28px] p-5 border border-white">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[#0292fc] bg-blue-50 px-3 py-1 rounded-full">
-                    {currentStep + 1} dari {PRE_TEST_SCENARIOS.length}
-                  </span>
-
-                  {/* Timer Pill */}
-                  <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-xs font-black border transition ${timeLeft < 30
-                    ? "bg-red-50 text-red-600 border-red-200 animate-pulse"
-                    : "bg-blue-50/80 text-[#003882] border-blue-100"
-                    }`}>
-                    <Icon name="Clock3" size={13} />
-                    <span>{formatTimer(timeLeft)}</span>
-                  </div>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full bg-[#0292fc] transition-all duration-300 rounded-full"
-                    style={{ width: `${((currentStep + 1) / PRE_TEST_SCENARIOS.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Scenario Card */}
-              <div className="mt-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
-                <div className="text-xs font-bold text-slate-500 mb-2">
-                  {activePreScenario.context}
-                </div>
-
-                {/* Chat / Mock Interface */}
-                <div className="my-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5">
-                    <div className="grid h-7 w-7 place-items-center rounded-full bg-blue-100 text-[#0876c9]">
-                      <Icon name={activePreScenario.mockType === "sms" ? "MessageSquare" : activePreScenario.mockType === "qris" ? "QrCode" : "PhoneCall"} size={14} />
-                    </div>
-                    <span className="text-xs font-black text-[#102a54]">
-                      {activePreScenario.sender}
-                    </span>
+                {/* Scenario Card */}
+                <div className="mt-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
+                  <div className="text-xs font-bold text-slate-500 mb-2">
+                    {activeScenario.context}
                   </div>
 
-                  <div className="mt-3 text-xs leading-relaxed text-slate-700 bg-white p-3 rounded-xl border border-slate-100 font-medium">
-                    {activePreScenario.message}
-                  </div>
-                </div>
-
-                {/* Question */}
-                <h3 className="text-sm font-black text-[#102a54] mb-3">
-                  {activePreScenario.question}
-                </h3>
-
-                {/* Options */}
-                <div className="space-y-2.5">
-                  {activePreScenario.options.map((opt) => {
-                    const isSelected = selectedOption?.id === opt.id
-                    return (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => handleSelectPreOption(opt)}
-                        className={`w-full text-left rounded-2xl border p-4 text-xs font-bold transition-all duration-150 flex items-start gap-3 ${isSelected
-                          ? "border-[#0876c9] bg-blue-50 text-[#0876c9] shadow-sm"
-                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                          }`}
-                      >
-                        <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-bold ${isSelected ? "bg-[#0876c9] text-white border-[#0876c9]" : "border-slate-300"
-                          }`}>
-                          {opt.id.toUpperCase()}
-                        </span>
-                        <span className="flex-1 leading-snug">{opt.text}</span>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Stage 2: 5 Golden Rules Intervention */}
-          {stage === "intervention" && (
-            <div className="mt-6">
-              <div className="rounded-3xl bg-white p-6 shadow-soft md:p-8">
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700">
-                  Kunci Pengamanan Akun
-                </span>
-
-                <h2 className="mt-3 text-xl font-black text-[#102a54] md:text-2xl">
-                  5 Golden Rules Keamanan Finansial Digital
-                </h2>
-
-                <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-                  Anda telah menyelesaikan 5 skenario pertama. Sebelum lanjut ke tantangan penentu berikutnya, perhatikan 5 prinsip keamanan mutlak berikut:
-                </p>
-
-                {/* 5 Core Rules */}
-                <div className="mt-5 space-y-3">
-                  {[
-                    {
-                      num: "1",
-                      title: "Kerahasiaan Data:",
-                      desc: "Jangan pernah membagikan OTP, PIN, CVV, atau password kepada siapa pun termasuk pihak bank."
-                    },
-                    {
-                      num: "2",
-                      title: "Waspada File .APK:",
-                      desc: (
-                        <>
-                          Jangan pernah membuka atau menginstal file berakhiran{" "}
-                          <code className="rounded bg-slate-200/80 px-1 py-0.5 font-mono text-[11px] text-slate-800">
-                            .apk
-                          </code>{" "}
-                          dari WhatsApp atau Telegram.
-                        </>
-                      )
-                    },
-                    {
-                      num: "3",
-                      title: "Periksa Domain URL:",
-                      desc: "Jangan klik link SMS. Ketik manual alamat portal resmi bank di browser Anda."
-                    },
-                    {
-                      num: "4",
-                      title: "Tolak Syarat Deposit:",
-                      desc: "Tawaran kerja paruh waktu yang meminta deposit uang terlebih dahulu adalah penipuan."
-                    },
-                    {
-                      num: "5",
-                      title: "Verifikasi Nama QRIS:",
-                      desc: "Selalu periksa kesesuaian nama merchant di layar m-banking sebelum menginput PIN transaksi."
-                    }
-                  ].map((item) => (
-                    <div
-                      key={item.num}
-                      className="flex items-start gap-3.5 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 transition hover:border-blue-100 hover:bg-blue-50/30"
-                    >
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#102a54] text-xs font-black text-white shadow-xs">
-                        {item.num}
+                  {/* Chat / Mock Interface */}
+                  <div className="my-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5">
+                      <div className="grid h-7 w-7 place-items-center rounded-full bg-emerald-100 text-emerald-700">
+                        <Icon
+                          name={
+                            activeScenario.mockType === "sms"
+                              ? "MessageSquare"
+                              : activeScenario.mockType === "qris"
+                              ? "QrCode"
+                              : "PhoneCall"
+                          }
+                          size={14}
+                        />
                       </div>
-                      <div className="text-xs leading-relaxed text-slate-700">
-                        <strong className="font-black text-[#102a54] mr-1.5">{item.title}</strong>
-                        {item.desc}
-                      </div>
+                      <span className="text-xs font-black text-[#102a54]">
+                        {activeScenario.sender}
+                      </span>
                     </div>
-                  ))}
-                </div>
 
-                <div className="mt-6 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleStartPostTest}
-                    className="flex items-center gap-2 rounded-2xl bg-[#0876c9] px-6 py-3.5 text-xs font-black text-white shadow-md transition hover:bg-[#075da8]"
-                  >
-                    Mulai Tantangan Bagian 2 (2 Menit)
-                    <Icon name="ArrowRight" size={16} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Stage 3: Post-Test */}
-          {stage === "post_test" && activePostScenario && (
-            <div className="space-y-3">
-              <div className="glass-card rounded-[28px] p-5 border border-white">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
-                    Skenario {currentStep + 1} dari {POST_TEST_SCENARIOS.length}
-                  </span>
-
-                  {/* Timer Pill */}
-                  <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-xs font-black border transition ${timeLeft < 30
-                    ? "bg-red-50 text-red-600 border-red-200 animate-pulse"
-                    : "bg-emerald-50 text-emerald-800 border-emerald-200"
-                    }`}>
-                    <Icon name="Clock3" size={13} />
-                    <span>{formatTimer(timeLeft)}</span>
-                  </div>
-                </div>
-
-                <div className="mt-2.5 flex items-center justify-between">
-                  <span className="text-xs font-black text-[#002554]">
-                    {activePostScenario.category}
-                  </span>
-                  <span className="text-[10px] font-bold text-slate-400">
-                    {Math.round(((currentStep + (showFeedback ? 1 : 0)) / POST_TEST_SCENARIOS.length) * 100)}% Selesai
-                  </span>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full bg-emerald-500 transition-all duration-300 rounded-full"
-                    style={{ width: `${((currentStep + (showFeedback ? 1 : 0)) / POST_TEST_SCENARIOS.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Scenario Card */}
-              <div className="mt-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
-                <div className="text-xs font-bold text-slate-500 mb-2">
-                  {activePostScenario.context}
-                </div>
-
-                {/* Chat / Mock Interface */}
-                <div className="my-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5">
-                    <div className="grid h-7 w-7 place-items-center rounded-full bg-emerald-100 text-emerald-700">
-                      <Icon name={activePostScenario.mockType === "sms" ? "MessageSquare" : activePostScenario.mockType === "qris" ? "QrCode" : "PhoneCall"} size={14} />
+                    <div className="mt-3 text-xs leading-relaxed text-slate-700 bg-white p-3 rounded-xl border border-slate-100 font-medium">
+                      {activeScenario.message}
                     </div>
-                    <span className="text-xs font-black text-[#102a54]">
-                      {activePostScenario.sender}
-                    </span>
                   </div>
 
-                  <div className="mt-3 text-xs leading-relaxed text-slate-700 bg-white p-3 rounded-xl border border-slate-100 font-medium">
-                    {activePostScenario.message}
-                  </div>
-                </div>
+                  {/* Question */}
+                  <h3 className="text-sm font-black text-[#102a54] mb-3">
+                    {activeScenario.question}
+                  </h3>
 
-                {/* Question */}
-                <h3 className="text-sm font-black text-[#102a54] mb-3">
-                  {activePostScenario.question}
-                </h3>
+                  {/* Options */}
+                  <div className="space-y-2.5">
+                    {activeScenario.options.map((opt, idx) => {
+                      const isSelected = selectedOption?.id === opt.id
+                      const labelText = opt.label || opt.id || String.fromCharCode(65 + idx)
+                      let btnStyle = "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
 
-                {/* Options */}
-                <div className="space-y-2.5">
-                  {activePostScenario.options.map((opt) => {
-                    const isSelected = selectedOption?.id === opt.id
-                    let btnStyle = "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-
-                    if (showFeedback) {
-                      if (opt.isCorrect) {
-                        btnStyle = "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-sm"
-                      } else if (isSelected && !opt.isCorrect) {
-                        btnStyle = "border-red-400 bg-red-50 text-red-800 shadow-sm"
-                      } else {
-                        btnStyle = "border-slate-200 bg-slate-50 text-slate-400 opacity-60"
+                      if (showFeedback) {
+                        if (opt.isCorrect) {
+                          btnStyle = "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-sm"
+                        } else if (isSelected && !opt.isCorrect) {
+                          btnStyle = "border-red-400 bg-red-50 text-red-800 shadow-sm"
+                        } else {
+                          btnStyle = "border-slate-200 bg-slate-50 text-slate-400 opacity-60"
+                        }
                       }
-                    }
 
-                    return (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        disabled={showFeedback}
-                        onClick={() => handleSelectPostOption(opt)}
-                        className={`w-full text-left rounded-2xl border p-4 text-xs font-bold transition-all duration-150 flex items-start gap-3 ${btnStyle}`}
-                      >
-                        <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-bold ${showFeedback && opt.isCorrect ? "bg-emerald-600 text-white border-emerald-600" : "border-slate-300"
-                          }`}>
-                          {opt.id.toUpperCase()}
-                        </span>
-                        <span className="flex-1 leading-snug">{opt.text}</span>
-                      </button>
-                    )
-                  })}
-                </div>
-
-                {/* Instant Feedback Panel */}
-                {showFeedback && selectedOption && (
-                  <div className={`mt-5 rounded-2xl p-4 border transition-all ${selectedOption.isCorrect ? "bg-emerald-50/80 border-emerald-200" : "bg-red-50/80 border-red-200"
-                    }`}>
-                    <div className="flex items-center gap-2">
-                      <Icon
-                        name={selectedOption.isCorrect ? "CheckCircle2" : "AlertTriangle"}
-                        size={18}
-                        className={selectedOption.isCorrect ? "text-emerald-600" : "text-red-600"}
-                      />
-                      <span className={`text-xs font-black ${selectedOption.isCorrect ? "text-emerald-800" : "text-red-800"}`}>
-                        {selectedOption.isCorrect ? "Tindakan Aman & Tepat (+20 Poin)" : "Tindakan Berisiko (-20 Poin)"}
-                      </span>
-                    </div>
-
-                    <p className="mt-2 text-xs text-slate-700 leading-relaxed font-medium">
-                      {selectedOption.feedbackReason}
-                    </p>
-
-                    <div className="mt-3 rounded-xl bg-white/80 p-2.5 border border-slate-200/60 text-[11px] text-slate-600">
-                      <strong>Aturan Keamanan:</strong> {activePostScenario.goldenRule}
-                    </div>
-
-                    <div className="mt-4 flex justify-end">
-                      <button
-                        type="button"
-                        onClick={handleNextPostStep}
-                        className="flex items-center gap-2 rounded-2xl bg-[#102a54] px-5 py-2.5 text-xs font-black text-white transition hover:bg-[#1a3e75]"
-                      >
-                        {currentStep < POST_TEST_SCENARIOS.length - 1 ? (
-                          <>
-                            Skenario Berikutnya
-                            <Icon name="ArrowRight" size={15} />
-                          </>
-                        ) : (
-                          <>
-                            Lanjut ke Evaluasi Refleks
-                            <Icon name="ArrowRight" size={15} />
-                          </>
-                        )}
-                      </button>
-                    </div>
+                      return (
+                        <button
+                          key={opt.id || idx}
+                          type="button"
+                          disabled={showFeedback}
+                          onClick={() => handleSelectOption(opt)}
+                          className={`w-full text-left rounded-2xl border p-4 text-xs font-bold transition-all duration-150 flex items-start gap-3 cursor-pointer ${btnStyle}`}
+                        >
+                          <span
+                            className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-bold ${
+                              showFeedback && opt.isCorrect
+                                ? "bg-emerald-600 text-white border-emerald-600"
+                                : "border-slate-300"
+                            }`}
+                          >
+                            {String(labelText).toUpperCase()}
+                          </span>
+                          <span className="flex-1 leading-snug">{opt.text}</span>
+                        </button>
+                      )
+                    })}
                   </div>
-                )}
-              </div>
-            </div>
-          )}
 
-          {/* Stage 4: ARI Survey */}
-          {stage === "ari_survey" && activeAriQuestion && (
-            <div className="mt-6">
-              <div className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-[#0876c9] bg-blue-50 px-2.5 py-1 rounded-full">
-                      Evaluasi Safe Score & Kebiasaan
-                    </span>
-                    <h2 className="mt-1 text-base font-black text-[#102a54]">
-                      {activeAriQuestion.title} ({currentAriStep + 1} dari {ARI_SURVEY_QUESTIONS.length})
-                    </h2>
-                  </div>
-                  <span className="text-xs font-bold text-slate-400">
-                    Pilar: {activeAriQuestion.pillar}
-                  </span>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full bg-[#0876c9] transition-all duration-300"
-                    style={{ width: `${((currentAriStep + 1) / ARI_SURVEY_QUESTIONS.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Question Card */}
-              <div className="mt-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
-                <h3 className="text-sm font-bold leading-relaxed text-[#102a54] mb-4">
-                  {activeAriQuestion.question}
-                </h3>
-
-                {/* Option Likert Cards */}
-                <div className="space-y-2.5">
-                  {activeAriQuestion.options.map((opt) => (
-                    <button
-                      key={opt.score}
-                      type="button"
-                      disabled={isSubmitting}
-                      onClick={() => handleSelectAriScore(opt.score)}
-                      className="w-full text-left rounded-2xl border border-slate-200 bg-white p-4 text-xs font-bold transition-all hover:border-[#0876c9] hover:bg-blue-50/50 flex items-start gap-3"
+                  {/* Instant Feedback Panel */}
+                  {showFeedback && selectedOption && (
+                    <div
+                      className={`mt-5 rounded-2xl p-4 border transition-all animate-fade-in ${
+                        selectedOption.isCorrect
+                          ? "bg-emerald-50/80 border-emerald-200 text-emerald-900"
+                          : "bg-red-50/80 border-red-200 text-red-900"
+                      }`}
                     >
-                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-slate-100 text-[#102a54] text-xs font-bold">
-                        {opt.score}
-                      </span>
-                      <div className="flex-1">
-                        <div className="text-slate-900 font-bold">{opt.label}</div>
-                        <div className="text-[11px] text-slate-400 font-normal mt-0.5">{opt.desc}</div>
+                      <div className="flex items-center gap-2 font-black text-sm">
+                        <Icon
+                          name={selectedOption.isCorrect ? "CheckCircle2" : "AlertTriangle"}
+                          size={18}
+                          className={selectedOption.isCorrect ? "text-emerald-600" : "text-red-600"}
+                        />
+                        <span>
+                          {selectedOption.isCorrect
+                            ? "Tindakan Aman & Tepat (+20 Poin)"
+                            : "Tindakan Berisiko (-20 Poin)"}
+                        </span>
                       </div>
-                    </button>
-                  ))}
+
+                      <p className="mt-2 text-xs leading-relaxed font-medium">
+                        {selectedOption.feedbackReason}
+                      </p>
+
+                      {activeScenario.goldenRule && (
+                        <div className="mt-3 rounded-xl bg-white/80 p-2.5 border border-slate-200/60 text-[11px] text-slate-600">
+                          <strong>Aturan Keamanan:</strong> {activeScenario.goldenRule}
+                        </div>
+                      )}
+
+                      <div className="mt-4 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={handleNextStep}
+                          className="flex items-center gap-2 rounded-2xl bg-[#102a54] hover:bg-[#1a3e75] px-5 py-2.5 text-xs font-black text-white transition cursor-pointer"
+                        >
+                          {currentStep < POST_TEST_SCENARIOS.length - 1 ? (
+                            <>
+                              <span>Skenario Berikutnya</span>
+                              <Icon name="ArrowRight" size={15} />
+                            </>
+                          ) : (
+                            <>
+                              <span>Lihat Hasil Safe Score</span>
+                              <Icon name="ArrowRight" size={15} />
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-
-                {isSubmitting && (
-                  <div className="mt-4 text-center text-xs font-bold text-[#0876c9] animate-pulse">
-                    Menyimpan hasil evaluasi ke database...
-                  </div>
-                )}
               </div>
-            </div>
-          )}
-          <BottomSpace />
-        </div>
+            )}
+          </div>
         </main>
-
-        <div className="md:hidden"><BottomNav /></div>
       </div>
+
+      <BottomNav />
+      <BottomSpace />
     </div>
   )
 }

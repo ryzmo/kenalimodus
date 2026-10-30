@@ -7,6 +7,7 @@ import Icon from "../../components/Icon"
 export default function RegisterPage() {
   const router = useRouter()
   const [name, setName] = useState("")
+  const [age, setAge] = useState(25)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -36,7 +37,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password, age: Number(age) || 25 })
       })
 
       const data = await res.json()
@@ -148,6 +149,29 @@ export default function RegisterPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Budi Santoso"
+                    className="w-full text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-hidden bg-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Usia / Umur */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Usia (Tahun)
+                </label>
+                <div className="relative flex items-center border-b border-slate-200 focus-within:border-[#0292fc] pb-1.5 transition">
+                  <span className="text-slate-400 mr-2.5">
+                    <Icon name="Calendar" size={16} />
+                  </span>
+                  <span className="text-slate-300 text-sm mr-2 font-light">|</span>
+                  <input
+                    type="number"
+                    min="10"
+                    max="100"
+                    required
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    placeholder="25"
                     className="w-full text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-hidden bg-transparent"
                   />
                 </div>

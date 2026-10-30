@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import Head from "next/head"
 import Link from "next/link"
+import Image from "next/image"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/router"
 import AppHeader from "../../components/AppHeader"
@@ -261,61 +262,61 @@ export default function AdminDashboardPage() {
     }
   }
 
-  // Daftar Menu Utama di Halaman Admin
+  // Daftar Menu Utama di Halaman Admin dengan 3D Icon seperti di Halaman Utama
   const adminMenuItems = [
     {
       id: "modus",
-      title: "Katalog & Modus",
-      desc: "Atur ensiklopedia kejahatan, red flags, dan tips mitigasi",
-      icon: "ShieldAlert",
+      title: "Katalog Modus",
+      desc: "Ensiklopedia modus & tips mitigasi",
+      iconImg: "/3d-alert-icon.png",
       count: modusList.length,
       badge: "Katalog",
-      color: "from-blue-600 to-sky-500"
+      badgeColor: "bg-blue-500"
     },
     {
       id: "soal",
       title: "Bank Soal Simulasi",
-      desc: "Rancang studi kasus chat WhatsApp, SMS, dan uji Safe Score",
-      icon: "HelpCircle",
+      desc: "Skenario chat, SMS & uji Safe Score",
+      iconImg: "/3d-shield-icon.png",
       count: scenarioList.length,
-      badge: "Interaktif",
-      color: "from-indigo-600 to-blue-500"
+      badge: "Simulasi",
+      badgeColor: "bg-amber-500"
     },
     {
       id: "articles",
       title: "Artikel & Edukasi",
-      desc: "Kelola artikel, video, dan tentukan reward poin saat dibaca",
-      icon: "BookOpen",
+      desc: "Materi edukasi & reward poin baca",
+      iconImg: "/3d-trophy-icon.png",
       count: articleList.length,
-      badge: "Reward Poin",
-      color: "from-cyan-600 to-teal-500"
+      badge: "Poin Edu",
+      badgeColor: "bg-emerald-500"
     },
     {
       id: "rewards",
       title: "Katalog Rewards",
-      desc: "Atur voucher e-wallet, merchandise, dan harga poin penukaran",
-      icon: "Gift",
+      desc: "Voucher e-wallet & harga poin",
+      iconImg: "/3d-trophy-icon.png",
       count: rewardList.length,
       badge: "Poin Store",
-      color: "from-amber-600 to-orange-500"
+      badgeColor: "bg-rose-500"
     },
     {
       id: "settings",
-      title: "Aturan Poin & Sistem",
-      desc: "Ubah besaran poin challenge, bonus perfect score, dan durasi lockout",
-      icon: "Sliders",
+      title: "Aturan Poin Sistem",
+      desc: "Parameter poin & keamanan akun",
+      iconImg: "/3d-shield-icon.png",
       count: settingsList.length,
-      badge: "Sistem",
-      color: "from-emerald-600 to-green-500"
+      badge: "Aturan",
+      badgeColor: "bg-purple-500"
     },
     {
       id: "impact_nav",
-      title: "Analitik Riset & ARI",
-      desc: "Pantau metriks efektivitas intervensi kognitif & data OJK",
-      icon: "BarChart3",
+      title: "Analitik Riset",
+      desc: "Metrik behavioral impact & OJK",
+      iconImg: "/3d-family-icon.png",
       href: "/admin/impact",
-      badge: "Laporan Riset",
-      color: "from-violet-600 to-purple-500"
+      badge: "Laporan",
+      badgeColor: "bg-sky-500"
     }
   ]
 
@@ -360,129 +361,137 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff] text-[#002554] flex flex-col font-sans">
+    <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff]">
       <Head>
         <title>Admin Control Center — Kenali Modus BCA</title>
       </Head>
 
-      <AppHeader
-        title={currentMenu === "menu" ? "Admin Control Center" : adminMenuItems.find((m) => m.id === currentMenu)?.title || "Admin"}
-        subtitle="Sistem Manajemen Konten Terpadu BCA"
-        showBack={currentMenu !== "menu"}
-        backHref="#"
-      />
+      <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
+        <AppHeader
+          title={currentMenu === "menu" ? "Admin Control Center" : adminMenuItems.find((m) => m.id === currentMenu)?.title || "Admin"}
+          subtitle="Sistem Manajemen Konten Terpadu BCA"
+          showBack={currentMenu !== "menu"}
+          backHref="#"
+        />
 
-      {/* Override Action Back saat berada di submenu */}
-      {currentMenu !== "menu" && (
-        <div className="w-full max-w-6xl mx-auto px-4 sm:px-8 -mt-2 mb-2">
-          <button
-            onClick={() => setCurrentMenu("menu")}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs backdrop-blur-md border border-white/30 transition cursor-pointer"
-          >
-            <Icon name="ArrowLeft" size={14} />
-            <span>Kembali ke Menu Utama Admin</span>
-          </button>
-        </div>
-      )}
-
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-8 py-3 sm:py-5">
-        {/* Toast Notifikasi */}
-        {toastMsg && (
-          <div className="fixed top-6 right-6 z-50 bg-[#002554] text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 border border-blue-400 animate-fade-in">
-            <Icon name="CheckCircle" size={16} className="text-emerald-400" />
-            <span>{toastMsg}</span>
+        {/* Override Action Back saat berada di submenu */}
+        {currentMenu !== "menu" && (
+          <div className="w-full max-w-6xl mx-auto px-5 sm:px-8 -mt-1 mb-2">
+            <button
+              onClick={() => setCurrentMenu("menu")}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs backdrop-blur-md border border-white/30 transition cursor-pointer active:scale-95"
+            >
+              <Icon name="ArrowLeft" size={14} />
+              <span>Kembali ke Menu Utama Admin</span>
+            </button>
           </div>
         )}
 
-        {/* ==================================================== */}
-        {/* TAMPILAN 1: GRID MENU UTAMA ADMIN */}
-        {/* ==================================================== */}
-        {currentMenu === "menu" && (
-          <div className="space-y-6">
-            {/* Banner Sambutan Admin */}
-            <div className="glass-card rounded-[32px] p-6 sm:p-8 border border-white shadow-xl shadow-blue-500/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#0292fc] border border-blue-200 text-xs font-black mb-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                  <span>Administrator Server Active</span>
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-black text-[#002554] tracking-tight">
-                  Pusat Pengaturan Ekosistem
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">
-                  Kelola skenario simulasi, tipologi modus kejahatan, artikel edukasi berhadiah poin, dan parameter sistem dalam satu kendali.
-                </p>
+        {/* BOTTOM SHEET / DESKTOP FULL CONTENT BODY */}
+        <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-12 mt-2">
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 space-y-6">
+            
+            {/* Toast Notifikasi */}
+            {toastMsg && (
+              <div className="fixed top-6 right-6 z-50 bg-[#002554] text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 border border-blue-400 animate-fade-in">
+                <Icon name="CheckCircle" size={16} className="text-emerald-400" />
+                <span>{toastMsg}</span>
               </div>
+            )}
 
-              <div className="flex items-center gap-3">
-                <Link
-                  href="/admin/impact"
-                  className="px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 shadow-sm flex items-center gap-2 transition"
-                >
-                  <Icon name="TrendingUp" size={16} className="text-[#0292fc]" />
-                  <span>Lihat Riset Impact</span>
-                </Link>
-              </div>
-            </div>
-
-            {/* Grid Menu Kotak-Kotak Simple & Modern */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-              {adminMenuItems.map((menu) => {
-                const IconComponent = () => (
-                  <div className={`h-11 w-11 sm:h-13 sm:w-13 rounded-2xl bg-gradient-to-br ${menu.color} text-white flex items-center justify-center shadow-md group-hover:scale-105 transition`}>
-                    <Icon name={menu.icon} size={22} />
+            {/* ==================================================== */}
+            {/* TAMPILAN 1: GRID MENU UTAMA ADMIN */}
+            {/* ==================================================== */}
+            {currentMenu === "menu" && (
+              <div className="space-y-6">
+                {/* Banner Sambutan Admin */}
+                <div className="glass-card rounded-[28px] p-6 border border-white shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#0292fc] border border-blue-200 text-[11px] font-black mb-2">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Administrator Server Active</span>
+                    </div>
+                    <h1 className="text-xl sm:text-2xl font-black text-[#002554] tracking-tight">
+                      Pusat Pengaturan Ekosistem
+                    </h1>
+                    <p className="text-xs text-slate-500 mt-1 max-w-xl">
+                      Kelola skenario simulasi, tipologi modus kejahatan, artikel edukasi berhadiah poin, dan parameter sistem dalam satu kendali.
+                    </p>
                   </div>
-                )
 
-                if (menu.href) {
-                  return (
+                  <div className="flex items-center gap-3">
                     <Link
-                      key={menu.id}
-                      href={menu.href}
-                      className="glass-card rounded-[26px] p-4 sm:p-5 border border-white shadow-sm hover:shadow-md hover:border-blue-300 transition active:scale-[0.98] flex flex-col items-center text-center justify-between aspect-square group"
+                      href="/admin/impact"
+                      className="px-4 py-2.5 rounded-2xl bg-[#003882] text-white font-bold text-xs hover:bg-[#002554] shadow-md flex items-center gap-2 transition active:scale-95"
                     >
-                      <div className="flex flex-col items-center justify-center flex-1">
-                        <IconComponent />
-                        <h3 className="text-xs sm:text-sm font-black text-[#002554] mt-3 leading-tight">
-                          {menu.title}
-                        </h3>
-                        <p className="text-[11px] text-slate-400 mt-1 line-clamp-1">
-                          {menu.desc}
-                        </p>
-                      </div>
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 mt-2">
-                        {menu.badge}
-                      </span>
+                      <Icon name="TrendingUp" size={15} />
+                      <span>Laporan Riset Impact</span>
                     </Link>
-                  )
-                }
-
-                return (
-                  <div
-                    key={menu.id}
-                    onClick={() => setCurrentMenu(menu.id)}
-                    className="glass-card rounded-[26px] p-4 sm:p-5 border border-white shadow-sm hover:shadow-md hover:border-blue-300 transition active:scale-[0.98] flex flex-col items-center text-center justify-between aspect-square cursor-pointer group"
-                  >
-                    <div className="flex flex-col items-center justify-center flex-1">
-                      <IconComponent />
-                      <h3 className="text-xs sm:text-sm font-black text-[#002554] mt-3 leading-tight">
-                        {menu.title}
-                      </h3>
-                      <p className="text-[11px] text-slate-400 mt-1 line-clamp-1">
-                        {menu.desc}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-[#0292fc] border border-blue-100">
-                        {menu.count !== undefined ? `${menu.count} Data` : "Setup"}
-                      </span>
-                    </div>
                   </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
+                </div>
+
+                {/* Grid Menu Kotak-Kotak Serasi dengan Halaman Utama (3D Icon) */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                  {adminMenuItems.map((menu) => {
+                    const CardInner = (
+                      <div className="flex flex-col items-center justify-between h-full p-4 text-center">
+                        <div className="relative h-14 w-14 sm:h-16 sm:w-16 flex items-center justify-center shrink-0 drop-shadow-md group-hover:scale-105 transition-transform duration-300">
+                          <Image
+                            src={menu.iconImg}
+                            alt={menu.title}
+                            width={56}
+                            height={56}
+                            className="object-contain"
+                          />
+                          {menu.badge && (
+                            <span className={`absolute -top-1.5 -right-1 text-[9px] font-black uppercase text-white px-1.5 py-0.5 rounded-full shadow-2xs ${menu.badgeColor || "bg-[#0292fc]"}`}>
+                              {menu.badge}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mt-3 min-w-0 w-full">
+                          <h3 className="text-xs sm:text-sm font-black text-[#002554] leading-tight truncate">
+                            {menu.title}
+                          </h3>
+                          <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">
+                            {menu.desc}
+                          </p>
+                        </div>
+
+                        <div className="mt-3 pt-2 w-full border-t border-slate-100 flex items-center justify-center">
+                          <span className="text-[10px] font-black text-[#0292fc] bg-blue-50/80 px-2 py-0.5 rounded-full border border-blue-100">
+                            {menu.count !== undefined ? `${menu.count} Data` : "Buka"}
+                          </span>
+                        </div>
+                      </div>
+                    )
+
+                    if (menu.href) {
+                      return (
+                        <Link
+                          key={menu.id}
+                          href={menu.href}
+                          className="glass-card rounded-[24px] border border-white hover:border-blue-200 shadow-soft hover:shadow-md transition active:scale-[0.98] group bg-white/70"
+                        >
+                          {CardInner}
+                        </Link>
+                      )
+                    }
+
+                    return (
+                      <div
+                        key={menu.id}
+                        onClick={() => setCurrentMenu(menu.id)}
+                        className="glass-card rounded-[24px] border border-white hover:border-blue-200 shadow-soft hover:shadow-md transition active:scale-[0.98] cursor-pointer group bg-white/70"
+                      >
+                        {CardInner}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
         {/* ==================================================== */}
         {/* SUBMENU 1: KATALOG MODUS */}
@@ -1071,7 +1080,9 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         )}
-      </main>
+          </div>
+        </main>
+      </div>
 
       <BottomSpace />
     </div>

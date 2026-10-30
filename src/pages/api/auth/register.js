@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, email, password } = req.body
+    const { name, email, password, age } = req.body
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Nama, email, dan kata sandi wajib diisi." })
@@ -19,6 +19,7 @@ export default async function handler(req, res) {
 
     const cleanEmail = email.trim().toLowerCase()
     const cleanName = name.trim()
+    const parsedAge = age ? parseInt(age, 10) : 25
 
     await initDbSchema()
     const sql = getDb()
@@ -39,11 +40,12 @@ export default async function handler(req, res) {
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(password, saltRounds)
 
-    // Simpan user baru ke database Neon (tanpa phone_number)
+    // Simpan user baru ke database Neon (termasuk usia)
     const inserted = await sql`
       INSERT INTO users (
         name,
         email,
+        age,
         password_hash,
         safe_score,
         total_points,
@@ -51,12 +53,13 @@ export default async function handler(req, res) {
       ) VALUES (
         ${cleanName},
         ${cleanEmail},
+        ${parsedAge},
         ${passwordHash},
         78,
         120,
         1
       )
-      RETURNING id, name, email, safe_score, total_points
+      RETURNING id, name, email, age, safe_score, total_points
     `
 
     const newUser = inserted[0]
