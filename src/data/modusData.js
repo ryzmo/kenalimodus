@@ -1971,64 +1971,84 @@ export const POINTS_ACTIVITIES = [
 
 export const REWARD_CATALOG = [
   {
-    id: "voucher-digital",
-    title: "Voucher Belanja Digital",
-    desc: "Voucher e-commerce senilai Rp 25.000 untuk pengguna setia.",
+    id: "voucher-digital-25k",
+    title: "Voucher Belanja Digital Rp 25.000",
+    desc: "Voucher e-commerce (Shopee/Tokopedia) resmi senilai Rp 25.000.",
     icon: "Gift",
-    cost: 50,
+    cost: 500,
     category: "Voucher",
     color: "blue",
     available: true
   },
   {
-    id: "badge-scam-buster",
-    title: "Exclusive Badge 'Scam Buster'",
-    desc: "Badge eksklusif yang tampil di profil sebagai tanda penguasaan anti-fraud.",
-    icon: "Medal",
-    cost: 30,
-    category: "Badge",
+    id: "voucher-gopay-50k",
+    title: "Saldo e-Wallet GoPay / OVO Rp 50.000",
+    desc: "Top-up saldo e-wallet instan Rp 50.000 untuk transaksi harian Anda.",
+    icon: "Gift",
+    cost: 1000,
+    category: "e-Wallet",
+    color: "emerald",
+    available: true
+  },
+  {
+    id: "voucher-digital-100k",
+    title: "Voucher Belanja Digital Rp 100.000",
+    desc: "Voucher e-commerce & merchant resmi rekanan BCA senilai Rp 100.000.",
+    icon: "Gift",
+    cost: 2000,
+    category: "Voucher",
     color: "amber",
     available: true
   },
   {
+    id: "voucher-flazz-150k",
+    title: "Saldo BCA Flazz Eksklusif Rp 150.000",
+    desc: "Kartu fisik Flazz edisi khusus #AwasModus dengan saldo awal Rp 150.000.",
+    icon: "Sparkles",
+    cost: 3000,
+    category: "Merchandise",
+    color: "purple",
+    available: true
+  },
+  {
+    id: "merchandise-awasmodus",
+    title: "Official Merchandise Set #AwasModus",
+    desc: "Paket merchandise resmi BCA: T-shirt eksklusif, tumbler premium, dan sticker pack.",
+    icon: "Medal",
+    cost: 4500,
+    category: "Merchandise",
+    color: "rose",
+    available: true
+  },
+  {
+    id: "voucher-investasi-250k",
+    title: "Voucher Reksa Dana BCA Rp 250.000",
+    desc: "Voucher investasi reksa dana melalui aplikasi Welma / myBCA senilai Rp 250.000.",
+    icon: "Star",
+    cost: 5000,
+    category: "Investasi",
+    color: "cyan",
+    available: true
+  },
+  {
     id: "priority-alert",
-    title: "Priority Alert Access",
-    desc: "Akses prioritas notifikasi modus penipuan terbaru sebelum dipublikasi umum.",
+    title: "Priority Alert Access & VIP Webinars",
+    desc: "Akses prioritas intelijen modus penipuan baru + undangan webinar keamanan siber perbankan.",
     icon: "Bell",
-    cost: 80,
+    cost: 1500,
     category: "Benefit",
     color: "purple",
     available: true
   },
   {
-    id: "mystery-box",
-    title: "Mystery Reward Box",
-    desc: "Hadiah langsung kejutan — bisa voucher, merchandise, atau benefit premium.",
+    id: "mystery-box-grand",
+    title: "Grand Mystery Reward Box",
+    desc: "Hadiah kejutan bernilai tinggi — gadget perlindungan, voucher belanja premium, atau gadget banking.",
     icon: "Sparkles",
-    cost: 100,
+    cost: 6000,
     category: "Hadiah Langsung",
     color: "emerald",
     available: true
-  },
-  {
-    id: "family-shield",
-    title: "Family Shield Premium",
-    desc: "Fitur Grup Keluarga premium: pantau hingga 10 anggota keluarga secara real-time.",
-    icon: "Shield",
-    cost: 120,
-    category: "Benefit",
-    color: "cyan",
-    available: true
-  },
-  {
-    id: "voucher-cashback",
-    title: "Cashback Transfer Voucher",
-    desc: "Voucher cashback 1% untuk 5 kali transaksi transfer berikutnya.",
-    icon: "Star",
-    cost: 150,
-    category: "Voucher",
-    color: "rose",
-    available: false
   }
 ]
 

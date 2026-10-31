@@ -7,7 +7,7 @@ import Icon from "../../components/Icon"
 export default function RegisterPage() {
   const router = useRouter()
   const [name, setName] = useState("")
-  const [age, setAge] = useState(25)
+  const [birthYear, setBirthYear] = useState(2000)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -31,13 +31,22 @@ export default function RegisterPage() {
       return
     }
 
+    const currentYear = new Date().getFullYear()
+    const parsedYear = Number(birthYear)
+    if (!parsedYear || parsedYear < 1920 || parsedYear > currentYear) {
+      setErrorMsg(`Tahun lahir tidak valid (1920 - ${currentYear}).`)
+      return
+    }
+
+    const calculatedAge = Math.max(1, currentYear - parsedYear)
+
     setLoading(true)
 
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, age: Number(age) || 25 })
+        body: JSON.stringify({ name, email, password, age: calculatedAge })
       })
 
       const data = await res.json()
@@ -59,39 +68,37 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-0 sm:p-4 md:p-6 font-sans">
+    <div className="h-screen max-h-screen bg-slate-900 flex items-center justify-center p-0 sm:p-2 font-sans overflow-hidden">
       <Head>
         <title>Sign Up — Kenali Modus BCA</title>
       </Head>
 
-      {/* Mobile Device Canvas Wrapper */}
-      <div className="w-full max-w-md sm:rounded-[42px] bg-white min-h-screen sm:min-h-[820px] shadow-2xl relative overflow-hidden flex flex-col justify-between border-0 sm:border sm:border-slate-100">
+      {/* Mobile Device Canvas Wrapper - Fits Screen Without Scroll */}
+      <div className="w-full max-w-md sm:rounded-[36px] bg-white h-full sm:h-auto sm:max-h-[96vh] shadow-2xl relative overflow-hidden flex flex-col justify-between border-0 sm:border sm:border-slate-100">
         
-        {/* Top Organic Wave Graphic Area */}
-        <div className="relative h-56 sm:h-64 w-full bg-gradient-to-br from-[#0292fc] via-[#2ba8ff] to-[#0051b3] overflow-hidden flex flex-col justify-between p-6">
+        {/* Top Organic Wave Graphic Area (Seimbang) */}
+        <div className="relative h-32 sm:h-36 shrink-0 w-full bg-gradient-to-br from-[#0292fc] via-[#2ba8ff] to-[#0051b3] overflow-hidden flex flex-col justify-between p-4 sm:p-5">
           {/* Topographic Contour Vector Background Effect */}
           <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay">
             <svg className="w-full h-full object-cover" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M-50 80 Q 100 20 200 90 T 450 60" stroke="white" strokeWidth="1.5" fill="none"/>
               <path d="M-50 120 Q 80 50 220 130 T 450 100" stroke="white" strokeWidth="1.5" fill="none"/>
               <path d="M-50 160 Q 120 90 240 180 T 450 140" stroke="white" strokeWidth="1.5" fill="none"/>
-              <ellipse cx="280" cy="110" rx="60" ry="35" stroke="white" strokeWidth="1.5" fill="none" />
-              <ellipse cx="120" cy="180" rx="70" ry="40" stroke="white" strokeWidth="1.5" fill="none" />
             </svg>
           </div>
 
           {/* Top Navigation */}
-          <div className="relative z-10 flex items-center justify-between text-white pt-2">
+          <div className="relative z-10 flex items-center justify-between text-white">
             <Link
               href="/auth/login"
-              className="h-9 w-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center transition active:scale-95"
+              className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center transition active:scale-95"
             >
-              <Icon name="ChevronLeft" size={20} />
+              <Icon name="ChevronLeft" size={18} />
             </Link>
-            <span className="text-[11px] font-black uppercase tracking-wider bg-white/15 px-3 py-1 rounded-full border border-white/20">
+            <span className="text-[10px] font-black uppercase tracking-wider bg-white/15 px-2.5 py-0.5 rounded-full border border-white/20">
               Registrasi Akun
             </span>
-            <div className="w-9" />
+            <div className="w-8" />
           </div>
 
           {/* Wave Curve Masking Bottom */}
@@ -99,7 +106,7 @@ export default function RegisterPage() {
             <svg
               viewBox="0 0 500 150"
               preserveAspectRatio="none"
-              className="h-16 w-full fill-white"
+              className="h-9 sm:h-11 w-full fill-white"
             >
               <path d="M0.00,49.98 C149.99,150.00 349.81,-49.98 500.00,49.98 L500.00,150.00 L0.00,150.00 Z" />
             </svg>
@@ -107,42 +114,42 @@ export default function RegisterPage() {
         </div>
 
         {/* Form Body Area */}
-        <div className="px-7 sm:px-9 pt-1 pb-6 flex-1 flex flex-col justify-between bg-white z-10">
-          <div>
+        <div className="px-7 sm:px-9 pt-1 pb-5 flex-1 flex flex-col justify-between bg-white z-10 overflow-hidden">
+          <div className="space-y-4">
             {/* Title with Underline Accent */}
-            <div className="mb-5">
-              <h1 className="text-2xl sm:text-3xl font-black text-[#002554] tracking-tight inline-block relative">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black text-[#002554] tracking-tight inline-block relative">
                 Sign up
-                <div className="h-1 w-10 bg-[#0292fc] rounded-full mt-1.5" />
+                <div className="h-0.5 w-8 bg-[#0292fc] rounded-full mt-1" />
               </h1>
             </div>
 
             {/* Error & Success Notification */}
             {errorMsg && (
-              <div className="mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-semibold flex items-center gap-2">
-                <Icon name="AlertCircle" size={16} className="shrink-0" />
+              <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-semibold flex items-center gap-2">
+                <Icon name="AlertCircle" size={15} className="shrink-0" />
                 <span>{errorMsg}</span>
               </div>
             )}
 
             {successMsg && (
-              <div className="mb-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold flex items-center gap-2">
-                <Icon name="CheckCircle" size={16} className="shrink-0" />
+              <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold flex items-center gap-2">
+                <Icon name="CheckCircle" size={15} className="shrink-0" />
                 <span>{successMsg}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-3.5">
               {/* Full Name */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Full Name
+                  Nama Lengkap
                 </label>
                 <div className="relative flex items-center border-b border-slate-200 focus-within:border-[#0292fc] pb-1.5 transition">
                   <span className="text-slate-400 mr-2.5">
-                    <Icon name="User" size={16} />
+                    <Icon name="User" size={15} />
                   </span>
-                  <span className="text-slate-300 text-sm mr-2 font-light">|</span>
+                  <span className="text-slate-300 text-xs mr-2 font-light">|</span>
                   <input
                     type="text"
                     required
@@ -154,24 +161,24 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Usia / Umur */}
+              {/* Tahun Lahir */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Usia (Tahun)
+                  Tahun Lahir
                 </label>
                 <div className="relative flex items-center border-b border-slate-200 focus-within:border-[#0292fc] pb-1.5 transition">
                   <span className="text-slate-400 mr-2.5">
-                    <Icon name="Calendar" size={16} />
+                    <Icon name="Calendar" size={15} />
                   </span>
-                  <span className="text-slate-300 text-sm mr-2 font-light">|</span>
+                  <span className="text-slate-300 text-xs mr-2 font-light">|</span>
                   <input
                     type="number"
-                    min="10"
-                    max="100"
+                    min="1920"
+                    max={new Date().getFullYear()}
                     required
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                    placeholder="25"
+                    value={birthYear}
+                    onChange={(e) => setBirthYear(e.target.value)}
+                    placeholder="Contoh: 1998, 2002"
                     className="w-full text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-hidden bg-transparent"
                   />
                 </div>
@@ -184,9 +191,9 @@ export default function RegisterPage() {
                 </label>
                 <div className="relative flex items-center border-b border-slate-200 focus-within:border-[#0292fc] pb-1.5 transition">
                   <span className="text-slate-400 mr-2.5">
-                    <Icon name="Mail" size={16} />
+                    <Icon name="Mail" size={15} />
                   </span>
-                  <span className="text-slate-300 text-sm mr-2 font-light">|</span>
+                  <span className="text-slate-300 text-xs mr-2 font-light">|</span>
                   <input
                     type="email"
                     required
@@ -205,9 +212,9 @@ export default function RegisterPage() {
                 </label>
                 <div className="relative flex items-center border-b border-slate-200 focus-within:border-[#0292fc] pb-1.5 transition">
                   <span className="text-slate-400 mr-2.5">
-                    <Icon name="Lock" size={16} />
+                    <Icon name="Lock" size={15} />
                   </span>
-                  <span className="text-slate-300 text-sm mr-2 font-light">|</span>
+                  <span className="text-slate-300 text-xs mr-2 font-light">|</span>
                   <input
                     type={showPassword ? "text" : "password"}
                     required
@@ -221,7 +228,7 @@ export default function RegisterPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="text-slate-400 hover:text-slate-600 transition pl-2 cursor-pointer"
                   >
-                    <Icon name={showPassword ? "EyeOff" : "Eye"} size={16} />
+                    <Icon name={showPassword ? "EyeOff" : "Eye"} size={15} />
                   </button>
                 </div>
               </div>
@@ -233,9 +240,9 @@ export default function RegisterPage() {
                 </label>
                 <div className="relative flex items-center border-b border-slate-200 focus-within:border-[#0292fc] pb-1.5 transition">
                   <span className="text-slate-400 mr-2.5">
-                    <Icon name="Lock" size={16} />
+                    <Icon name="Lock" size={15} />
                   </span>
-                  <span className="text-slate-300 text-sm mr-2 font-light">|</span>
+                  <span className="text-slate-300 text-xs mr-2 font-light">|</span>
                   <input
                     type={showPassword ? "text" : "password"}
                     required
@@ -248,11 +255,11 @@ export default function RegisterPage() {
               </div>
 
               {/* Primary Submit Button */}
-              <div className="pt-4">
+              <div className="pt-2 sm:pt-3">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-12 rounded-2xl bg-[#0292fc] hover:bg-[#0081e3] text-white font-bold text-sm shadow-lg shadow-blue-500/25 transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full h-11 sm:h-12 rounded-2xl bg-[#0292fc] hover:bg-[#0081e3] text-white font-bold text-xs sm:text-sm shadow-md transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {loading ? (
                     <span>Mendaftarkan...</span>
@@ -265,7 +272,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Bottom Switch Link */}
-          <div className="text-center pt-4 text-xs text-slate-500">
+          <div className="text-center pt-2 sm:pt-3 text-xs text-slate-500">
             Already have an Account ?{" "}
             <Link
               href="/auth/login"

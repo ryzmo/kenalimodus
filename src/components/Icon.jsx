@@ -46,7 +46,8 @@ import {
   Target,
   Sparkles,
   Medal,
-  Plus
+  Plus,
+  Link as LinkIcon
 } from "lucide-react"
 
 const icons = {
@@ -99,7 +100,8 @@ const icons = {
   Target,
   Sparkles,
   Medal,
-  Plus
+  Plus,
+  Link: LinkIcon
 }
 
 export default function Icon({ name, className = "", size = 20, strokeWidth = 2, ...props }) {

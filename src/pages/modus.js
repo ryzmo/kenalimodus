@@ -21,27 +21,23 @@ export default function ModusPage() {
   const [activeVideoModal, setActiveVideoModal] = useState(null)
   const [activeArticleModal, setActiveArticleModal] = useState(null)
   const [claimedMedia, setClaimedMedia] = useState([])
-  const [userPoints, setUserPoints] = useState(120)
+  const [userPoints, setUserPoints] = useState(null)
   const [toastMsg, setToastMsg] = useState("")
 
-  // Load status klaim edukasi dari localStorage & database
+  // Load status klaim edukasi & poin berdasarkan sesi user
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const storedClaimed = localStorage.getItem("kenali_claimed_edu_media")
-        if (storedClaimed) setClaimedMedia(JSON.parse(storedClaimed) || [])
-
-        const storedPoints = localStorage.getItem("kenali_points_data")
-        if (storedPoints) {
-          const parsed = JSON.parse(storedPoints)
-          if (parsed.totalPoints !== undefined) setUserPoints(parsed.totalPoints)
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    }
-
     if (session?.user?.id) {
+      const userKey = `kenali_claimed_edu_media_${session.user.id}`
+      if (typeof window !== "undefined") {
+        try {
+          const storedClaimed = localStorage.getItem(userKey)
+          if (storedClaimed) setClaimedMedia(JSON.parse(storedClaimed) || [])
+          else setClaimedMedia([])
+        } catch (e) {
+          console.error(e)
+        }
+      }
+
       fetch(`/api/user/sync?userId=${session.user.id}`)
         .then((res) => res.json())
         .then((res) => {
@@ -50,6 +46,10 @@ export default function ModusPage() {
           }
         })
         .catch((e) => console.log(e))
+    } else {
+      // Jika belum login, reset state klaim dan poin
+      setClaimedMedia([])
+      setUserPoints(null)
     }
   }, [session])
 
@@ -66,6 +66,12 @@ export default function ModusPage() {
   }, [selectedCategory, searchQuery])
 
   const handleClaimEduPoints = async (mediaId, pts, title) => {
+    if (!session?.user?.id) {
+      setToastMsg("Silakan login terlebih dahulu untuk mengklaim poin edukasi.")
+      setTimeout(() => setToastMsg(""), 3000)
+      return
+    }
+
     if (claimedMedia.includes(mediaId)) {
       setToastMsg(`Anda sudah pernah mengklaim poin untuk materi ini.`)
       setTimeout(() => setToastMsg(""), 2500)
@@ -75,57 +81,34 @@ export default function ModusPage() {
     const newClaimed = [...claimedMedia, mediaId]
     setClaimedMedia(newClaimed)
 
-    let newPts = userPoints + pts
-
+    const userKey = `kenali_claimed_edu_media_${session.user.id}`
     if (typeof window !== "undefined") {
       try {
-        localStorage.setItem("kenali_claimed_edu_media", JSON.stringify(newClaimed))
-
-        const stored = localStorage.getItem("kenali_points_data")
-        let data = { totalPoints: 120, streakCount: 1, redeemed: [], historyLog: [] }
-        if (stored) {
-          data = JSON.parse(stored)
-        }
-        newPts = (data.totalPoints || userPoints) + pts
-        const newLog = [
-          {
-            id: `edu-${Date.now()}`,
-            activity: `Edukasi: ${title}`,
-            points: pts,
-            date: new Date().toISOString()
-          },
-          ...(data.historyLog || [])
-        ]
-        localStorage.setItem("kenali_points_data", JSON.stringify({
-          ...data,
-          totalPoints: newPts,
-          historyLog: newLog
-        }))
+        localStorage.setItem(userKey, JSON.stringify(newClaimed))
       } catch (e) {
         console.error(e)
       }
     }
 
+    const newPts = (userPoints || 0) + pts
     setUserPoints(newPts)
     setToastMsg(`Selamat! +${pts} Poin berhasil ditambahkan ke akun Anda 🎉`)
     setTimeout(() => setToastMsg(""), 3000)
 
     // Sinkronisasi penambahan poin LANGSUNG ke Neon Database
-    if (session?.user?.id) {
-      try {
-        await fetch("/api/user/sync", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: session.user.id,
-            pointsAdded: pts,
-            activityType: "edu_claim",
-            description: `Edukasi BCA: ${title}`
-          })
+    try {
+      await fetch("/api/user/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: session.user.id,
+          pointsAdded: pts,
+          activityType: "edu_claim",
+          description: `Edukasi BCA: ${title}`
         })
-      } catch (err) {
-        console.error("Sync point claim to DB failed:", err)
-      }
+      })
+    } catch (err) {
+      console.error("Sync point claim to DB failed:", err)
     }
   }
 
@@ -144,17 +127,7 @@ export default function ModusPage() {
           backHref="/"
 
         />
-        <section className="w-full max-w-6xl mx-auto px-5 sm:px-8 pt-1 pb-3 text-white">
-          <div className="flex items-center justify-between gap-4">
-            <div className="text-xs font-semibold text-white/90">
-              Pelajari modus operandi & dapatkan poin perlindungan aktif
-            </div>
-            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-white/30 text-xs font-bold text-white shadow-2xs">
-              <Icon name="Award" size={15} />
-              <span>{userPoints.toLocaleString()} PTS</span>
-            </div>
-          </div>
-        </section>
+
 
         {/* BOTTOM SHEET: Full Width on Desktop, Curved Sheet on Mobile */}
         <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10">
@@ -219,11 +192,10 @@ export default function ModusPage() {
                   <span className="rounded-md bg-blue-50 text-[#0292fc] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
                     Video Edukasi Resmi
                   </span>
-                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
-                    claimedMedia.includes(mainVideo.id)
-                      ? "bg-slate-100 text-slate-500"
-                      : "text-emerald-700 bg-emerald-50 border border-emerald-200"
-                  }`}>
+                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${claimedMedia.includes(mainVideo.id)
+                    ? "bg-slate-100 text-slate-500"
+                    : "text-emerald-700 bg-emerald-50 border border-emerald-200"
+                    }`}>
                     {claimedMedia.includes(mainVideo.id) ? "✓ Sudah Diklaim" : `+${mainVideo.rewardPoints} Poin`}
                   </span>
                 </div>
@@ -243,7 +215,7 @@ export default function ModusPage() {
                     onClick={() => setActiveVideoModal(mainVideo)}
                     className="mt-3 md:mt-0 shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-[#0292fc] px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#0081e3] transition active:scale-95 cursor-pointer"
                   >
-                    <span>{claimedMedia.includes(mainVideo.id) ? "Tonton Lagi" : "Tonton & Dapatkan Poin"}</span>
+                    <span>{claimedMedia.includes(mainVideo.id) ? "Tonton Lagi" : "Tonton"}</span>
                     <Icon name="ArrowRight" size={14} />
                   </button>
                 </div>
@@ -327,11 +299,10 @@ export default function ModusPage() {
                           </div>
                         </div>
 
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 border ${
-                          isClaimed
-                            ? "bg-slate-100 text-slate-400 border-slate-200"
-                            : "text-emerald-700 bg-emerald-50 border-emerald-200"
-                        }`}>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 border ${isClaimed
+                          ? "bg-slate-100 text-slate-400 border-slate-200"
+                          : "text-emerald-700 bg-emerald-50 border-emerald-200"
+                          }`}>
                           {isClaimed ? "✓ Selesai" : `+${art.rewardPoints} Pts`}
                         </span>
                       </div>

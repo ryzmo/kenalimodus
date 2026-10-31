@@ -7,6 +7,7 @@ import { useRouter } from "next/router"
 import AppHeader from "../../components/AppHeader"
 import BottomSpace from "../../components/BottomSpace"
 import Icon from "../../components/Icon"
+import { isPresentationMode, setPresentationMode } from "../../utils/presentationMode"
 
 export default function AdminDashboardPage() {
   const { data: session, status } = useSession()
@@ -18,6 +19,23 @@ export default function AdminDashboardPage() {
   const [currentMenu, setCurrentMenu] = useState("menu")
   const [loading, setLoading] = useState(false)
   const [toastMsg, setToastMsg] = useState("")
+  const [presentationEnabled, setPresentationEnabled] = useState(false)
+
+  useEffect(() => {
+    setPresentationEnabled(isPresentationMode())
+  }, [])
+
+  const handleTogglePresentationMode = () => {
+    const nextVal = !presentationEnabled
+    setPresentationEnabled(nextVal)
+    setPresentationMode(nextVal)
+    setToastMsg(
+      nextVal
+        ? "Mode Presentasi DIAKTIFKAN: Semua fitur kini terisi data dummy simulasi!"
+        : "Mode Presentasi DINONAKTIFKAN: Kembali ke data asli pengguna."
+    )
+    setTimeout(() => setToastMsg(""), 3500)
+  }
 
   // State Radar & Scraping Intelijen Siber
   const [scrapeCategory, setScrapeCategory] = useState("all")
@@ -818,6 +836,25 @@ export default function AdminDashboardPage() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2.5">
+                    {/* Toggle Sakelar Mode Presentasi Dummy */}
+                    <button
+                      type="button"
+                      onClick={handleTogglePresentationMode}
+                      className={`px-4 py-2.5 rounded-2xl font-bold text-xs shadow-md flex items-center gap-2.5 transition active:scale-95 cursor-pointer border ${
+                        presentationEnabled
+                          ? "bg-amber-500 hover:bg-amber-600 text-white border-amber-400 ring-2 ring-amber-300"
+                          : "bg-white hover:bg-slate-50 text-[#003882] border-slate-200"
+                      }`}
+                      title="Klik untuk on/off mode presentasi dummy di seluruh halaman"
+                    >
+                      <span className={`h-2.5 w-2.5 rounded-full shrink-0 transition ${
+                        presentationEnabled ? "bg-white animate-ping" : "bg-slate-400"
+                      }`} />
+                      <span>
+                        Mode Presentasi: <strong className="uppercase">{presentationEnabled ? "ON (Dummy Aktif)" : "OFF"}</strong>
+                      </span>
+                    </button>
+
                     <Link
                       href="/challenge-impact"
                       className="px-4 py-2.5 rounded-2xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 shadow-md flex items-center gap-2 transition active:scale-95"

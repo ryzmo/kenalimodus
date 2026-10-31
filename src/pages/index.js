@@ -6,6 +6,7 @@ import BottomNav from "../components/BottomNav"
 import BottomSpace from "../components/BottomSpace"
 import Icon from "../components/Icon"
 import { MODUS_LIST } from "../data/modusData"
+import { isPresentationMode, DUMMY_PRESENTATION_DATA } from "../utils/presentationMode"
 
 const DEFAULT_NOTIFICATIONS = [
   {
@@ -51,6 +52,49 @@ export default function Home() {
   const [notifications, setNotifications] = useState(DEFAULT_NOTIFICATIONS)
   const notifRef = useRef(null)
 
+  // Load status notifikasi terbaca dari localStorage agar tersimpan di browser
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const savedReadIds = JSON.parse(localStorage.getItem("km_read_notifications") || "[]")
+        if (Array.isArray(savedReadIds) && savedReadIds.length > 0) {
+          setNotifications((prev) =>
+            prev.map((n) => ({
+              ...n,
+              unread: !savedReadIds.includes(n.id)
+            }))
+          )
+        }
+      } catch (e) {
+        // Abaikan parse error
+      }
+    }
+  }, [])
+
+  const toggleNotificationRead = (id, e) => {
+    e?.stopPropagation?.()
+    setNotifications((prev) => {
+      const next = prev.map((n) => (n.id === id ? { ...n, unread: !n.unread } : n))
+      if (typeof window !== "undefined") {
+        const readIds = next.filter((n) => !n.unread).map((n) => n.id)
+        localStorage.setItem("km_read_notifications", JSON.stringify(readIds))
+      }
+      return next
+    })
+  }
+
+  const markAllNotificationsAsRead = () => {
+    setNotifications((prev) => {
+      const allRead = prev.every((n) => !n.unread)
+      const next = prev.map((n) => ({ ...n, unread: allRead }))
+      if (typeof window !== "undefined") {
+        const readIds = next.filter((n) => !n.unread).map((n) => n.id)
+        localStorage.setItem("km_read_notifications", JSON.stringify(readIds))
+      }
+      return next
+    })
+  }
+
   const [userPoints, setUserPoints] = useState(null)
 
   useEffect(() => {
@@ -71,47 +115,43 @@ export default function Home() {
     if (typeof window !== "undefined") {
       setOriginUrl(window.location.origin)
 
-      // Ambil skor & poin live dari database jika login, atau fallback histori challenge
+      // Cek apakah Mode Presentasi aktif
+      if (isPresentationMode()) {
+        setSafeScore(DUMMY_PRESENTATION_DATA.safeScore)
+        setUserPoints(DUMMY_PRESENTATION_DATA.totalPoints)
+        setHasTested(true)
+        return
+      }
+
+      // Hanya ambil skor jika user sudah login
       if (session?.user?.id) {
         fetch(`/api/user/sync?userId=${session.user.id}`)
           .then((res) => res.json())
           .then((res) => {
             if (res.success && res.data) {
-              setSafeScore(res.data.safe_score ?? session.user.safe_score ?? 78)
-              setUserPoints(res.data.total_points ?? session.user.total_points ?? 120)
-              setHasTested(true)
+              if (res.data.safe_score !== null && res.data.safe_score !== undefined) {
+                setSafeScore(res.data.safe_score)
+                setHasTested(true)
+              }
+              if (res.data.total_points !== null && res.data.total_points !== undefined) {
+                setUserPoints(res.data.total_points)
+              }
             }
           })
           .catch(() => {
-            setSafeScore(session.user.safe_score ?? 78)
-            setUserPoints(session.user.total_points ?? 120)
-            setHasTested(true)
-          })
-      } else {
-        // Cek localStorage jika bermain secara tamu/guest
-        const storedAvg = localStorage.getItem("kenali_average_safe_score")
-        const storedResult = localStorage.getItem("kenali_modus_result")
-        const storedPoints = localStorage.getItem("kenali_points_data")
-
-        if (storedAvg) {
-          setSafeScore(Number(storedAvg))
-          setHasTested(true)
-        } else if (storedResult) {
-          try {
-            const parsed = JSON.parse(storedResult)
-            if (parsed.score !== undefined) {
-              setSafeScore(parsed.score)
+            if (session.user.safe_score !== null && session.user.safe_score !== undefined) {
+              setSafeScore(session.user.safe_score)
               setHasTested(true)
             }
-          } catch (e) {}
-        }
-
-        if (storedPoints) {
-          try {
-            const parsedPts = JSON.parse(storedPoints)
-            if (parsedPts.totalPoints !== undefined) setUserPoints(parsedPts.totalPoints)
-          } catch (e) {}
-        }
+            if (session.user.total_points !== null && session.user.total_points !== undefined) {
+              setUserPoints(session.user.total_points)
+            }
+          })
+      } else {
+        // Jika belum login, reset state skor sehingga menampilkan banner "Siap Diuji?"
+        setSafeScore(null)
+        setUserPoints(null)
+        setHasTested(false)
       }
     }
   }, [session])
@@ -150,7 +190,8 @@ export default function Home() {
       iconImg: "/solar-shield-check.svg",
       href: "/challenge",
       badge: "Utama",
-      badgeColor: "bg-[#0292fc]",
+      badgeColor: "bg-blue-600",
+      bgWrapper: "bg-blue-50/80 border-blue-100",
     },
     {
       title: "Katalog Modus",
@@ -158,6 +199,7 @@ export default function Home() {
       iconImg: "/solar-danger-triangle.svg",
       href: "/modus",
       badge: null,
+      bgWrapper: "bg-rose-50/80 border-rose-100",
     },
     {
       title: "Keluarga",
@@ -165,6 +207,7 @@ export default function Home() {
       iconImg: "/solar-users-group.svg",
       href: "/keluarga",
       badge: null,
+      bgWrapper: "bg-sky-50/80 border-sky-100",
     },
     {
       title: "Rewards",
@@ -172,7 +215,8 @@ export default function Home() {
       iconImg: "/solar-cup-first.svg",
       href: "/rewards",
       badge: "Poin",
-      badgeColor: "bg-[#003882]",
+      badgeColor: "bg-amber-500",
+      bgWrapper: "bg-amber-50/80 border-amber-100",
     },
   ]
 
@@ -235,16 +279,88 @@ export default function Home() {
               </button>
 
               {notificationsOpen && (
-                <div className="absolute right-0 top-12 z-50 w-72 md:w-80 rounded-3xl border border-slate-100 bg-white p-3.5 shadow-2xl animate-in fade-in zoom-in-95 text-[#002554]">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                    <span className="text-xs font-bold text-[#003882]">Peringatan Keamanan</span>
-                    <span className="text-[10px] text-slate-400">{unreadCount} baru</span>
+                <div className="absolute right-0 top-12 z-50 w-80 sm:w-96 rounded-3xl border border-slate-100 bg-white p-4 shadow-2xl animate-in fade-in zoom-in-95 text-[#002554]">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-[#003882]">Peringatan Keamanan</span>
+                      {unreadCount > 0 ? (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-100 text-red-600">
+                          {unreadCount} baru
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-medium text-slate-400">Semua dibaca</span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={markAllNotificationsAsRead}
+                      className="text-[10px] font-semibold text-blue-600 hover:text-blue-800 transition cursor-pointer"
+                    >
+                      {unreadCount > 0 ? "Tandai semua dibaca" : "Tandai belum dibaca"}
+                    </button>
                   </div>
-                  <div className="mt-2 divide-y divide-slate-50 max-h-56 overflow-y-auto">
+                  <div className="mt-2 divide-y divide-slate-100 max-h-72 overflow-y-auto pr-0.5">
                     {notifications.map((n) => (
-                      <div key={n.id} className="py-2">
-                        <div className="text-[11px] font-bold text-[#003882]">{n.title}</div>
-                        <div className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">{n.desc}</div>
+                      <div
+                        key={n.id}
+                        className={`group py-2.5 px-2 rounded-2xl transition flex items-start gap-2.5 ${
+                          n.unread ? "bg-blue-50/50 hover:bg-blue-50" : "hover:bg-slate-50 opacity-75 hover:opacity-100"
+                        }`}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className={`h-2 w-2 rounded-full shrink-0 transition ${
+                                n.unread ? "bg-red-500 animate-pulse" : "bg-transparent"
+                              }`}
+                            />
+                            <div className={`text-[11px] leading-snug line-clamp-1 ${n.unread ? "font-bold text-[#003882]" : "font-medium text-slate-700"}`}>
+                              {n.title}
+                            </div>
+                          </div>
+                          <div className="text-[10px] text-slate-500 line-clamp-2 mt-0.5 pl-3.5 leading-relaxed">
+                            {n.desc}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1 pl-3.5 text-[9px] text-slate-400">
+                            <span>{n.time}</span>
+                            {n.badge && (
+                              <span className="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-semibold text-[8.5px]">
+                                {n.badge}
+                              </span>
+                            )}
+                            {n.link && (
+                              <Link
+                                href={n.link}
+                                onClick={() => {
+                                  // Otomatis tandai dibaca saat link diklik
+                                  if (n.unread) toggleNotificationRead(n.id)
+                                  setNotificationsOpen(false)
+                                }}
+                                className="text-blue-600 hover:underline font-semibold ml-auto"
+                              >
+                                Lihat Detail →
+                              </Link>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Tombol Klik Tandai Baca / Belum Baca */}
+                        <button
+                          type="button"
+                          onClick={(e) => toggleNotificationRead(n.id, e)}
+                          title={n.unread ? "Tandai sudah dibaca" : "Tandai belum dibaca"}
+                          className={`shrink-0 p-1.5 rounded-full transition cursor-pointer ${
+                            n.unread
+                              ? "text-blue-600 hover:bg-blue-100/80 hover:text-blue-800"
+                              : "text-slate-400 hover:bg-slate-200 hover:text-slate-600"
+                          }`}
+                        >
+                          {n.unread ? (
+                            <Icon name="Check" size={14} />
+                          ) : (
+                            <Icon name="CheckCheck" size={14} className="text-blue-500" />
+                          )}
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -284,11 +400,7 @@ export default function Home() {
 
                   <div className="mt-2 text-[11px] sm:text-xs font-semibold text-white/95 leading-relaxed drop-shadow-xs flex items-center gap-2">
                     <span>Cek Safe Score kamu, seberapa aman dari scam?</span>
-                    {userPoints !== null && (
-                      <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold border border-white/25">
-                        {userPoints.toLocaleString()} PTS
-                      </span>
-                    )}
+
                   </div>
                 </>
               ) : (
@@ -374,7 +486,7 @@ export default function Home() {
                     className="glass-card rounded-[24px] p-4 flex flex-col justify-between group active:scale-95 transition hover:shadow-md hover:border-blue-200 border border-white"
                   >
                     <div className="flex items-start justify-between">
-                      <div className="relative h-12 w-12 rounded-2xl bg-blue-50/80 border border-blue-100 p-2.5 shadow-2xs group-hover:scale-105 transition flex items-center justify-center">
+                      <div className={`relative h-12 w-12 rounded-2xl ${service.bgWrapper || "bg-blue-50/80 border-blue-100"} border p-2.5 shadow-2xs group-hover:scale-105 transition flex items-center justify-center`}>
                         <Image
                           src={service.iconImg}
                           alt={service.title}
@@ -497,11 +609,12 @@ export default function Home() {
                     <div className="space-y-3">
                       {MODUS_LIST.slice(0, 3).map((item) => {
                         const iconName =
-                          item.category === "Impersonation"
+                          item.icon ||
+                          (item.category === "Impersonation"
                             ? "PhoneCall"
                             : item.category === "APK Berbahaya"
                               ? "Smartphone"
-                              : "Link"
+                              : "Link")
 
                         return (
                           <Link

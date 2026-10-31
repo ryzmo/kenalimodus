@@ -38,7 +38,7 @@ export default async function handler(req, res) {
           // Buat grup awal jika tabel masih kosong
           const newGroup = await sql`
             INSERT INTO family_groups (group_name, invite_code, family_defense_index, vulnerable_members_count)
-            VALUES ('Keluarga Sejahtera BCA', 'AMAN-BCA-778', 78.0, 1)
+            VALUES ('Keluarga Sejahtera', 'AMAN-778', 78.0, 1)
             RETURNING *
           `
           group = newGroup[0]

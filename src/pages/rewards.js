@@ -1,26 +1,21 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useSession } from "next-auth/react"
 import AppHeader from "../components/AppHeader"
 import BottomNav from "../components/BottomNav"
 import BottomSpace from "../components/BottomSpace"
 import Icon from "../components/Icon"
 import {
   REWARD_CATALOG,
-  TIER_LEVELS,
   LEADERBOARD_MOCK
 } from "../data/modusData"
-
-function getCurrentTier(totalPoints) {
-  for (let i = TIER_LEVELS.length - 1; i >= 0; i--) {
-    if (totalPoints >= TIER_LEVELS[i].minPoints) return TIER_LEVELS[i]
-  }
-  return TIER_LEVELS[0]
-}
+import { isPresentationMode, DUMMY_PRESENTATION_DATA } from "../utils/presentationMode"
 
 export default function RewardsPage() {
-  const [totalPoints, setTotalPoints] = useState(1250)
-  const [streakCount, setStreakCount] = useState(3)
+  const { data: session } = useSession()
+  const [totalPoints, setTotalPoints] = useState(0)
+  const [streakCount, setStreakCount] = useState(0)
   const [activeTab, setActiveTab] = useState("catalog") // "catalog" | "history" | "leaderboard"
   const [redeemed, setRedeemed] = useState([])
   const [historyLog, setHistoryLog] = useState([])
@@ -29,21 +24,48 @@ export default function RewardsPage() {
 
   useEffect(() => {
     if (typeof window === "undefined") return
-    const storedPoints = localStorage.getItem("kenali_points_data")
-    if (storedPoints) {
-      try {
-        const parsed = JSON.parse(storedPoints)
-        if (parsed.totalPoints !== undefined) setTotalPoints(parsed.totalPoints)
-        if (parsed.streakCount !== undefined) setStreakCount(parsed.streakCount)
-        if (parsed.redeemed) setRedeemed(parsed.redeemed)
-        if (parsed.historyLog) setHistoryLog(parsed.historyLog)
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  }, [])
 
-  const currentTier = getCurrentTier(totalPoints)
+    // Jika Mode Presentasi aktif, gunakan dummy rewards
+    if (isPresentationMode()) {
+      setTotalPoints(DUMMY_PRESENTATION_DATA.totalPoints)
+      setStreakCount(DUMMY_PRESENTATION_DATA.currentStreak)
+      setHistoryLog(DUMMY_PRESENTATION_DATA.rewardHistoryLog)
+      setRedeemed(["demo-reward-1"])
+      return
+    }
+
+    // Jika user sudah login, sinkronisasi poin akun dari server / storage
+    if (session?.user?.id) {
+      fetch(`/api/user/sync?userId=${session.user.id}`)
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.success && res.data) {
+            setTotalPoints(res.data.total_points || 0)
+            setStreakCount(res.data.current_streak || 0)
+          }
+        })
+        .catch(() => {
+          setTotalPoints(session.user.total_points || 0)
+        })
+
+      const storedPoints = localStorage.getItem("kenali_points_data")
+      if (storedPoints) {
+        try {
+          const parsed = JSON.parse(storedPoints)
+          if (parsed.redeemed) setRedeemed(parsed.redeemed)
+          if (parsed.historyLog) setHistoryLog(parsed.historyLog)
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    } else {
+      // Jika belum login, reset seluruh poin & riwayat menjadi 0 / kosong
+      setTotalPoints(0)
+      setStreakCount(0)
+      setRedeemed([])
+      setHistoryLog([])
+    }
+  }, [session])
 
   const handleRedeem = (item) => {
     if (totalPoints < item.cost) {
@@ -84,7 +106,7 @@ export default function RewardsPage() {
   return (
     <div className="app-shell flex flex-col min-h-screen text-[#002554] bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff]">
       <div className="w-full flex-1 flex flex-col relative overflow-hidden pb-safe">
-        
+
         <AppHeader title="Rewards & Poin" subtitle="Gamifikasi Proteksi" />
 
         {/* Top Points Summary in Sky Blue Header */}
@@ -97,19 +119,14 @@ export default function RewardsPage() {
               <div className="text-4xl font-black tracking-tight text-white mt-0.5">
                 {totalPoints.toLocaleString()} <span className="text-sm font-bold text-sky-200">PTS</span>
               </div>
-              <div className="mt-1 text-xs font-semibold text-white/90">
-                Tingkat: <span className="underline">{currentTier.name}</span> • Streak {streakCount} Hari 🔥
-              </div>
-            </div>
-
-            <div className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center p-2 shadow-sm">
-              <Image
-                src="/3d-trophy-icon.png"
-                alt="Trophy Poin"
-                width={48}
-                height={48}
-                className="object-contain"
-              />
+              {!session && (
+                <div className="mt-1 text-[11px] font-medium text-white/80">
+                  <Link href="/auth/login" className="underline font-bold hover:text-white">
+                    Masuk ke akun Anda
+                  </Link>{" "}
+                  atau selesaikan challenge untuk mengumpulkan poin.
+                </div>
+              )}
             </div>
           </div>
 
@@ -118,27 +135,24 @@ export default function RewardsPage() {
             <button
               type="button"
               onClick={() => setActiveTab("catalog")}
-              className={`flex-1 py-1.5 rounded-xl transition ${
-                activeTab === "catalog" ? "bg-white text-[#003882] shadow-xs" : "hover:bg-white/10"
-              }`}
+              className={`flex-1 py-1.5 rounded-xl transition ${activeTab === "catalog" ? "bg-white text-[#003882] shadow-xs" : "hover:bg-white/10"
+                }`}
             >
               Katalog
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("leaderboard")}
-              className={`flex-1 py-1.5 rounded-xl transition ${
-                activeTab === "leaderboard" ? "bg-white text-[#003882] shadow-xs" : "hover:bg-white/10"
-              }`}
+              className={`flex-1 py-1.5 rounded-xl transition ${activeTab === "leaderboard" ? "bg-white text-[#003882] shadow-xs" : "hover:bg-white/10"
+                }`}
             >
               Peringkat
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("history")}
-              className={`flex-1 py-1.5 rounded-xl transition ${
-                activeTab === "history" ? "bg-white text-[#003882] shadow-xs" : "hover:bg-white/10"
-              }`}
+              className={`flex-1 py-1.5 rounded-xl transition ${activeTab === "history" ? "bg-white text-[#003882] shadow-xs" : "hover:bg-white/10"
+                }`}
             >
               Riwayat
             </button>
@@ -147,7 +161,7 @@ export default function RewardsPage() {
 
         {/* BOTTOM SHEET */}
         <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10"><div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-5">
-          
+
           {toastMsg && (
             <div className="rounded-2xl bg-[#003882] text-white p-3 text-xs font-bold text-center animate-in fade-in">
               {toastMsg}
@@ -193,29 +207,26 @@ export default function RewardsPage() {
                           {days.map((d) => (
                             <div key={d.key} className="flex flex-col items-center gap-1.5">
                               <div
-                                className={`w-full aspect-square max-w-[44px] rounded-xl flex items-center justify-center transition-all ${
-                                  d.isToday
-                                    ? "bg-[#0292fc] text-white shadow-xs ring-2 ring-sky-200"
-                                    : d.fire
+                                className={`w-full aspect-square max-w-[44px] rounded-xl flex items-center justify-center transition-all ${d.isToday
+                                  ? "bg-[#0292fc] text-white shadow-xs ring-2 ring-sky-200"
+                                  : d.fire
                                     ? "bg-sky-50 border border-sky-100 text-[#0292fc]"
                                     : "bg-slate-100/70 border border-slate-200/50 text-slate-300"
-                                }`}
+                                  }`}
                               >
                                 {d.fire ? (
                                   <Icon
                                     name="Flame"
-                                    className={`h-4 w-4 fill-current ${
-                                      d.isToday ? "text-white" : "text-[#0292fc]"
-                                    }`}
+                                    className={`h-4 w-4 fill-current ${d.isToday ? "text-white" : "text-[#0292fc]"
+                                      }`}
                                   />
                                 ) : (
                                   <span className="text-xs font-bold text-slate-300">-</span>
                                 )}
                               </div>
                               <span
-                                className={`text-[11px] font-bold ${
-                                  d.isToday ? "text-[#003882] font-black" : "text-slate-400"
-                                }`}
+                                className={`text-[11px] font-bold ${d.isToday ? "text-[#003882] font-black" : "text-slate-400"
+                                  }`}
                               >
                                 {d.label}
                               </span>
@@ -229,7 +240,7 @@ export default function RewardsPage() {
                   {/* Bottom Banner */}
                   <div className="mt-4 rounded-xl bg-blue-50/80 border border-blue-100/70 p-2.5 text-center">
                     <p className="text-xs font-medium text-slate-700">
-                      Jaga streak 7 hari berturut-turut <span className="font-black text-[#003882]">→ +10 bonus poin</span>
+                      Jaga streak 7 hari berturut-turut <span className="font-black text-[#003882]"> +10 bonus poin</span>
                     </p>
                   </div>
                 </div>
@@ -299,7 +310,6 @@ export default function RewardsPage() {
                   <span className="text-xs font-black uppercase tracking-wider text-[#002554]">
                     Tukar Hadiah Digital
                   </span>
-                  <span className="text-[11px] text-slate-400">Merchant Resmi BCA</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -329,11 +339,10 @@ export default function RewardsPage() {
                         type="button"
                         onClick={() => setSelectedReward(item)}
                         disabled={totalPoints < item.cost}
-                        className={`mt-4 w-full rounded-xl py-2 text-xs font-bold transition shadow-xs ${
-                          totalPoints >= item.cost
-                            ? "bg-[#0292fc] text-white hover:bg-[#007ad6] active:scale-95 cursor-pointer"
-                            : "bg-slate-200 text-slate-400 cursor-not-allowed"
-                        }`}
+                        className={`mt-4 w-full rounded-xl py-2 text-xs font-bold transition shadow-xs ${totalPoints >= item.cost
+                          ? "bg-[#0292fc] text-white hover:bg-[#007ad6] active:scale-95 cursor-pointer"
+                          : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                          }`}
                       >
                         {totalPoints >= item.cost ? "Tukarkan" : "Poin Belum Cukup"}
                       </button>
@@ -396,9 +405,8 @@ export default function RewardsPage() {
                       </div>
                     </div>
                     <span
-                      className={`text-xs font-black ${
-                        log.points > 0 ? "text-emerald-600" : "text-red-500"
-                      }`}
+                      className={`text-xs font-black ${log.points > 0 ? "text-emerald-600" : "text-red-500"
+                        }`}
                     >
                       {log.points > 0 ? `+${log.points}` : log.points} PTS
                     </span>
@@ -409,7 +417,7 @@ export default function RewardsPage() {
           )}
 
           <BottomSpace />
-          </div>
+        </div>
         </main>
 
         <div className="md:hidden"><BottomNav /></div>

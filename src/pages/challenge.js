@@ -47,10 +47,10 @@ function pickAdaptiveScenarios(pool, count = 5) {
   // Pisahkan soal:
   // a. Soal yang pernah dijawab salah sebelumnya (PRIORITAS TINGGI untuk remedial)
   const failedScenarios = validPool.filter((s) => failedSet.has(s.id))
-  
+
   // b. Soal yang belum pernah dijawab
   const unattempted = validPool.filter((s) => !answeredMap[s.id] && !failedSet.has(s.id))
-  
+
   // c. Soal tricky (difficulty "Sulit" atau "Sedang")
   const trickyScenarios = validPool.filter(
     (s) => s.difficulty === "Sulit" || s.difficulty === "Tinggi" || s.category === "Quishing (QRIS)" || s.category === "Account Takeover"
@@ -276,7 +276,7 @@ export default function ChallengePage() {
       evaluationLevel = "Tinggi"
       evaluationHeadline = "Sangat Waspada & Teliti"
       appreciationMessage = "Kerja bagus! Refleks pertahanan digital Anda sudah sangat tangguh. Sebagian besar taktik scammer berhasil Anda tangkal dengan tepat."
-      improvementFocus = failedCategories.length > 0 
+      improvementFocus = failedCategories.length > 0
         ? `Perdalam kewaspadaan Anda terutama pada modus: ${failedCategories.join(", ")}. Modus ini menggunakan taktik manipulasi yang sangat halus.`
         : "Tetap konsisten dan waspada terhadap skenario mendesak atau permintaan akses verifikasi OTP."
     } else if (calculatedScore >= 60) {
@@ -454,45 +454,36 @@ export default function ChallengePage() {
         {/* BOTTOM SHEET */}
         <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10">
           <div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-5">
-            
+
             {/* Stage 0: Challenge Intro */}
             {stage === "intro" && (
               <section className="glass-card rounded-[28px] p-6 sm:p-8 border border-white bg-white/95 shadow-sm space-y-6">
                 <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold text-[#003882] bg-blue-50 border border-blue-100">
-                    <span className="w-2 h-2 rounded-full bg-[#0292fc]" />
-                    Simulasi Refleks Finansial
-                  </div>
-                  <h1 className="text-xl sm:text-2xl font-black text-[#002554] tracking-tight mt-3">
+
+                  <h1 className="text-xl sm:text-2xl font-black text-[#002554] tracking-tight">
                     2-Minute Scam Challenge
                   </h1>
                   <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                    Uji ketajaman dan refleks Anda dalam menghadapi skenario penipuan digital nyata: manipulasi customer service palsu, file APK berbahaya, phishing perbankan, dan QRIS manipulatif.
+                    Uji apakah Anda mudah tertipu oleh berbagai modus penipuan digital.
                   </p>
                 </div>
 
                 {/* 3 Parameter Metrik */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="rounded-2xl bg-slate-50/80 border border-slate-200/80 p-3.5 text-center">
-                    <div className="text-base sm:text-lg font-black text-[#003882]">
-                      {POST_TEST_SCENARIOS.length}
-                    </div>
-                    <div className="text-[11px] font-semibold text-slate-700 mt-0.5">Skenario</div>
-                    <div className="text-[10px] text-slate-400">Kasus Riil</div>
-                  </div>
+                <div className="grid grid-cols-2 gap-3">
+
                   <div className="rounded-2xl bg-slate-50/80 border border-slate-200/80 p-3.5 text-center">
                     <div className="text-base sm:text-lg font-black text-[#0292fc]">
                       120s
                     </div>
                     <div className="text-[11px] font-semibold text-slate-700 mt-0.5">Durasi</div>
-                    <div className="text-[10px] text-slate-400">Batas Waktu</div>
+
                   </div>
                   <div className="rounded-2xl bg-slate-50/80 border border-slate-200/80 p-3.5 text-center">
                     <div className="text-base sm:text-lg font-black text-emerald-600">
                       Instan
                     </div>
                     <div className="text-[11px] font-semibold text-slate-700 mt-0.5">Feedback</div>
-                    <div className="text-[10px] text-slate-400">Analisis Langsung</div>
+
                   </div>
                 </div>
 
@@ -502,9 +493,9 @@ export default function ChallengePage() {
                     Petunjuk Pelaksanaan
                   </div>
                   <ul className="text-xs text-slate-600 space-y-2 leading-relaxed list-disc list-inside">
-                    <li>Baca dengan cermat setiap kasus komunikasi yang ditampilkan di layar.</li>
-                    <li>Pilih opsi respons paling aman sebelum batas waktu berakhir.</li>
-                    <li>Penjelasan detail dan Golden Rule keamanan perbankan akan langsung diberikan setelah Anda memilih jawaban.</li>
+                    <li>Baca setiap kasus dengan cermat.</li>
+                    <li>Pilih respons paling aman sebelum waktu habis.</li>
+                    <li>Dapatkan penjelasan dan tips keamanan setelah menjawab.</li>
                   </ul>
                 </div>
 
@@ -530,11 +521,10 @@ export default function ChallengePage() {
                     </span>
 
                     {/* Timer Pill */}
-                    <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-xs font-black border transition ${
-                      timeLeft < 30
-                        ? "bg-red-50 text-red-600 border-red-200 animate-pulse"
-                        : "bg-blue-50 text-[#003882] border-blue-100"
-                    }`}>
+                    <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-xs font-black border transition ${timeLeft < 30
+                      ? "bg-red-50 text-red-600 border-red-200 animate-pulse"
+                      : "bg-blue-50 text-[#003882] border-blue-100"
+                      }`}>
                       <Icon name="Clock3" size={13} />
                       <span>{formatTimer(timeLeft)}</span>
                     </div>
@@ -573,8 +563,8 @@ export default function ChallengePage() {
                             activeScenario.mockType === "sms"
                               ? "MessageSquare"
                               : activeScenario.mockType === "qris"
-                              ? "QrCode"
-                              : "PhoneCall"
+                                ? "QrCode"
+                                : "PhoneCall"
                           }
                           size={14}
                         />
@@ -620,11 +610,10 @@ export default function ChallengePage() {
                           className={`w-full text-left rounded-2xl border p-4 text-xs font-bold transition-all duration-150 flex items-start gap-3 cursor-pointer ${btnStyle}`}
                         >
                           <span
-                            className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-bold ${
-                              showFeedback && opt.isCorrect
-                                ? "bg-emerald-600 text-white border-emerald-600"
-                                : "border-slate-300"
-                            }`}
+                            className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-bold ${showFeedback && opt.isCorrect
+                              ? "bg-emerald-600 text-white border-emerald-600"
+                              : "border-slate-300"
+                              }`}
                           >
                             {String(labelText).toUpperCase()}
                           </span>
@@ -637,18 +626,13 @@ export default function ChallengePage() {
                   {/* Instant Feedback Panel */}
                   {showFeedback && selectedOption && (
                     <div
-                      className={`mt-5 rounded-2xl p-4 border transition-all animate-fade-in ${
-                        selectedOption.isCorrect
-                          ? "bg-blue-50/70 border-blue-200 text-slate-900"
-                          : "bg-red-50/70 border-red-200 text-slate-900"
-                      }`}
+                      className={`mt-5 rounded-2xl p-4 border transition-all animate-fade-in ${selectedOption.isCorrect
+                        ? "bg-blue-50/70 border-blue-200 text-slate-900"
+                        : "bg-red-50/70 border-red-200 text-slate-900"
+                        }`}
                     >
                       <div className="flex items-center gap-2 font-black text-sm">
-                        <Icon
-                          name={selectedOption.isCorrect ? "CheckCircle2" : "AlertTriangle"}
-                          size={18}
-                          className={selectedOption.isCorrect ? "text-[#003882]" : "text-red-600"}
-                        />
+
                         <span className={selectedOption.isCorrect ? "text-[#003882]" : "text-red-700"}>
                           {selectedOption.isCorrect
                             ? "Tindakan Aman & Tepat (+20 Poin)"
@@ -675,12 +659,12 @@ export default function ChallengePage() {
                           {currentStep < scenariosList.length - 1 ? (
                             <>
                               <span>Skenario Berikutnya</span>
-                              <Icon name="ArrowRight" size={15} />
+
                             </>
                           ) : (
                             <>
                               <span>Lihat Evaluasi Lengkap</span>
-                              <Icon name="ArrowRight" size={15} />
+
                             </>
                           )}
                         </button>
@@ -699,7 +683,7 @@ export default function ChallengePage() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold text-[#003882] bg-blue-50 border border-blue-100">
-                        <span>Hasil Safe Score Challenge</span>
+                        <span>Hasil Challenge</span>
                       </div>
                       <h2 className="text-xl sm:text-2xl font-black text-[#002554] tracking-tight mt-2">
                         {finalResult.evaluationHeadline}
@@ -733,19 +717,11 @@ export default function ChallengePage() {
 
                   {/* Feedback Analisis & Evaluasi Apresiasi */}
                   <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                    <div className="rounded-2xl bg-blue-50/70 border border-blue-100/90 p-4">
-                      <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#003882]">
-                        <Icon name="Target" size={15} />
-                        <span>Apresiasi & Catatan Evaluasi</span>
-                      </div>
-                      <p className="text-xs text-slate-700 mt-2 leading-relaxed font-medium">
-                        {finalResult.appreciationMessage}
-                      </p>
-                    </div>
+
 
                     <div className="rounded-2xl bg-slate-50 border border-slate-200/90 p-4">
                       <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#002554]">
-                        <Icon name="Sparkles" size={15} />
+
                         <span>Area yang Perlu Diperdalam</span>
                       </div>
                       <p className="text-xs text-slate-700 mt-2 leading-relaxed font-medium">
@@ -753,6 +729,33 @@ export default function ChallengePage() {
                       </p>
                     </div>
                   </div>
+
+                  {/* Prompt Ajakan Simpan Hasil ke Akun Jika Belum Login */}
+                  {!session && (
+                    <div className="mt-6 rounded-2xl bg-gradient-to-r from-blue-50 to-sky-50 border-2 border-blue-200/80 p-4.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex items-start gap-3.5">
+
+                        <div>
+                          <h4 className="text-sm font-black text-[#002554] tracking-tight">
+                            Simpan Skor & Poin Hasil Challenge Ini?
+                          </h4>
+                          <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                            Skor Safe Score <strong>{finalResult.score}/100</strong> dan reward poin Anda saat ini belum tersimpan ke akun cloud. Masuk akun sekarang untuk mengamankan riwayat Anda.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2.5 w-full sm:w-auto shrink-0">
+                        <Link
+                          href={`/auth/login?redirect=/profil`}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#0292fc] hover:bg-[#007ad6] px-5 py-2.5 text-xs font-black text-white shadow-md transition active:scale-95 cursor-pointer"
+                        >
+                          <Icon name="UserRound" size={15} />
+                          <span>Simpan</span>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Actions */}
                   <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -762,21 +765,21 @@ export default function ChallengePage() {
                       className="inline-flex items-center gap-2 rounded-2xl bg-[#0292fc] hover:bg-[#007ad6] px-5 py-3 text-xs font-black text-white shadow-sm transition active:scale-95 cursor-pointer"
                     >
                       <Icon name="RotateCcw" size={15} />
-                      <span>Coba Challenge Lagi (Soal Berbeda)</span>
+                      <span>Coba Challenge Lagi</span>
                     </button>
                     <Link
                       href="/profil"
                       className="inline-flex items-center gap-2 rounded-2xl bg-[#003882] hover:bg-[#002554] px-5 py-3 text-xs font-black text-white shadow-sm transition active:scale-95 cursor-pointer"
                     >
                       <Icon name="UserRound" size={15} />
-                      <span>Lihat Profil & Lencana</span>
+                      <span>Lihat Profil</span>
                     </Link>
                     <Link
                       href="/modus"
                       className="inline-flex items-center gap-2 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 px-4 py-3 text-xs font-bold text-slate-700 transition active:scale-95"
                     >
                       <Icon name="BookOpen" size={15} />
-                      <span>Pelajari Ensiklopedia Modus</span>
+                      <span>Pelajari Modus</span>
                     </Link>
                   </div>
                 </section>
@@ -787,29 +790,25 @@ export default function ChallengePage() {
                     <h3 className="text-sm font-black text-[#002554] uppercase tracking-wider">
                       Histori Pengerjaan Soal ({finalResult.answers.length} Kasus)
                     </h3>
-                    <span className="text-xs text-slate-400">
-                      Soal yang salah akan otomatis diprioritaskan di sesi berikutnya
-                    </span>
+
                   </div>
 
                   <div className="space-y-3">
                     {finalResult.answers.map((item, idx) => (
                       <div
                         key={item.scenarioId || idx}
-                        className={`rounded-2xl border p-4.5 bg-white transition shadow-2xs ${
-                          item.isCorrect
-                            ? "border-emerald-200/80 bg-white"
-                            : "border-rose-200 bg-rose-50/20"
-                        }`}
+                        className={`rounded-2xl border p-4.5 bg-white transition shadow-2xs ${item.isCorrect
+                          ? "border-emerald-200/80 bg-white"
+                          : "border-rose-200 bg-rose-50/20"
+                          }`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-center gap-2">
                             <span
-                              className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-black ${
-                                item.isCorrect
-                                  ? "bg-emerald-100 text-emerald-800"
-                                  : "bg-rose-100 text-rose-700"
-                              }`}
+                              className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-black ${item.isCorrect
+                                ? "bg-emerald-100 text-emerald-800"
+                                : "bg-rose-100 text-rose-700"
+                                }`}
                             >
                               {idx + 1}
                             </span>
@@ -822,11 +821,10 @@ export default function ChallengePage() {
                           </div>
 
                           <span
-                            className={`text-[11px] font-black px-2.5 py-0.5 rounded-full ${
-                              item.isCorrect
-                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                : "bg-rose-50 text-rose-700 border border-rose-200"
-                            }`}
+                            className={`text-[11px] font-black px-2.5 py-0.5 rounded-full ${item.isCorrect
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              : "bg-rose-50 text-rose-700 border border-rose-200"
+                              }`}
                           >
                             {item.isCorrect ? "Tepat (+20)" : "Kurang Tepat (0)"}
                           </span>
@@ -840,11 +838,10 @@ export default function ChallengePage() {
 
                         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                           <div
-                            className={`p-2.5 rounded-xl border ${
-                              item.isCorrect
-                                ? "bg-emerald-50/50 border-emerald-100 text-emerald-900"
-                                : "bg-rose-50/50 border-rose-100 text-rose-900"
-                            }`}
+                            className={`p-2.5 rounded-xl border ${item.isCorrect
+                              ? "bg-emerald-50/50 border-emerald-100 text-emerald-900"
+                              : "bg-rose-50/50 border-rose-100 text-rose-900"
+                              }`}
                           >
                             <div className="text-[10px] uppercase font-bold tracking-wider opacity-70">
                               Jawaban Anda:

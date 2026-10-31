@@ -63,47 +63,45 @@ export default function LoginPage() {
 
   // Masuk sebagai Tamu (Guest)
   const handleGuestLogin = () => {
-    localStorage.setItem("kenali_participant_name", "Tamu #AwasModus")
+    localStorage.setItem("kenali_participant_name", "Tamu")
     localStorage.setItem("kenali_participant_age", "25")
     router.push("/challenge")
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-0 sm:p-4 md:p-6 font-sans">
+    <div className="h-screen max-h-screen bg-slate-900 flex items-center justify-center p-0 sm:p-2 font-sans overflow-hidden">
       <Head>
         <title>Sign In — Kenali Modus BCA</title>
       </Head>
 
-      {/* Mobile Device Canvas Wrapper */}
-      <div className="w-full max-w-md sm:rounded-[42px] bg-white min-h-screen sm:min-h-[820px] shadow-2xl relative overflow-hidden flex flex-col justify-between border-0 sm:border sm:border-slate-100">
-        
-        {/* Top Organic Wave Graphic Area */}
-        <div className="relative h-64 sm:h-72 w-full bg-gradient-to-br from-[#0292fc] via-[#2ba8ff] to-[#0051b3] overflow-hidden flex flex-col justify-between p-6">
+      {/* Mobile Device Canvas Wrapper - Fits Screen Without Scroll */}
+      <div className="w-full max-w-md sm:rounded-[36px] bg-white h-full sm:h-auto sm:max-h-[96vh] shadow-2xl relative overflow-hidden flex flex-col justify-between border-0 sm:border sm:border-slate-100">
+
+        {/* Top Organic Wave Graphic Area (Kompak) */}
+        <div className="relative h-40 sm:h-44 shrink-0 w-full bg-gradient-to-br from-[#0292fc] via-[#2ba8ff] to-[#0051b3] overflow-hidden flex flex-col justify-between p-4 sm:p-5">
           {/* Topographic Contour Vector Background Effect */}
           <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay">
             <svg className="w-full h-full object-cover" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M-50 80 Q 100 20 200 90 T 450 60" stroke="white" strokeWidth="1.5" fill="none"/>
-              <path d="M-50 120 Q 80 50 220 130 T 450 100" stroke="white" strokeWidth="1.5" fill="none"/>
-              <path d="M-50 160 Q 120 90 240 180 T 450 140" stroke="white" strokeWidth="1.5" fill="none"/>
-              <path d="M-50 200 Q 90 130 210 220 T 450 180" stroke="white" strokeWidth="1.5" fill="none"/>
-              <path d="M-50 240 Q 110 170 230 260 T 450 220" stroke="white" strokeWidth="1.5" fill="none"/>
+              <path d="M-50 80 Q 100 20 200 90 T 450 60" stroke="white" strokeWidth="1.5" fill="none" />
+              <path d="M-50 120 Q 80 50 220 130 T 450 100" stroke="white" strokeWidth="1.5" fill="none" />
+              <path d="M-50 160 Q 120 90 240 180 T 450 140" stroke="white" strokeWidth="1.5" fill="none" />
               <ellipse cx="280" cy="110" rx="60" ry="35" stroke="white" strokeWidth="1.5" fill="none" />
               <ellipse cx="120" cy="180" rx="70" ry="40" stroke="white" strokeWidth="1.5" fill="none" />
             </svg>
           </div>
 
           {/* Top Navigation */}
-          <div className="relative z-10 flex items-center justify-between text-white pt-2">
+          <div className="relative z-10 flex items-center justify-between text-white">
             <Link
               href="/"
-              className="h-9 w-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center transition active:scale-95"
+              className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center transition active:scale-95"
             >
-              <Icon name="ChevronLeft" size={20} />
+              <Icon name="ChevronLeft" size={18} />
             </Link>
-            <span className="text-[11px] font-black uppercase tracking-wider bg-white/15 px-3 py-1 rounded-full border border-white/20">
-              #AwasModus BCA
+            <span className="text-[10px] font-black uppercase tracking-wider bg-white/15 px-2.5 py-0.5 rounded-full border border-white/20">
+              Kenali Modus
             </span>
-            <div className="w-9" />
+            <div className="w-8" />
           </div>
 
           {/* Wave Curve Masking Bottom */}
@@ -111,7 +109,7 @@ export default function LoginPage() {
             <svg
               viewBox="0 0 500 150"
               preserveAspectRatio="none"
-              className="h-16 sm:h-20 w-full fill-white"
+              className="h-10 sm:h-12 w-full fill-white"
             >
               <path d="M0.00,49.98 C149.99,150.00 349.81,-49.98 500.00,49.98 L500.00,150.00 L0.00,150.00 Z" />
             </svg>
@@ -119,23 +117,22 @@ export default function LoginPage() {
         </div>
 
         {/* Form Body Area */}
-        <div className="px-7 sm:px-9 pt-2 pb-6 flex-1 flex flex-col justify-between bg-white z-10">
+        <div className="px-6 sm:px-8 pt-0 pb-4 flex-1 flex flex-col justify-between bg-white z-10 overflow-hidden">
           <div>
             {/* Title with Custom Underline Accent */}
-            <div className="mb-6">
-              <h1 className="text-2xl sm:text-3xl font-black text-[#002554] tracking-tight inline-block relative">
+            <div className="mb-3">
+              <h1 className="text-xl sm:text-2xl font-black text-[#002554] tracking-tight inline-block relative">
                 Sign in
-                <div className="h-1 w-10 bg-[#0292fc] rounded-full mt-1.5" />
+                <div className="h-0.5 w-8 bg-[#0292fc] rounded-full mt-1" />
               </h1>
             </div>
 
             {/* Error Notification */}
             {errorMsg && (
-              <div className={`mb-4 p-3 rounded-2xl border text-xs font-semibold flex items-start gap-2.5 ${
-                lockoutTimer > 0
-                  ? "bg-amber-50 border-amber-300 text-amber-800"
-                  : "bg-rose-50 border-rose-200 text-rose-600"
-              }`}>
+              <div className={`mb-4 p-3 rounded-2xl border text-xs font-semibold flex items-start gap-2.5 ${lockoutTimer > 0
+                ? "bg-amber-50 border-amber-300 text-amber-800"
+                : "bg-rose-50 border-rose-200 text-rose-600"
+                }`}>
                 <Icon
                   name={lockoutTimer > 0 ? "Clock" : "AlertCircle"}
                   size={16}
@@ -243,16 +240,27 @@ export default function LoginPage() {
               </div>
             </form>
 
-            {/* Guest Login Option */}
-            <div className="mt-3">
+            {/* Guest Login Option - Rapat & Proporsional */}
+            <div className="mt-3.5 pt-3 border-t border-slate-100">
+              <div className="relative flex items-center justify-center mb-2">
+                <span className="bg-white px-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Atau Coba Langsung
+                </span>
+              </div>
+
               <button
                 type="button"
                 onClick={handleGuestLogin}
-                className="w-full h-11 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-[0.99] border border-slate-200/80 cursor-pointer"
+                className="w-full h-11 rounded-2xl bg-gradient-to-r from-blue-50 via-sky-50 to-blue-50 hover:from-blue-100 hover:to-sky-100 text-[#003882] font-black text-xs sm:text-sm flex items-center justify-center gap-2.5 transition active:scale-[0.99] border-2 border-[#0292fc]/40 shadow-xs hover:shadow-sm cursor-pointer"
               >
-                <Icon name="UserCheck" size={15} className="text-[#0292fc]" />
-                <span>Masuk sebagai Tamu (Mode Latihan)</span>
+                <div className="h-6 w-6 rounded-full bg-[#0292fc] text-white flex items-center justify-center">
+                  <Icon name="UserCheck" size={13} />
+                </div>
+                <span>Masuk sebagai Tamu</span>
               </button>
+              <p className="text-[10px] text-center text-slate-400 mt-1.5">
+                Langsung coba simulasi Scam Challenge tanpa registrasi akun
+              </p>
             </div>
           </div>
 
