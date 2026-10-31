@@ -179,6 +179,98 @@ export default async function handler(req, res) {
       }
     }
 
+    // ----------------------------------------------------
+    // 6. MANAJEMEN LAPORAN INTERNAL LAPOR BARENG BCA
+    // ----------------------------------------------------
+    if (type === "lapor_bareng") {
+      if (req.method === "GET") {
+        const items = await sql`SELECT * FROM lapor_bareng_reports ORDER BY id DESC`
+        return res.status(200).json({ success: true, data: items })
+      }
+
+      if (req.method === "POST") {
+        const {
+          title,
+          modusCategory,
+          chronology,
+          scammerPhone,
+          scammerBankAccount,
+          scammerBankName,
+          estimatedLoss,
+          reporterName,
+          reporterContact,
+          status
+        } = req.body
+
+        if (!title || !chronology) {
+          return res.status(400).json({ message: "Judul dan kronologi wajib diisi." })
+        }
+
+        const inserted = await sql`
+          INSERT INTO lapor_bareng_reports (
+            title,
+            modus_category,
+            chronology,
+            scammer_phone,
+            scammer_bank_account,
+            scammer_bank_name,
+            estimated_loss,
+            reporter_name,
+            reporter_contact,
+            status
+          ) VALUES (
+            ${title},
+            ${modusCategory || 'Impersonation (CS Palsu)'},
+            ${chronology},
+            ${scammerPhone || '-'},
+            ${scammerBankAccount || '-'},
+            ${scammerBankName || 'Bank Lain'},
+            ${Number(estimatedLoss) || 0},
+            ${reporterName || 'Internal Satgas BCA'},
+            ${reporterContact || 'satgas@bca.co.id'},
+            ${status || 'verified'}
+          )
+          RETURNING *
+        `
+        return res.status(201).json({ success: true, data: inserted[0], message: "Laporan internal Lapor Bareng BCA berhasil disimpan!" })
+      }
+
+      if (req.method === "DELETE") {
+        const { id } = req.body
+        await sql`DELETE FROM lapor_bareng_reports WHERE id = ${parseInt(id, 10)}`
+        return res.status(200).json({ success: true, message: "Laporan berhasil dihapus" })
+      }
+    }
+
+    // ----------------------------------------------------
+    // 7. REGISTRY KASUS INTELIJEN & TRACKING STATUS
+    // ----------------------------------------------------
+    if (type === "cases") {
+      if (req.method === "GET") {
+        const items = await sql`SELECT * FROM intelligence_cases ORDER BY id DESC`
+        return res.status(200).json({ success: true, data: items })
+      }
+
+      if (req.method === "PATCH") {
+        const { id, status, adminNotes } = req.body
+        const updated = await sql`
+          UPDATE intelligence_cases
+          SET status = COALESCE(${status}, status),
+              admin_notes = COALESCE(${adminNotes}, admin_notes),
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = ${parseInt(id, 10)}
+          RETURNING *
+        `
+        return res.status(200).json({ success: true, data: updated[0], message: "Status investigasi kasus berhasil diperbarui!" })
+      }
+
+      if (req.method === "DELETE") {
+        const { id } = req.body
+        await sql`DELETE FROM intelligence_cases WHERE id = ${parseInt(id, 10)}`
+        return res.status(200).json({ success: true, message: "Kasus berhasil dihapus dari registry" })
+      }
+    }
+
     return res.status(400).json({ message: "Tipe entitas tidak valid." })
   } catch (error) {
     console.error("Admin Manage API Error:", error)

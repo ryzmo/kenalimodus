@@ -14,10 +14,19 @@ export default function AdminDashboardPage() {
 
   // State Menu Navigasi Admin
   // "menu" = halaman beranda menu admin
-  // "modus" | "soal" | "rewards" | "articles" | "settings"
+  // "crawler" | "modus" | "soal" | "rewards" | "articles" | "settings"
   const [currentMenu, setCurrentMenu] = useState("menu")
   const [loading, setLoading] = useState(false)
   const [toastMsg, setToastMsg] = useState("")
+
+  // State Radar & Scraping Intelijen Siber
+  const [scrapeCategory, setScrapeCategory] = useState("all")
+  const [scrapePlatform, setScrapePlatform] = useState("all")
+  const [customKeyword, setCustomKeyword] = useState("")
+  const [scrapeLoading, setScrapeLoading] = useState(false)
+  const [scrapeResults, setScrapeResults] = useState([])
+  const [selectedScrapeItem, setSelectedScrapeItem] = useState(null)
+  const [publishingAction, setPublishingAction] = useState(false)
 
   // Data State dari Neon DB
   const [modusList, setModusList] = useState([])
@@ -25,9 +34,28 @@ export default function AdminDashboardPage() {
   const [rewardList, setRewardList] = useState([])
   const [articleList, setArticleList] = useState([])
   const [settingsList, setSettingsList] = useState([])
+  const [laporBarengList, setLaporBarengList] = useState([])
+  const [caseRegistryList, setCaseRegistryList] = useState([])
+
+  // Tracking Status Case State
+  const [caseStatusFilter, setCaseStatusFilter] = useState("all")
 
   // Modal State
   const [showModal, setShowModal] = useState(false)
+
+  // 0. Form Inputs: Internal Lapor Bareng BCA
+  const [laporForm, setLaporForm] = useState({
+    title: "",
+    modusCategory: "Impersonation (CS Palsu)",
+    chronology: "",
+    scammerPhone: "",
+    scammerBankAccount: "",
+    scammerBankName: "Bank Lain",
+    estimatedLoss: 0,
+    reporterName: "Satgas Anti-Scam BCA",
+    reporterContact: "satgas@bca.co.id",
+    status: "verified"
+  })
 
   // 1. Form Inputs: Modus
   const [modusForm, setModusForm] = useState({
@@ -92,18 +120,22 @@ export default function AdminDashboardPage() {
     if (!session || session.user?.role !== "admin") return
     setLoading(true)
     try {
-      const [resModus, resScen, resRew, resArt, resSet] = await Promise.all([
+      const [resModus, resScen, resRew, resArt, resSet, resLapor, resCases] = await Promise.all([
         fetch("/api/admin/manage?type=modus").then((r) => r.json()),
         fetch("/api/admin/manage?type=scenario").then((r) => r.json()),
         fetch("/api/admin/manage?type=reward").then((r) => r.json()),
         fetch("/api/admin/manage?type=article").then((r) => r.json()),
-        fetch("/api/admin/manage?type=settings").then((r) => r.json())
+        fetch("/api/admin/manage?type=settings").then((r) => r.json()),
+        fetch("/api/admin/manage?type=lapor_bareng").then((r) => r.json()),
+        fetch("/api/admin/manage?type=cases").then((r) => r.json())
       ])
 
       if (resModus.data) setModusList(resModus.data)
       if (resScen.data) setScenarioList(resScen.data)
       if (resRew.data) setRewardList(resRew.data)
       if (resArt.data) setArticleList(resArt.data)
+      if (resLapor.data) setLaporBarengList(resLapor.data)
+      if (resCases.data) setCaseRegistryList(resCases.data)
       if (resSet.data) {
         setSettingsList(resSet.data)
         setEditableSettings(resSet.data)
@@ -226,6 +258,37 @@ export default function AdminDashboardPage() {
     }
   }
 
+  // Submit Laporan Internal Lapor Bareng BCA
+  const handleSubmitLaporBareng = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await fetch("/api/admin/manage?type=lapor_bareng", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(laporForm)
+      })
+      if (res.ok) {
+        showToast("Laporan Lapor Bareng BCA berhasil ditambahkan!")
+        setShowModal(false)
+        setLaporForm({
+          title: "",
+          modusCategory: "Impersonation (CS Palsu)",
+          chronology: "",
+          scammerPhone: "",
+          scammerBankAccount: "",
+          scammerBankName: "Bank Lain",
+          estimatedLoss: 0,
+          reporterName: "Satgas Anti-Scam BCA",
+          reporterContact: "satgas@bca.co.id",
+          status: "verified"
+        })
+        fetchAllData()
+      }
+    } catch (e) {
+      showToast("Gagal menyimpan laporan internal Lapor Bareng")
+    }
+  }
+
   // Simpan Perubahan Setting Poin Global
   const handleSaveSettings = async (e) => {
     e.preventDefault()
@@ -262,8 +325,158 @@ export default function AdminDashboardPage() {
     }
   }
 
+  // Fungsi Scraping Radar Modus Penipuan Siber
+  const handleRunScrape = async (e) => {
+    if (e) e.preventDefault()
+    setScrapeLoading(true)
+    setScrapeResults([])
+    try {
+      const res = await fetch("/api/admin/crawler?action=scrape", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category: scrapeCategory,
+          platform: scrapePlatform,
+          customKeyword
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setScrapeResults(data.items || [])
+        showToast(`Berhasil menemukan ${data.totalFound || 0} kasus intelijen siber!`)
+      } else {
+        showToast(data.message || "Gagal melakukan radar siber")
+      }
+    } catch (err) {
+      showToast("Koneksi gagal saat melakukan scraping")
+    } finally {
+      setScrapeLoading(false)
+    }
+  }
+
+  // Fungsi Publikasi Satu-Klik dari Hasil Scraping
+  const handlePublishScrape = async (publishType, item) => {
+    setPublishingAction(true)
+    try {
+      let payload = {}
+      if (publishType === "modus") {
+        payload = {
+          title: item.title,
+          category: item.category,
+          description: `Kasus terdeteksi via radar intelijen siber sumber ${item.source}. Dianalisis untuk proteksi nasabah.`,
+          difficulty: "Tinggi",
+          redFlags: item.redFlags,
+          tips: item.preventionTips
+        }
+      } else if (publishType === "scenario") {
+        payload = {
+          title: item.scenarioDraft?.title || item.title,
+          modusType: item.category,
+          sender: item.scenarioDraft?.sender || "Pihak Mengaku Bank",
+          message: item.scenarioDraft?.message || item.title,
+          question: item.scenarioDraft?.question || "Bagaimana tindakan paling aman?",
+          options: item.scenarioDraft?.options || []
+        }
+      } else if (publishType === "article") {
+        payload = {
+          title: item.articleDraft?.title || item.title,
+          readingTime: item.articleDraft?.readingTime || "3 Menit",
+          rewardPoints: item.articleDraft?.rewardPoints || 20,
+          summary: item.articleDraft?.summary || item.title,
+          fullContent: `${item.title}\n\nSumber Laporan: ${item.source}\nTautan Kasus: ${item.link}\n\nPanduan Mitigasi:\n${(item.preventionTips || []).map((t, i) => `${i + 1}. ${t}`).join("\n")}`,
+          author: item.articleDraft?.author || "Tim Riset Siber BCA #AwasModus"
+        }
+      } else if (publishType === "case_registry") {
+        payload = {
+          caseCode: item.case_code || `CASE-${Date.now().toString().slice(-6)}`,
+          title: item.title,
+          source: item.source,
+          sourceUrl: item.link,
+          category: item.category,
+          isKnownInDb: item.isKnownInDb,
+          noveltyType: item.noveltyType || "Varian Baru",
+          noveltyNotes: item.noveltyNotes || "",
+          chronology: item.chronology || item.title,
+          redFlags: item.redFlags || [],
+          preventionTips: item.preventionTips || [],
+          status: item.targetStatus || "analisis",
+          adminNotes: item.adminNotes || "Tersimpan via Radar Intelijen Siber"
+        }
+      }
+
+      const res = await fetch("/api/admin/crawler?action=publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          publishType,
+          payload,
+          laporId: item.isLaporBareng ? item.laporId : null
+        })
+      })
+
+      const result = await res.json()
+      if (result.success) {
+        showToast(result.message || "Berhasil dipublikasikan!")
+        fetchAllData() // Refresh list di admin
+      } else {
+        showToast(result.message || "Gagal mempublikasikan")
+      }
+    } catch (err) {
+      showToast("Terjadi kendala saat publikasi")
+    } finally {
+      setPublishingAction(false)
+    }
+  }
+
+  // Update Status Case di Registry
+  const handleUpdateCaseStatus = async (id, newStatus, adminNotes) => {
+    try {
+      const res = await fetch("/api/admin/manage?type=cases", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: newStatus, adminNotes })
+      })
+      const result = await res.json()
+      if (result.success) {
+        showToast("Status kasus berhasil diperbarui!")
+        fetchAllData()
+      } else {
+        showToast("Gagal memperbarui status kasus")
+      }
+    } catch (e) {
+      showToast("Koneksi gagal")
+    }
+  }
+
   // Daftar Menu Utama di Halaman Admin dengan 3D Icon seperti di Halaman Utama
   const adminMenuItems = [
+    {
+      id: "crawler",
+      title: "Radar Scraping Siber",
+      desc: "Scrape kasus modus & scam terbaru online",
+      iconImg: "/3d-shield-icon.png",
+      count: scrapeResults.length > 0 ? `${scrapeResults.length} Temuan` : "Siap Scrape",
+      badge: "Intelijen AI",
+      badgeColor: "bg-indigo-600"
+    },
+    {
+      id: "cases_registry",
+      title: "Investigasi Case Modus",
+      desc: "Status kontrol & registry keunikan modus",
+      iconImg: "/3d-shield-icon.png",
+      count: caseRegistryList.length,
+      badge: "Tracking Kasus",
+      badgeColor: "bg-purple-600"
+    },
+    {
+      id: "lapor_internal",
+      title: "Lapor Bareng BCA",
+      desc: "Input laporan aduan kasus & scam nasabah",
+      iconImg: "/3d-alert-icon.png",
+      count: laporBarengList.length,
+      badge: "Internal BCA",
+      badgeColor: "bg-cyan-600"
+    },
     {
       id: "modus",
       title: "Katalog Modus",
@@ -317,6 +530,15 @@ export default function AdminDashboardPage() {
       href: "/admin/impact",
       badge: "Laporan",
       badgeColor: "bg-sky-500"
+    },
+    {
+      id: "challenge_impact_run",
+      title: "Uji Challenge Impact",
+      desc: "Simulasi Pre-Test & Post-Test Riset",
+      iconImg: "/3d-shield-icon.png",
+      href: "/challenge-impact",
+      badge: "Riset Pre/Post",
+      badgeColor: "bg-indigo-600"
     }
   ]
 
@@ -403,7 +625,14 @@ export default function AdminDashboardPage() {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <Link
+                      href="/challenge-impact"
+                      className="px-4 py-2.5 rounded-2xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 shadow-md flex items-center gap-2 transition active:scale-95"
+                    >
+                      <Icon name="Target" size={15} />
+                      <span>Uji Challenge Impact</span>
+                    </Link>
                     <Link
                       href="/admin/impact"
                       className="px-4 py-2.5 rounded-2xl bg-[#003882] text-white font-bold text-xs hover:bg-[#002554] shadow-md flex items-center gap-2 transition active:scale-95"
@@ -467,6 +696,663 @@ export default function AdminDashboardPage() {
                     )
                   })}
                 </div>
+              </div>
+            )}
+
+            {/* ==================================================== */}
+            {/* SUBMENU 0: RADAR & SCRAPING INTELIJEN SIBER */}
+            {/* ==================================================== */}
+            {currentMenu === "crawler" && (
+              <div className="space-y-5">
+                {/* Header & Filter Card */}
+                <div className="glass-card rounded-[28px] p-6 border border-white bg-white/95 shadow-sm space-y-4">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+                      Auto-Intelligence Web Scraper
+                    </span>
+                    <h2 className="text-xl font-black text-[#002554] mt-2">
+                      Radar Intelijen Kasus Modus Penipuan Online
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Scraping berita, rilis OJK, kepolisian, dan media siber untuk menjaring modus penipuan yang sudah ada maupun ragam modus baru yang belum dikenal masyarakat.
+                    </p>
+                  </div>
+
+                  {/* Form Filter & Input Keyword */}
+                  <form onSubmit={handleRunScrape} className="space-y-3 pt-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                          Preset Kategori Modus
+                        </label>
+                        <select
+                          value={scrapeCategory}
+                          onChange={(e) => setScrapeCategory(e.target.value)}
+                          className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200 bg-white focus:outline-hidden focus:border-[#0292fc]"
+                        >
+                          <option value="all">Semua Kategori (Global OJK & Siber)</option>
+                          <option value="social_viral">Curhatan Korban Viral Medsos</option>
+                          <option value="apk">File APK & Malware WhatsApp</option>
+                          <option value="cs_palsu">CS Palsu & Social Engineering</option>
+                          <option value="phishing">Link Phishing & Tarif Transfer</option>
+                          <option value="qris">Manipulasi QRIS & Merchant</option>
+                          <option value="loker">Loker Freelance & Like Video</option>
+                          <option value="love_scam">Romance / Love Scam Kencan</option>
+                          <option value="ai_deepfake">AI Voice Scam & Deepfake</option>
+                          <option value="undian">Undian & Hadiah Palsu</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                          Platform Sasaran Scraping
+                        </label>
+                        <select
+                          value={scrapePlatform}
+                          onChange={(e) => setScrapePlatform(e.target.value)}
+                          className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200 bg-white focus:outline-hidden focus:border-[#0292fc]"
+                        >
+                          <option value="all">Multi-Platform & Portal Siber</option>
+                          <option value="lapor_bareng">Lapor Bareng BCA (laporbareng.bca.co.id)</option>
+                          <option value="twitter">X (Twitter) & Tweet Viral</option>
+                          <option value="instagram">Instagram Post & Caption</option>
+                          <option value="threads">Threads Curhatan Penipuan</option>
+                          <option value="tiktok">TikTok & Video Modus</option>
+                          <option value="telegram">Telegram & Chat WhatsApp</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                          Kata Kunci Spesifik (Opsional)
+                        </label>
+                        <input
+                          type="text"
+                          value={customKeyword}
+                          onChange={(e) => setCustomKeyword(e.target.value)}
+                          placeholder="Contoh: sniffing kartu, undangan apk..."
+                          className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200 bg-white focus:outline-hidden focus:border-[#0292fc]"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-[11px] text-slate-400">
+                        {scrapeResults.length > 0 ? `Menampilkan ${scrapeResults.length} laporan hasil radar` : "Klik tombol untuk mulai mengumpulkan data internet"}
+                      </span>
+                      <button
+                        type="submit"
+                        disabled={scrapeLoading}
+                        className="px-6 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-md transition active:scale-95 cursor-pointer disabled:opacity-50"
+                      >
+                        {scrapeLoading ? "Sedang Menelusuri Internet..." : "Jalankan Radar Scraping"}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* State Loading */}
+                {scrapeLoading && (
+                  <div className="glass-card rounded-[24px] p-8 text-center border border-white space-y-3">
+                    <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                    <p className="text-xs font-bold text-indigo-900">
+                      Sedang menjelajah kanal berita nasional & media siber...
+                    </p>
+                    <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+                      Sistem mengekstrak judul, menganalisis indikator bahaya (red flags), serta menyusun draf soal simulasi dan artikel secara otomatis.
+                    </p>
+                  </div>
+                )}
+
+                {/* Hasil Scraping */}
+                {!scrapeLoading && scrapeResults.length === 0 && (
+                  <div className="glass-card rounded-[24px] p-8 text-center border border-white text-slate-400 text-xs">
+                    Belum ada data scraping aktif. Pilih kategori dan klik &quot;Jalankan Radar Scraping&quot; di atas.
+                  </div>
+                )}
+
+                {!scrapeLoading && scrapeResults.length > 0 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {scrapeResults.map((item, idx) => (
+                      <div
+                        key={item.id}
+                        className="glass-card rounded-[24px] p-5 border border-white hover:border-indigo-200 bg-white shadow-xs space-y-3 flex flex-col justify-between"
+                      >
+                        <div className="space-y-2.5">
+                          {/* Baris Status Analisis Keunikan & Timestamp Lengkap */}
+                          <div className="flex flex-wrap items-center justify-between gap-1.5 pb-1 border-b border-slate-100">
+                            <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${item.noveltyBadgeColor || "bg-amber-50 text-amber-800 border-amber-200"}`}>
+                              {item.noveltyType || (item.isKnownInDb ? "Sudah Dikenali di Database" : "Modus Unik & Baru")}
+                            </span>
+                            <span className="text-[10px] font-mono font-medium text-slate-500">
+                              {item.fullTimestamp || "Realtime Radar"}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100">
+                              {item.category}
+                            </span>
+                            <span className="text-[10px] text-slate-400 truncate max-w-[140px]">
+                              {item.source}
+                            </span>
+                          </div>
+
+                          <h3 className="text-sm font-black text-[#002554] leading-snug">
+                            {item.title}
+                          </h3>
+
+                          {/* Catatan Keunikan / Hasil Analisis Database */}
+                          {item.noveltyNotes && (
+                            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-700 leading-relaxed">
+                              <span className="font-bold text-slate-900 block text-[10px] uppercase tracking-wider mb-0.5">Analisis Deteksi Database:</span>
+                              {item.noveltyNotes}
+                            </div>
+                          )}
+
+                          {/* Jika bersumber dari Lapor Bareng BCA: Tampilkan Gambar Bukti & Narasi Resmi BCA */}
+                          {item.isLaporBareng && (
+                            <div className="p-3 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-2">
+                              <div className="flex items-center justify-between text-[10px] font-black uppercase text-amber-900 tracking-wider">
+                                <span>Platform: {item.targetPlatform || "BCA Media"}</span>
+                                <span className="bg-amber-200/70 px-2 py-0.5 rounded-full text-amber-900">Resmi Lapor Bareng BCA</span>
+                              </div>
+                              {item.evidenceImage && (
+                                <div className="rounded-xl overflow-hidden border border-amber-200/60 bg-white max-h-36 flex items-center justify-center">
+                                  <img
+                                    src={item.evidenceImage}
+                                    alt={item.title}
+                                    className="object-contain max-h-36 w-full"
+                                  />
+                                </div>
+                              )}
+                              <p className="text-[11px] text-slate-700 leading-relaxed line-clamp-3">
+                                {item.chronology}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Red Flags / Ciri Bahaya Terdeteksi */}
+                          <div className="p-3 rounded-2xl bg-rose-50/70 border border-rose-100 space-y-1">
+                            <div className="text-[10px] font-black uppercase text-rose-600 tracking-wider">
+                              Red Flags / Ciri Penipuan
+                            </div>
+                            <ul className="text-[11px] text-slate-600 space-y-1 list-disc list-inside">
+                              {(item.redFlags || []).slice(0, 2).map((rf, rIdx) => (
+                                <li key={rIdx}>{rf}</li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          {/* Tips Mitigasi */}
+                          <div className="p-3 rounded-2xl bg-blue-50/70 border border-blue-100 space-y-1">
+                            <div className="text-[10px] font-black uppercase text-[#003882] tracking-wider">
+                              Mitigasi & Solusi Aman
+                            </div>
+                            <ul className="text-[11px] text-slate-600 space-y-1 list-disc list-inside">
+                              {(item.preventionTips || []).slice(0, 2).map((tip, tIdx) => (
+                                <li key={tIdx}>{tip}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+
+                        {/* Aksi Simpan ke Registry Kasus & Publikasi Cepat */}
+                        <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <a
+                              href={item.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-bold text-slate-400 hover:text-indigo-600 underline"
+                            >
+                              Buka Sumber Asli
+                            </a>
+
+                            <button
+                              type="button"
+                              disabled={publishingAction}
+                              onClick={() => handlePublishScrape("case_registry", item)}
+                              className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-[10px] shadow-sm transition active:scale-95 cursor-pointer flex items-center gap-1"
+                              title="Simpan ke Investigasi Case Modus untuk ditindaklanjuti"
+                            >
+                              <span>+ Simpan ke Case Registry</span>
+                            </button>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-1.5 justify-end pt-1 border-t border-dashed border-slate-200">
+                            <span className="text-[10px] text-slate-400 mr-auto font-medium">Publikasi Langsung:</span>
+                            <button
+                              type="button"
+                              disabled={publishingAction}
+                              onClick={() => handlePublishScrape("modus", item)}
+                              className="px-2.5 py-1 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003882] font-black text-[10px] border border-blue-200 transition active:scale-95 cursor-pointer"
+                              title="Masukkan ke Katalog Modus"
+                            >
+                              + Katalog
+                            </button>
+                            <button
+                              type="button"
+                              disabled={publishingAction}
+                              onClick={() => handlePublishScrape("scenario", item)}
+                              className="px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-black text-[10px] border border-amber-200 transition active:scale-95 cursor-pointer"
+                              title="Jadikan Soal Simulasi 2-Minute Test"
+                            >
+                              + Soal Test
+                            </button>
+                            <button
+                              type="button"
+                              disabled={publishingAction}
+                              onClick={() => handlePublishScrape("article", item)}
+                              className="px-2.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black text-[10px] border border-emerald-200 transition active:scale-95 cursor-pointer"
+                              title="Jadikan Artikel Edukasi Berhadiah Poin"
+                            >
+                              + Artikel Poin
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ==================================================== */}
+            {/* SUBMENU: CASE REGISTRY & TRACKING INVESTIGASI MODUS */}
+            {/* ==================================================== */}
+            {currentMenu === "cases_registry" && (
+              <div className="space-y-4">
+                <div className="glass-card rounded-[24px] p-5 border border-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/95 shadow-sm">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-100">
+                      Case Tracking & Intelligence Registry
+                    </span>
+                    <h2 className="text-lg font-black text-[#002554] mt-1.5">
+                      Investigasi Case Modus
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      Sistem kontrol status kasus, analisis pembeda/keunikan modus dari database, dan pencatatan audit timestamp lengkap.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-600">Filter Status:</span>
+                    <select
+                      value={caseStatusFilter}
+                      onChange={(e) => setCaseStatusFilter(e.target.value)}
+                      className="text-xs font-bold px-3 py-1.5 rounded-xl border border-purple-200 bg-purple-50 text-purple-900 focus:outline-hidden"
+                    >
+                      <option value="all">Semua Status</option>
+                      <option value="analisis">Sedang dalam Analisis</option>
+                      <option value="investigasi">Dalam Investigasi</option>
+                      <option value="terverifikasi">Terverifikasi Satgas</option>
+                      <option value="terpublikasi">Sudah Terpublikasi</option>
+                      <option value="diarsipkan">Diarsipkan</option>
+                    </select>
+                  </div>
+                </div>
+
+                {caseRegistryList.filter((c) => caseStatusFilter === "all" || c.status === caseStatusFilter).length === 0 ? (
+                  <div className="glass-card rounded-[24px] p-8 text-center border border-white text-slate-400 text-xs">
+                    Belum ada data kasus investigasi dengan filter ini. Simpan temuan baru melalui menu &quot;Radar Scraping Siber&quot;.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {caseRegistryList
+                      .filter((c) => caseStatusFilter === "all" || c.status === caseStatusFilter)
+                      .map((caseItem) => {
+                        const statusColors = {
+                          analisis: "bg-amber-100 text-amber-800 border-amber-200",
+                          investigasi: "bg-blue-100 text-blue-800 border-blue-200",
+                          terverifikasi: "bg-emerald-100 text-emerald-800 border-emerald-200",
+                          terpublikasi: "bg-indigo-100 text-indigo-800 border-indigo-200",
+                          diarsipkan: "bg-slate-100 text-slate-600 border-slate-200"
+                        }
+                        const formattedDate = caseItem.scraped_at
+                          ? new Date(caseItem.scraped_at).toLocaleString("id-ID", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit",
+                              timeZone: "Asia/Jakarta"
+                            }) + " WIB"
+                          : "-"
+
+                        return (
+                          <div
+                            key={caseItem.id}
+                            className="glass-card rounded-[24px] p-5 border border-white hover:border-purple-200 bg-white shadow-xs space-y-3.5 flex flex-col justify-between"
+                          >
+                            <div className="space-y-3">
+                              {/* Header Kode Case, Status, & Timestamp */}
+                              <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-mono font-black text-purple-700 bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-200">
+                                    {caseItem.case_code || `CASE-${caseItem.id}`}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-slate-500 uppercase">
+                                    {caseItem.category || "Modus Penipuan"}
+                                  </span>
+                                </div>
+                                <span className="text-[10px] font-mono text-slate-500 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
+                                  {formattedDate}
+                                </span>
+                              </div>
+
+                              {/* Judul & Sumber */}
+                              <div>
+                                <h3 className="text-sm font-black text-[#002554] leading-snug">
+                                  {caseItem.title}
+                                </h3>
+                                <p className="text-[11px] text-slate-400 mt-0.5 truncate">
+                                  Sumber: {caseItem.source || "Laporan Siber"}
+                                </p>
+                              </div>
+
+                              {/* Indikator Keunikan vs Database */}
+                              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                    Status Keunikan Modus
+                                  </span>
+                                  <span
+                                    className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${
+                                      caseItem.is_known_in_db
+                                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                        : "bg-purple-50 text-purple-700 border-purple-200"
+                                    }`}
+                                  >
+                                    {caseItem.novelty_type || (caseItem.is_known_in_db ? "Sudah Dikenali di Database" : "Modus Unik & Baru")}
+                                  </span>
+                                </div>
+                                {caseItem.novelty_notes && (
+                                  <p className="text-xs text-slate-700 leading-relaxed italic">
+                                    &quot;{caseItem.novelty_notes}&quot;
+                                  </p>
+                                )}
+                              </div>
+
+                              {/* Kronologi Singkat */}
+                              {caseItem.chronology && (
+                                <div className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                                  {caseItem.chronology}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Kontrol Status & Aksi Publikasi */}
+                            <div className="pt-3 border-t border-slate-100 space-y-2.5">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[11px] font-bold text-slate-600">Status Investigasi:</span>
+                                <select
+                                  value={caseItem.status || "analisis"}
+                                  onChange={(e) => handleUpdateCaseStatus(caseItem.id, e.target.value, caseItem.admin_notes)}
+                                  className={`text-xs font-black px-2.5 py-1 rounded-xl border focus:outline-hidden ${statusColors[caseItem.status] || statusColors.analisis}`}
+                                >
+                                  <option value="analisis">Sedang dalam Analisis</option>
+                                  <option value="investigasi">Dalam Investigasi</option>
+                                  <option value="terverifikasi">Terverifikasi Satgas</option>
+                                  <option value="terpublikasi">Sudah Terpublikasi</option>
+                                  <option value="diarsipkan">Diarsipkan</option>
+                                </select>
+                              </div>
+
+                              {/* Aksi Konversi Cepat */}
+                              <div className="flex flex-wrap items-center justify-between gap-1.5 pt-1 border-t border-dashed border-slate-200">
+                                <span className="text-[10px] text-slate-400 font-medium">Konversi Cepat:</span>
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handlePublishScrape("modus", {
+                                      title: caseItem.title,
+                                      category: caseItem.category,
+                                      chronology: caseItem.chronology,
+                                      preventionTips: caseItem.prevention_tips || []
+                                    })}
+                                    className="px-2 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#003882] font-black text-[10px] border border-blue-200 transition cursor-pointer"
+                                  >
+                                    + Katalog
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handlePublishScrape("scenario", {
+                                      title: caseItem.title,
+                                      category: caseItem.category,
+                                      scenarioDraft: {
+                                        title: `Simulasi: ${caseItem.title.slice(0, 80)}`,
+                                        sender: "Indikasi Scammer",
+                                        message: (caseItem.chronology || caseItem.title).slice(0, 180) + "...",
+                                        question: "Apa tindakan mitigasi teraman saat menghadapi situasi ini?",
+                                        options: [
+                                          {
+                                            id: "a",
+                                            label: "A",
+                                            text: "Abaikan dan konfirmasi melalui kontak resmi BCA 1500888.",
+                                            isCorrect: true,
+                                            scoreImpact: 20,
+                                            feedbackReason: "Tepat! Konfirmasi saluran resmi mencegah kebocoran data."
+                                          },
+                                          {
+                                            id: "b",
+                                            label: "B",
+                                            text: "Ikuti perintah dan klik tautan untuk verifikasi cepat.",
+                                            isCorrect: false,
+                                            isRisky: true,
+                                            scoreImpact: -20,
+                                            feedbackReason: "Bahaya! Menekan tautan sembarangan dapat mencuri kredensial."
+                                          }
+                                        ]
+                                      }
+                                    })}
+                                    className="px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-black text-[10px] border border-amber-200 transition cursor-pointer"
+                                  >
+                                    + Soal Test
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handlePublishScrape("article", {
+                                      title: caseItem.title,
+                                      articleDraft: {
+                                        title: `Peringatan: ${caseItem.title.slice(0, 80)}`,
+                                        readingTime: "3 Menit",
+                                        rewardPoints: 20,
+                                        summary: (caseItem.chronology || caseItem.title).slice(0, 150) + "...",
+                                        author: "Satgas Investigasi Siber BCA"
+                                      },
+                                      source: caseItem.source,
+                                      preventionTips: caseItem.prevention_tips || []
+                                    })}
+                                    className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black text-[10px] border border-emerald-200 transition cursor-pointer"
+                                  >
+                                    + Artikel
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ==================================================== */}
+            {/* SUBMENU: INTERNAL LAPOR BARENG BCA */}
+            {/* ==================================================== */}
+            {currentMenu === "lapor_internal" && (
+              <div className="space-y-4">
+                <div className="glass-card rounded-[24px] p-5 border border-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/95 shadow-sm">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-cyan-700 bg-cyan-50 px-2.5 py-0.5 rounded-full border border-cyan-100">
+                      Internal Satgas BCA #AwasModus
+                    </span>
+                    <h2 className="text-lg font-black text-[#002554] mt-1.5">
+                      Bank Data Lapor Bareng BCA
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      Entri dan kelola data aduan penipuan, akun palsu, serta nomor rekening/telepon penipu langsung dari tim internal untuk dikonversi menjadi modus & simulasi tes.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs shadow-sm cursor-pointer hover:bg-[#002b66] transition active:scale-95 shrink-0"
+                  >
+                    <span>+ Input Aduan Lapor Bareng</span>
+                  </button>
+                </div>
+
+                {laporBarengList.length === 0 ? (
+                  <div className="glass-card rounded-[24px] p-8 text-center border border-white text-slate-400 text-xs">
+                    Belum ada data aduan internal. Silakan klik &quot;+ Input Aduan Lapor Bareng&quot; untuk menambahkan.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {laporBarengList.map((item) => (
+                      <div
+                        key={item.id}
+                        className="glass-card rounded-[24px] p-5 border border-white hover:border-cyan-200 bg-white shadow-xs space-y-3 flex flex-col justify-between"
+                      >
+                        <div className="space-y-2.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-cyan-800 bg-cyan-50 px-2.5 py-0.5 rounded-full border border-cyan-200">
+                              {item.modus_category || "Social Engineering"}
+                            </span>
+                            <span className="text-[10px] text-slate-400">
+                              Pelapor: {item.reporter_name || "Internal BCA"}
+                            </span>
+                          </div>
+
+                          <h4 className="text-sm font-black text-[#002554] leading-snug">
+                            {item.title}
+                          </h4>
+
+                          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                              Kronologi Kejadian
+                            </div>
+                            <p className="text-xs text-slate-700 leading-relaxed italic line-clamp-3">
+                              &quot;{item.chronology}&quot;
+                            </p>
+                          </div>
+
+                          {/* Data Finansial & Kontak Pelaku */}
+                          <div className="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-amber-50/60 border border-amber-100">
+                            <div>
+                              <span className="text-slate-400 block text-[10px]">Kontak Pelaku:</span>
+                              <span className="font-mono font-bold text-slate-800">{item.scammer_phone || "-"}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 block text-[10px]">Rekening/Bank:</span>
+                              <span className="font-mono font-bold text-slate-800">{item.scammer_bank_account || "-"} ({item.scammer_bank_name || "-"})</span>
+                            </div>
+                            <div className="col-span-2 pt-1 border-t border-amber-100/80 flex items-center justify-between">
+                              <span className="text-slate-500 font-medium">Estimasi Kerugian:</span>
+                              <span className="font-bold text-rose-600">Rp {Number(item.estimated_loss || 0).toLocaleString("id-ID")}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Tombol Aksi Konversi Langsung */}
+                        <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                          <button
+                            onClick={() => handleDelete("lapor_bareng", item.id)}
+                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
+                          >
+                            Hapus
+                          </button>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              disabled={publishingAction}
+                              onClick={() => handlePublishScrape("modus", {
+                                title: item.title,
+                                category: item.modus_category,
+                                source: `Lapor Bareng BCA (${item.reporter_name})`,
+                                redFlags: [
+                                  `Nomor/Akun pelaku: ${item.scammer_phone || "-"}`,
+                                  `Rekening tujuan: ${item.scammer_bank_account || "-"} (${item.scammer_bank_name})`,
+                                  "Menggunakan teknik manipulasi psikologis kepanikan"
+                                ],
+                                preventionTips: [
+                                  "Selalu verifikasi kontak melalui Halo BCA 1500888",
+                                  "Jangan pernah transfer dana ke rekening perorangan yang tidak jelas"
+                                ]
+                              })}
+                              className="px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003882] font-black text-[10px] border border-blue-200 transition active:scale-95 cursor-pointer"
+                              title="Konversi ke Katalog Modus"
+                            >
+                              + Katalog
+                            </button>
+                            <button
+                              type="button"
+                              disabled={publishingAction}
+                              onClick={() => handlePublishScrape("scenario", {
+                                title: item.title,
+                                category: item.modus_category,
+                                scenarioDraft: {
+                                  title: `Simulasi Kasus: ${item.title.slice(0, 80)}`,
+                                  sender: item.scammer_phone ? `Nomor Penipu (${item.scammer_phone})` : "Pihak Mengaku BCA",
+                                  message: item.chronology.slice(0, 180) + "...",
+                                  question: "Bagaimana cara menangkal modus ini?",
+                                  options: [
+                                    {
+                                      id: "a",
+                                      label: "A",
+                                      text: "Tolak dan konfirmasi langsung ke cabang BCA terdekat atau Halo BCA 1500888.",
+                                      isCorrect: true,
+                                      scoreImpact: 20,
+                                      feedbackReason: "Tepat! Verifikasi langsung adalah kunci utama mencegah pembobolan rekening."
+                                    },
+                                    {
+                                      id: "b",
+                                      label: "B",
+                                      text: "Segera lakukan transfer sesuai instruksi agar transaksi tidak dibatalkan.",
+                                      isCorrect: false,
+                                      isRisky: true,
+                                      scoreImpact: -20,
+                                      feedbackReason: "Salah! Anda akan mengalami kerugian finansial."
+                                    }
+                                  ]
+                                }
+                              })}
+                              className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-black text-[10px] border border-amber-200 transition active:scale-95 cursor-pointer"
+                              title="Konversi ke Soal Test 2-Minute Challenge"
+                            >
+                              + Soal Test
+                            </button>
+                            <button
+                              type="button"
+                              disabled={publishingAction}
+                              onClick={() => handlePublishScrape("article", {
+                                title: item.title,
+                                articleDraft: {
+                                  title: `Peringatan Kasus: ${item.title.slice(0, 80)}`,
+                                  readingTime: "3 Menit",
+                                  rewardPoints: 20,
+                                  summary: `Kasus penipuan ${item.modus_category} dengan modus: ${item.chronology.slice(0, 150)}...`,
+                                  author: "Satgas Lapor Bareng BCA"
+                                },
+                                source: "Internal Lapor Bareng BCA",
+                                preventionTips: [
+                                  "Hati-hati dengan rekening penampung penipuan",
+                                  "Laporkan indikasi penipuan langsung ke laporbareng.bca.co.id"
+                                ]
+                              })}
+                              className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black text-[10px] border border-emerald-200 transition active:scale-95 cursor-pointer"
+                              title="Konversi ke Artikel Edukasi Berhadiah Poin"
+                            >
+                              + Artikel Poin
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -745,6 +1631,7 @@ export default function AdminDashboardPage() {
                 <div className="w-full max-w-lg bg-white rounded-[32px] p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <h2 className="text-base font-black text-[#002554]">
+                      {currentMenu === "lapor_internal" && "Input Aduan Lapor Bareng BCA"}
                       {currentMenu === "modus" && "Formulir Modus Baru"}
                       {currentMenu === "soal" && "Formulir Soal Simulasi Baru"}
                       {currentMenu === "rewards" && "Formulir Reward Baru"}
@@ -757,6 +1644,113 @@ export default function AdminDashboardPage() {
                       <Icon name="X" size={16} />
                     </button>
                   </div>
+
+                  {/* FORM LAPOR BARENG BCA INTERNAL */}
+                  {currentMenu === "lapor_internal" && (
+                    <form onSubmit={handleSubmitLaporBareng} className="mt-4 space-y-3 text-xs">
+                      <div>
+                        <label className="font-bold text-slate-700">Judul Kasus / Akun Palsu</label>
+                        <input
+                          type="text"
+                          required
+                          value={laporForm.title}
+                          onChange={(e) => setLaporForm({ ...laporForm, title: e.target.value })}
+                          placeholder="Contoh: Akun Instagram Palsu @halo_bca_official_promo"
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="font-bold text-slate-700">Kategori Penipuan</label>
+                          <select
+                            value={laporForm.modusCategory}
+                            onChange={(e) => setLaporForm({ ...laporForm, modusCategory: e.target.value })}
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          >
+                            <option value="Impersonation (CS Palsu)">Impersonation (CS Palsu)</option>
+                            <option value="APK Berbahaya">APK Berbahaya</option>
+                            <option value="QRIS Palsu">QRIS Palsu</option>
+                            <option value="Phishing Website">Phishing Website / Webform</option>
+                            <option value="Job Scam & Tugas Palsu">Job Scam & Tugas Palsu</option>
+                            <option value="Romance Scam">Romance / Love Scam</option>
+                            <option value="Social Engineering">Social Engineering Lainnya</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-700">Estimasi Kerugian (Rp)</label>
+                          <input
+                            type="number"
+                            value={laporForm.estimatedLoss}
+                            onChange={(e) => setLaporForm({ ...laporForm, estimatedLoss: e.target.value })}
+                            placeholder="0 jika belum ada kerugian"
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-700">Kronologi / Modus Yang Terjadi</label>
+                        <textarea
+                          rows={3}
+                          required
+                          value={laporForm.chronology}
+                          onChange={(e) => setLaporForm({ ...laporForm, chronology: e.target.value })}
+                          placeholder="Uraikan alur pesan, tautan yang dikirim penipu, atau nomor kontak yang mencurigakan..."
+                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="font-bold text-slate-700">No HP / Akun Pelaku</label>
+                          <input
+                            type="text"
+                            value={laporForm.scammerPhone}
+                            onChange={(e) => setLaporForm({ ...laporForm, scammerPhone: e.target.value })}
+                            placeholder="+62812xxxx / @akun_scam"
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-700">No Rekening / e-Wallet Pelaku</label>
+                          <input
+                            type="text"
+                            value={laporForm.scammerBankAccount}
+                            onChange={(e) => setLaporForm({ ...laporForm, scammerBankAccount: e.target.value })}
+                            placeholder="1234567890 (Bank Lain)"
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="font-bold text-slate-700">Nama Petugas / Pelapor</label>
+                          <input
+                            type="text"
+                            value={laporForm.reporterName}
+                            onChange={(e) => setLaporForm({ ...laporForm, reporterName: e.target.value })}
+                            placeholder="Satgas Anti-Scam BCA"
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-700">Status Validasi</label>
+                          <select
+                            value={laporForm.status}
+                            onChange={(e) => setLaporForm({ ...laporForm, status: e.target.value })}
+                            className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          >
+                            <option value="verified">Terverifikasi (Valid)</option>
+                            <option value="pending">Menunggu Penyelidikan</option>
+                          </select>
+                        </div>
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full py-3 rounded-2xl bg-[#003882] text-white font-black shadow-md cursor-pointer mt-2 hover:bg-[#002554] transition"
+                      >
+                        Simpan ke Database Lapor Bareng BCA
+                      </button>
+                    </form>
+                  )}
 
                   {/* FORM MODUS */}
                   {currentMenu === "modus" && (

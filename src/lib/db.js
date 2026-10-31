@@ -285,6 +285,118 @@ export async function initDbSchema() {
       CREATE INDEX IF NOT EXISTS idx_impact_created_at ON impact_experiments (created_at DESC);
     `
 
+    // 13. Lapor Bareng Community Scam Reports Table
+    await sql`
+      CREATE TABLE IF NOT EXISTS lapor_bareng_reports (
+        id SERIAL PRIMARY KEY,
+        reporter_name VARCHAR(100) DEFAULT 'Warga Anonim',
+        reporter_contact VARCHAR(100),
+        modus_category VARCHAR(100) NOT NULL DEFAULT 'Social Engineering',
+        title VARCHAR(200) NOT NULL,
+        chronology TEXT NOT NULL,
+        scammer_phone VARCHAR(100),
+        scammer_bank_account VARCHAR(100),
+        scammer_bank_name VARCHAR(50),
+        estimated_loss NUMERIC(15,2) DEFAULT 0,
+        evidence_attachment TEXT,
+        status VARCHAR(50) DEFAULT 'verified', -- 'pending' | 'verified' | 'converted'
+        is_converted_to_modus BOOLEAN DEFAULT FALSE,
+        is_converted_to_scenario BOOLEAN DEFAULT FALSE,
+        is_converted_to_article BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `
+
+    // Seed dummy data Lapor Bareng jika tabel masih kosong
+    const laporCount = await sql`SELECT count(*) FROM lapor_bareng_reports`
+    if (parseInt(laporCount[0]?.count || "0", 10) === 0) {
+      await sql`
+        INSERT INTO lapor_bareng_reports (
+          reporter_name,
+          reporter_contact,
+          modus_category,
+          title,
+          chronology,
+          scammer_phone,
+          scammer_bank_account,
+          scammer_bank_name,
+          estimated_loss,
+          status
+        ) VALUES 
+          (
+            'Hendra Wibowo',
+            'hendra.w@email.com',
+            'APK Berbahaya',
+            'File APK Undangan Pernikahan Menguras Saldo m-BCA',
+            'Saya menerima pesan WhatsApp dari nomor asing mengaku teman SMP mengundang ke nikahan. Ada file Surat_Undangan.apk. Begitu dibuka, HP restart sendiri dan 10 menit kemudian ada notifikasi transfer keluar Rp 15.000.000.',
+            '+62813-8891-2311',
+            '8820192811',
+            'Bank Lain',
+            15000000,
+            'verified'
+          ),
+          (
+            'Siti Rahmawati',
+            'siti.rahma@email.com',
+            'Impersonation (CS Palsu)',
+            'CS Palsu WhatsApp Mengaku Halo BCA Meminta Kode OTP',
+            'Ditelepon via WA foto profil logo Halo BCA resmi. Katanya ada pembaruan biaya transfer bulanan dari Rp 6.500 jadi Rp 150.000. Penipu mengarahkan saya memberikan 6 digit OTP yang masuk SMS agar kenaikan tarif dibatalkan.',
+            '+62852-1144-8900',
+            '12900381928',
+            'Bank Lain',
+            4500000,
+            'verified'
+          ),
+          (
+            'Rian Pratama',
+            'rian.p@email.com',
+            'QRIS Palsu',
+            'Stiker QRIS Rumah Ibadah & Kafe Ditempel Kode Pribadi Penipu',
+            'Saat mau bayar kopi di gerai kasir, saya scan QRIS di meja kasir. Pas konfirmasi pembayaran namanya ternyata Toko Barokah Elektronik, bukan nama kafe. Untung saya konfirmasi ke kasir sebelum masukkan PIN.',
+            '+62819-0922-3111',
+            '00192837192',
+            'e-Wallet',
+            0,
+            'verified'
+          ),
+          (
+            'Dewi Lestari',
+            'dewi.lestari@email.com',
+            'Job Scam & Tugas Palsu',
+            'Tawaran Kerja Freelance Like Video YouTube Berujung Setoran Deposit',
+            'Dimasukkan ke grup Telegram kerja sampingan. Awalnya dibayar Rp 20.000 per 3 like. Lalu di tugas level 4 diminta deposit Rp 2.000.000 untuk buka komisi Rp 5.000.000, uang saya langsung dibawa kabur admin grup.',
+            '+62877-2291-8841',
+            '99182736152',
+            'Bank Lain',
+            2000000,
+            'verified'
+          )
+      `
+    }
+
+    // 14. Intelligence Cases Registry (Pusat Tracking & Investigasi Case Modus)
+    await sql`
+      CREATE TABLE IF NOT EXISTS intelligence_cases (
+        id SERIAL PRIMARY KEY,
+        case_code VARCHAR(50) UNIQUE NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        source VARCHAR(100) NOT NULL, -- 'Lapor Bareng BCA' | 'X/Twitter' | 'Instagram' | 'Web Scraper' | dll
+        source_url TEXT,
+        category VARCHAR(100) NOT NULL,
+        is_known_in_db BOOLEAN DEFAULT FALSE,
+        novelty_type VARCHAR(50) DEFAULT 'Varian Baru', -- 'Sudah Dikenali' | 'Varian Baru' | 'Modus Unik/Belum Dikenal'
+        novelty_notes TEXT,
+        chronology TEXT,
+        red_flags JSONB DEFAULT '[]'::jsonb,
+        prevention_tips JSONB DEFAULT '[]'::jsonb,
+        status VARCHAR(50) DEFAULT 'analisis', -- 'analisis' | 'investigasi' | 'terverifikasi' | 'terpublikasi' | 'diarsipkan'
+        admin_notes TEXT,
+        scraped_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `
+
     return true
   } catch (error) {
     console.error("Failed to initialize NeonDB tables:", error)
