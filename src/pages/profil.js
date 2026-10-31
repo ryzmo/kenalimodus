@@ -36,6 +36,53 @@ export default function ProfilPage() {
     postScore: 100
   })
 
+  // State histori pengerjaan dari database
+  const [challengeHistory, setChallengeHistory] = useState([])
+  const [stats, setStats] = useState({
+    avgScore: 0,
+    latestScore: 0,
+    totalSessions: 0
+  })
+  const [totalPoints, setTotalPoints] = useState(120)
+
+  // Fetch histori sesi challenge dari API database Neon
+  const fetchChallengeHistory = async () => {
+    try {
+      const q = session?.user?.id ? `?userId=${session.user.id}` : ""
+      const res = await fetch(`/api/challenge/history${q}`)
+      const json = await res.json()
+      if (json.success && json.data) {
+        setChallengeHistory(json.data.history || [])
+        setStats({
+          avgScore: json.data.avgScore || 0,
+          latestScore: json.data.latestScore || 0,
+          totalSessions: json.data.totalSessions || 0
+        })
+      }
+    } catch (err) {
+      console.error("Gagal load histori challenge:", err)
+    }
+  }
+
+  // Fetch data user (poin live dari DB)
+  const fetchUserData = async () => {
+    if (!session?.user?.id) return
+    try {
+      const res = await fetch(`/api/user/sync?userId=${session.user.id}`)
+      const json = await res.json()
+      if (json.success && json.data) {
+        if (json.data.total_points !== undefined) setTotalPoints(json.data.total_points)
+      }
+    } catch (err) {
+      console.error("Gagal load user sync:", err)
+    }
+  }
+
+  useEffect(() => {
+    fetchChallengeHistory()
+    fetchUserData()
+  }, [session])
+
   useEffect(() => {
     if (session?.user?.name) {
       setParticipantName(session.user.name)
@@ -116,17 +163,19 @@ export default function ProfilPage() {
     setTimeout(() => setCopied(false), 2500)
   }
 
+  const displayScore = stats.totalSessions > 0 ? stats.avgScore : resultData.score
+
   const badgeEarned =
-    resultData.score >= 85
+    displayScore >= 85
       ? BADGES_DATA[2]
-      : resultData.score >= 75
+      : displayScore >= 75
         ? BADGES_DATA[1]
         : BADGES_DATA[0]
 
   const statusLabel =
-    resultData.score >= 80
+    displayScore >= 80
       ? "Sangat Waspada"
-      : resultData.score >= 60
+      : displayScore >= 60
         ? "Cukup Waspada"
         : "Perlu Latihan"
 
@@ -154,22 +203,25 @@ export default function ProfilPage() {
               {/* Safe Score Display */}
               <div className="flex items-baseline gap-2 mt-2">
                 <span className="text-5xl sm:text-6xl font-black tracking-tight text-white leading-none drop-shadow-sm">
-                  {resultData.score}
+                  {displayScore}
                 </span>
                 <span className="text-base font-bold text-white/80">/100</span>
-                <span className={`ml-2 px-3 py-0.5 rounded-full text-xs font-bold ${resultData.score >= 80
-                  ? "bg-emerald-400/25 text-emerald-100 border border-emerald-300/40"
-                  : resultData.score >= 60
-                    ? "bg-amber-400/25 text-amber-100 border border-amber-300/40"
-                    : "bg-red-400/25 text-red-100 border border-red-300/40"
-                  }`}>
-
+                <span className="ml-2 px-3 py-0.5 rounded-full text-xs font-bold bg-white/20 text-white border border-white/30 backdrop-blur-xs">
                   {statusLabel}
                 </span>
               </div>
 
+              <div className="flex items-center gap-2 mt-1 text-xs text-sky-100 font-semibold">
+                <span>Rata-Rata Akumulatif: <strong>{displayScore} PTS</strong></span>
+                {stats.totalSessions > 0 && (
+                  <span>• Sesi Terakhir: <strong>{stats.latestScore} PTS</strong></span>
+                )}
+              </div>
+
               <p className="text-xs sm:text-sm text-white/90 mt-2 max-w-sm leading-relaxed">
-                Telah menyelesaikan simulasi refleks dengan {resultData.correctCount} dari {resultData.totalQuestions} keputusan tepat.
+                {stats.totalSessions > 0
+                  ? `Telah menyelesaikan ${stats.totalSessions} sesi simulasi refleks dengan total ${totalPoints.toLocaleString()} poin aktif tersimpan.`
+                  : `Telah menyelesaikan simulasi refleks dengan ${resultData.correctCount} dari ${resultData.totalQuestions} keputusan tepat.`}
               </p>
 
               {/* Action Buttons */}
@@ -267,34 +319,151 @@ export default function ProfilPage() {
               <section className="glass-card rounded-[26px] p-5 border border-white flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-[#0292fc] bg-blue-50 px-2.5 py-1 rounded-full">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-[#003882] bg-blue-50/80 px-2.5 py-1 rounded-full">
                       Dampak Intervensi Edukasi
                     </span>
-                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-bold text-[#003882] bg-blue-50/80 border border-blue-100/60 px-2.5 py-0.5 rounded-full">
                       Efektif
                     </span>
                   </div>
 
                   <div className="mt-4 grid grid-cols-2 gap-3 text-center">
-                    <div className="rounded-2xl bg-red-50/70 p-3 border border-red-100">
-                      <div className="text-[10px] text-red-600 font-bold uppercase">Risiko Sebelum Tes</div>
-                      <div className="text-xl font-black text-red-700 mt-1">{impactData.preRiskyRate}%</div>
-                      <div className="text-[10px] text-red-500 mt-0.5">Rentan Tertipu</div>
+                    <div className="rounded-2xl bg-slate-50/90 p-3 border border-slate-200/80">
+                      <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Risiko Sebelum Tes</div>
+                      <div className="text-xl font-black text-[#002554] mt-1">{impactData.preRiskyRate}%</div>
+                      <div className="text-[10px] font-semibold text-slate-500 mt-0.5">Rentan Tertipu</div>
                     </div>
-                    <div className="rounded-2xl bg-emerald-50/70 p-3 border border-emerald-100">
-                      <div className="text-[10px] text-emerald-700 font-bold uppercase">Risiko Pasca Edukasi</div>
-                      <div className="text-xl font-black text-emerald-700 mt-1">{impactData.postRiskyRate}%</div>
-                      <div className="text-[10px] text-emerald-600 mt-0.5">Penurunan Signifikan</div>
+                    <div className="rounded-2xl bg-blue-50/70 p-3 border border-blue-100/80">
+                      <div className="text-[10px] text-[#003882] font-bold uppercase tracking-wider">Risiko Pasca Edukasi</div>
+                      <div className="text-xl font-black text-[#003882] mt-1">{impactData.postRiskyRate}%</div>
+                      <div className="text-[10px] font-semibold text-sky-700 mt-0.5">Penurunan Signifikan</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-3 text-[11px] text-slate-400 text-center">
-                  Estimasi kerugian terlindungi per 1.000 nasabah: <strong className="text-emerald-700">{formatRupiah(impactData.potentialLossAvoided1k)}</strong>
+                <div className="mt-3 text-[11px] text-slate-500 text-center">
+                  Estimasi kerugian terlindungi per 1.000 nasabah: <strong className="text-[#003882] font-black">{formatRupiah(impactData.potentialLossAvoided1k)}</strong>
                 </div>
               </section>
 
             </div>
+
+            {/* Histori Pengerjaan Challenge per Sesi */}
+            <section className="glass-card rounded-[28px] p-5 border border-white">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[#003882] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
+                    Histori Challenge & Progres Rata-Rata
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-slate-500">
+                  {challengeHistory.length > 0 ? `${challengeHistory.length} Sesi Terdata` : "Belum Ada Sesi"}
+                </div>
+              </div>
+
+              {challengeHistory.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center bg-slate-50/50">
+                  <div className="mx-auto w-10 h-10 rounded-full bg-blue-50 text-[#003882] flex items-center justify-center mb-2">
+                    <Icon name="Target" size={20} />
+                  </div>
+                  <div className="text-xs font-bold text-[#002554]">Belum Ada Riwayat Sesi Challenge</div>
+                  <p className="text-[11px] text-slate-400 mt-1 max-w-xs mx-auto">
+                    Mulai 2-Minute Scam Challenge sekarang untuk melatih refleks finansial dan mencatat riwayat skor Anda di database.
+                  </p>
+                  <Link
+                    href="/challenge"
+                    className="inline-flex items-center gap-1.5 mt-3 rounded-xl bg-[#0292fc] px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#007ad6] transition"
+                  >
+                    <span>Mulai Challenge</span>
+                    <Icon name="ArrowRight" size={13} />
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {challengeHistory.map((item, idx) => (
+                    <div
+                      key={item.id || idx}
+                      className="rounded-2xl border border-slate-100 bg-white p-4 shadow-2xs hover:border-blue-200 transition"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-50 pb-3">
+                        <div className="flex items-center gap-2.5">
+                          <span className="h-7 w-7 rounded-full bg-blue-50 text-[#003882] flex items-center justify-center text-xs font-black shrink-0">
+                            #{challengeHistory.length - idx}
+                          </span>
+                          <div>
+                            <div className="text-xs font-black text-[#002554]">
+                              {item.evaluation_headline || "2-Minute Scam Challenge"}
+                            </div>
+                            <div className="text-[10px] text-slate-400 mt-0.5">
+                              {new Date(item.created_at).toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit"
+                              })} • {item.participant_name}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 self-end sm:self-auto">
+                          <div className="text-right">
+                            <span className="text-sm font-black text-[#003882]">
+                              {item.score}/100
+                            </span>
+                            <div className="text-[10px] font-semibold text-slate-400">
+                              Skor Sesi Ini
+                            </div>
+                          </div>
+                          <span
+                            className={`text-[10px] font-black px-2.5 py-1 rounded-full border ${
+                              item.score >= 80
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : item.score >= 60
+                                ? "bg-blue-50 text-[#003882] border-blue-200"
+                                : "bg-rose-50 text-rose-700 border-rose-200"
+                            }`}
+                          >
+                            +{item.points_earned || 20} PTS
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Detail Soal di Sesi Ini */}
+                      {Array.isArray(item.details_json) && item.details_json.length > 0 && (
+                        <div className="mt-3 pt-1">
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                            Detail Keputusan Kasus ({item.correct_count} Benar, {item.failed_count} Salah):
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                            {item.details_json.map((d, dIdx) => (
+                              <div
+                                key={dIdx}
+                                className={`p-2.5 rounded-xl border text-[11px] ${
+                                  d.isCorrect
+                                    ? "bg-slate-50/70 border-slate-100 text-slate-700"
+                                    : "bg-rose-50/30 border-rose-100 text-slate-800"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between font-bold text-[10px]">
+                                  <span className="truncate pr-1 text-[#002554]">{d.title}</span>
+                                  <span className={d.isCorrect ? "text-emerald-600 shrink-0" : "text-rose-600 shrink-0"}>
+                                    {d.isCorrect ? "✓ Tepat" : "✗ Rentan"}
+                                  </span>
+                                </div>
+                                <div className="text-[10px] text-slate-500 line-clamp-1 mt-1">
+                                  {d.chosenText}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
 
             {/* Kunci Emas Perlindungan BCA */}
             <section className="glass-card rounded-[28px] p-5 border border-white">

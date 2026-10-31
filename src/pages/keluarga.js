@@ -1,71 +1,57 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useSession } from "next-auth/react"
 import AppHeader from "../components/AppHeader"
 import BottomNav from "../components/BottomNav"
 import BottomSpace from "../components/BottomSpace"
 import Icon from "../components/Icon"
-import { DEFAULT_FAMILY_MEMBERS } from "../data/modusData"
 
 export default function KeluargaPage() {
-  const [members, setMembers] = useState(DEFAULT_FAMILY_MEMBERS)
-  const [groupName, setGroupName] = useState("Keluarga Sejahtera")
-  const [inviteCode] = useState("AMAN-BCA-778")
+  const { data: session } = useSession()
+  const [members, setMembers] = useState([])
+  const [groupName, setGroupName] = useState("Keluarga Sejahtera BCA")
+  const [inviteCode, setInviteCode] = useState("AMAN-BCA-778")
   const [copiedInvite, setCopiedInvite] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [newMemberName, setNewMemberName] = useState("")
   const [newMemberRole, setNewMemberRole] = useState("Orang Tua")
   const [originUrl, setOriginUrl] = useState("https://kenalimodus.id")
   const [nudgedMember, setNudgedMember] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  // Fetch live family data from database
+  const fetchFamilyData = async () => {
+    try {
+      const userIdParam = session?.user?.id ? `?userId=${session.user.id}` : ""
+      const res = await fetch(`/api/family${userIdParam}`)
+      const json = await res.json()
+      if (json.success && json.data) {
+        if (json.data.group?.group_name) setGroupName(json.data.group.group_name)
+        if (json.data.group?.invite_code) setInviteCode(json.data.group.invite_code)
+        if (Array.isArray(json.data.members)) {
+          setMembers(json.data.members)
+        }
+      }
+    } catch (err) {
+      console.error("Gagal load keluarga dari DB:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setOriginUrl(window.location.origin)
-      const storedGroup = localStorage.getItem("kenali_family_group")
-      if (storedGroup) {
-        try {
-          const parsed = JSON.parse(storedGroup)
-          if (parsed.members) setMembers(parsed.members)
-          if (parsed.groupName) setGroupName(parsed.groupName)
-        } catch (e) {
-          console.error(e)
-        }
-      }
-
-      const storedPersonalResult = localStorage.getItem("kenali_modus_result")
-      if (storedPersonalResult) {
-        try {
-          const parsedRes = JSON.parse(storedPersonalResult)
-          if (parsedRes.score !== undefined) {
-            setMembers((prev) =>
-              prev.map((m) =>
-                m.id === "saya"
-                  ? {
-                    ...m,
-                    score: parsedRes.score,
-                    status:
-                      parsedRes.score >= 80
-                        ? "Waspada"
-                        : parsedRes.score >= 60
-                          ? "Cukup Waspada"
-                          : "Rentan"
-                  }
-                  : m
-              )
-            )
-          }
-        } catch (e) {
-          console.error(e)
-        }
-      }
     }
-  }, [])
+    fetchFamilyData()
+  }, [session])
 
-  const averageScore = Math.round(
-    members.reduce((acc, curr) => acc + curr.score, 0) / members.length
-  )
+  const averageScore = members.length > 0
+    ? Math.round(members.reduce((acc, curr) => acc + (curr.score || 0), 0) / members.length)
+    : 75
 
-  const vulnerableCount = members.filter((m) => m.score < 60).length
+  const vulnerableCount = members.filter((m) => (m.score || 0) < 60).length
 
   const handleCopyInvite = () => {
     const text = `Halo! Yuk gabung ke perlindungan keamanan digital keluarga "${groupName}" di Kenali Modus BCA: ${originUrl}/challenge`
@@ -76,31 +62,29 @@ export default function KeluargaPage() {
     setTimeout(() => setCopiedInvite(false), 2500)
   }
 
-  const handleAddMember = (e) => {
+  const handleAddMember = async (e) => {
     e.preventDefault()
     if (!newMemberName.trim()) return
 
-    const newMember = {
-      id: `fam-${Date.now()}`,
-      name: newMemberName,
-      relation: newMemberRole,
-      score: 50,
-      status: "Rentan",
-      lastActive: "Baru ditambahkan",
-      weakCategory: "Belum Ikut Tes",
-      avatarColor: "bg-blue-600",
-      completedChallenges: 0,
-      nudgeCount: 0,
-      recommendation: "Ajak kerabat untuk menyelesaikan 2-Minute Scam Challenge pertamanya."
-    }
-
-    const updated = [...members, newMember]
-    setMembers(updated)
-    setNewMemberName("")
-    setShowAddModal(false)
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("kenali_family_group", JSON.stringify({ groupName, members: updated }))
+    try {
+      const res = await fetch("/api/family", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newMemberName.trim(),
+          relation: newMemberRole,
+          role: "Anggota",
+          score: 50
+        })
+      })
+      const json = await res.json()
+      if (json.success) {
+        setNewMemberName("")
+        setShowAddModal(false)
+        fetchFamilyData()
+      }
+    } catch (err) {
+      console.error("Gagal tambah anggota ke DB:", err)
     }
   }
 
@@ -110,6 +94,13 @@ export default function KeluargaPage() {
     window.open(waUrl, "_blank")
     setNudgedMember(member.name)
     setTimeout(() => setNudgedMember(null), 3000)
+
+    // Catat aksi nudge ke backend
+    fetch("/api/family", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ memberId: member.id, action: "nudge" })
+    }).catch((e) => console.log(e))
   }
 
   return (
@@ -158,10 +149,18 @@ export default function KeluargaPage() {
                 <button
                   type="button"
                   onClick={handleCopyInvite}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-xs font-bold text-[#003882] shadow-sm hover:bg-slate-50 transition active:scale-95"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-xs font-bold text-[#003882] shadow-sm hover:bg-slate-50 transition active:scale-95 cursor-pointer"
                 >
                   <Icon name="Share2" size={14} />
                   <span>{copiedInvite ? "Link Tersalin!" : "Undang Keluarga"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(true)}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 px-3.5 py-2 text-xs font-bold text-white transition active:scale-95 backdrop-blur-md cursor-pointer"
+                >
+                  <Icon name="Plus" size={14} />
+                  <span>Tambah Anggota</span>
                 </button>
               </div>
             </div>

@@ -392,9 +392,54 @@ export async function initDbSchema() {
         prevention_tips JSONB DEFAULT '[]'::jsonb,
         status VARCHAR(50) DEFAULT 'analisis', -- 'analisis' | 'investigasi' | 'terverifikasi' | 'terpublikasi' | 'diarsipkan'
         admin_notes TEXT,
+        is_in_modus BOOLEAN DEFAULT FALSE,
+        is_in_scenario BOOLEAN DEFAULT FALSE,
+        is_in_article BOOLEAN DEFAULT FALSE,
         scraped_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+    `
+
+    // Pastikan kolom tracking konversi ada jika tabel sudah terbuat sebelumnya
+    await sql`
+      ALTER TABLE intelligence_cases
+      ADD COLUMN IF NOT EXISTS is_in_modus BOOLEAN DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS is_in_scenario BOOLEAN DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS is_in_article BOOLEAN DEFAULT FALSE;
+    `
+
+    // 14. User Challenge Sessions / History Table (Menyimpan histori detail setiap challenge, rata-rata, skor per sesi)
+    await sql`
+      CREATE TABLE IF NOT EXISTS challenge_sessions (
+        id SERIAL PRIMARY KEY,
+        user_id INT REFERENCES users(id) ON DELETE CASCADE,
+        participant_name VARCHAR(100) DEFAULT 'Nasabah',
+        score INT NOT NULL,
+        total_questions INT NOT NULL DEFAULT 5,
+        correct_count INT NOT NULL DEFAULT 0,
+        failed_count INT NOT NULL DEFAULT 0,
+        evaluation_headline VARCHAR(255),
+        details_json JSONB DEFAULT '[]'::jsonb,
+        points_earned INT DEFAULT 20,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `
+
+    // Pastikan kolom poin & safe_score terupdate dengan benar
+    await sql`
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS total_points INT DEFAULT 120,
+      ADD COLUMN IF NOT EXISTS safe_score INT DEFAULT 78,
+      ADD COLUMN IF NOT EXISTS current_streak INT DEFAULT 1;
+    `
+
+    // Pastikan kolom avatarColor, relation, weak_category ada di family_members
+    await sql`
+      ALTER TABLE family_members
+      ADD COLUMN IF NOT EXISTS relation VARCHAR(50) DEFAULT 'Keluarga',
+      ADD COLUMN IF NOT EXISTS weak_category VARCHAR(100) DEFAULT 'Belum Ikut Tes',
+      ADD COLUMN IF NOT EXISTS avatar_color VARCHAR(50) DEFAULT 'bg-blue-600',
+      ADD COLUMN IF NOT EXISTS completed_challenges INT DEFAULT 0;
     `
 
     return true

@@ -2093,11 +2093,13 @@ export const BCA_EDU_VIDEOS = [
     tagline: "Mantra Jitu Lawan Penipu",
     desc: "Kenali rumus sakti B-C-A: Buka dengan ketik manual, Cek keaslian website, Ayo bintangin di browser agar aman dari link jebakan situs palsu.",
     duration: "0:55",
+    youtubeId: "V5i1X00R8Qk",
+    rewardPoints: 15,
     views: "2.100 Views",
     date: "26 Jan 2026",
     badge: "Utama",
     source: "Solusi BCA / #AwasModus",
-    pointsAward: 2,
+    pointsAward: 15,
     mantraPoints: [
       { letter: "B", title: "Buka dengan ketik manual", desc: "Ketik alamat portal resmi langsung di browser (contoh: bca.co.id atau klikbca.com)." },
       { letter: "C", title: "Cek keaslian website", desc: "Pastikan ada ikon gembok keamanan SSL/HTTPS dan sertifikat digital resmi." },
@@ -2111,11 +2113,13 @@ export const BCA_EDU_VIDEOS = [
     tagline: "Waspada Iklan Palsu di Search Engine",
     desc: "Penipu membeli iklan berbayar di mesin pencari dengan tampilan mirip situs resmi KlikBCA Bisnis. Jangan asal klik hasil teratas.",
     duration: "0:55",
+    youtubeId: "Y8E_HjW-B4A",
+    rewardPoints: 15,
     views: "1.850 Views",
     date: "20 Jan 2026",
     badge: "Bisnis",
     source: "Berita BCA",
-    pointsAward: 2,
+    pointsAward: 15,
     mantraPoints: [
       { letter: "1", title: "Jangan Klik Hasil Iklan (Ad)", desc: "Situs phishing sering dipromosikan lewat Google Ads dengan URL tiruan." },
       { letter: "2", title: "Perhatikan Typo Nama Domain", desc: "Penipu sering menggunakan nama mirip seperti klik-bca-id atau bca-online." }
@@ -2130,10 +2134,11 @@ export const BCA_EDU_ARTICLES = [
     category: "Awas Modus",
     date: "9 Sep 2026",
     readTime: "2 mnt baca",
+    rewardPoints: 10,
     sourceUrl: "https://www.bca.co.id/id/informasi/news-and-features/awas-modus",
     summary: "Saat ini marak website tiruan yang menyerupai internet banking. Lindungi diri Anda dengan menerapkan tiga langkah sederhana: Buka dengan ketik manual, Cek keaslian, dan Ayo bintangin.",
     content: "Penipuan bermodus website palsu kian marak. Modus ini biasanya memancing korban dengan tampilan antarmuka yang sangat mirip situs resmi bank.\n\nTips Mengamankan Diri:\n1. B - Buka dengan ketik manual: Jangan klik link dari SMS, chat WhatsApp, atau email mencurigakan.\n2. C - Cek keaslian website: Pastikan domain resmi berakhiran .bca.co.id atau .klikbca.com dan memiliki sertifikat SSL gembok hijau/aman.\n3. A - Ayo bintangin: Simpan (bookmark) alamat resmi di browser agar akses berikutnya selalu terarah ke situs yang benar.",
-    pointsAward: 1
+    pointsAward: 10
   },
   {
     id: "art-2",
@@ -2141,10 +2146,11 @@ export const BCA_EDU_ARTICLES = [
     category: "News & Features",
     date: "8 Sep 2026",
     readTime: "3 mnt baca",
+    rewardPoints: 10,
     sourceUrl: "https://www.bca.co.id/id/informasi/news-and-features",
     summary: "Waspadai nomor telepon atau akun WhatsApp tidak bercentang hijau yang mengatasnamakan Bank BCA dan meminta verifikasi OTP/PIN.",
     content: "Halo BCA resmi hanya dapat dihubungi melalui nomor resmi 1500888 atau aplikasi haloBCA (bebas pulsa), serta akun WhatsApp resmi yang memiliki centang hijau terverifikasi.\n\nPetugas BCA tidak pernah:\n• Meminta kode OTP, PIN m-BCA, atau nomor CVV kartu debit/kredit.\n• Meminta nasabah menginstal file aplikasi berformat .apk.\n• Mengirimkan link pembatalan tarif transfer.",
-    pointsAward: 1
+    pointsAward: 10
   },
   {
     id: "art-3",
@@ -2152,10 +2158,11 @@ export const BCA_EDU_ARTICLES = [
     category: "Edukatips",
     date: "1 Sep 2026",
     readTime: "2 mnt baca",
+    rewardPoints: 10,
     sourceUrl: "https://www.bca.co.id/id/informasi/edukatips",
     summary: "Ketahui bahaya file APK undangan pernikahan, resi kurir, dan surat tilang yang dapat menyadap SMS OTP m-banking.",
     content: "File berekstensi .apk adalah paket aplikasi Android yang dapat mengakses SMS dan notifikasi tanpa izin jika diinstal.\n\nPencegahan:\n• Jangan pernah klik atau buka file .apk dari kontak tak dikenal.\n• Matikan izin 'Install unknown apps' pada pengaturan smartphone Anda.\n• Jika terlanjur terinstal, segera putuskan koneksi internet dan hubungi Halo BCA.",
-    pointsAward: 1
+    pointsAward: 10
   }
 ]
 

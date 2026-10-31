@@ -155,51 +155,191 @@ export default function RewardsPage() {
           )}
 
           {activeTab === "catalog" && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between px-1">
-                <span className="text-xs font-black uppercase tracking-wider text-[#002554]">
-                  Tukar Hadiah Digital
-                </span>
-                <span className="text-[11px] text-slate-400">Merchant Resmi BCA</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {REWARD_CATALOG.map((item) => (
-                  <div
-                    key={item.id}
-                    className="glass-card rounded-[24px] p-4 flex flex-col justify-between border border-white hover:shadow-md transition"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#0292fc]">
-                          {item.category}
-                        </span>
-                        <span className="rounded-full bg-amber-50 text-amber-600 px-2 py-0.5 text-[10px] font-black">
-                          {item.cost} PTS
-                        </span>
+            <div className="space-y-5">
+              {/* Widget Challenge Streak & Cara Mendapatkan Points (Hanya muncul di tab Katalog) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Card Challenge Streak */}
+                <div className="glass-card rounded-[24px] p-5 border border-white/80 shadow-xs flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="text-[10px] font-black uppercase tracking-wider text-[#0292fc]">
+                          STREAK
+                        </div>
+                        <h2 className="text-lg font-black text-[#002554] tracking-tight mt-0.5">
+                          Challenge Streak
+                        </h2>
                       </div>
-                      <h3 className="text-sm font-black text-[#002554] mt-2 leading-snug">
-                        {item.title}
-                      </h3>
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                        {item.desc}
-                      </p>
+                      <div className="flex items-baseline gap-1 text-[#003882]">
+                        <span className="text-3xl font-black leading-none">{streakCount}</span>
+                        <span className="text-xs font-bold text-slate-500">hari</span>
+                      </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setSelectedReward(item)}
-                      disabled={totalPoints < item.cost}
-                      className={`mt-4 w-full rounded-xl py-2 text-xs font-bold transition shadow-xs ${
-                        totalPoints >= item.cost
-                          ? "bg-[#0292fc] text-white hover:bg-[#007ad6] active:scale-95"
-                          : "bg-slate-200 text-slate-400 cursor-not-allowed"
-                      }`}
-                    >
-                      {totalPoints >= item.cost ? "Tukarkan" : "Poin Belum Cukup"}
-                    </button>
+                    {/* 7-Day Streak Pills */}
+                    {(() => {
+                      const days = [
+                        { key: "S", label: "S", active: true, fire: false, isToday: false },
+                        { key: "S2", label: "S", active: true, fire: true, isToday: false },
+                        { key: "R", label: "R", active: true, fire: true, isToday: false },
+                        { key: "K", label: "K", active: true, fire: true, isToday: true },
+                        { key: "J", label: "J", active: false, fire: false, isToday: false },
+                        { key: "S3", label: "S", active: false, fire: false, isToday: false },
+                        { key: "M", label: "M", active: false, fire: false, isToday: false },
+                      ]
+
+                      return (
+                        <div className="mt-4 grid grid-cols-7 gap-2">
+                          {days.map((d) => (
+                            <div key={d.key} className="flex flex-col items-center gap-1.5">
+                              <div
+                                className={`w-full aspect-square max-w-[44px] rounded-xl flex items-center justify-center transition-all ${
+                                  d.isToday
+                                    ? "bg-[#0292fc] text-white shadow-xs ring-2 ring-sky-200"
+                                    : d.fire
+                                    ? "bg-sky-50 border border-sky-100 text-[#0292fc]"
+                                    : "bg-slate-100/70 border border-slate-200/50 text-slate-300"
+                                }`}
+                              >
+                                {d.fire ? (
+                                  <Icon
+                                    name="Flame"
+                                    className={`h-4 w-4 fill-current ${
+                                      d.isToday ? "text-white" : "text-[#0292fc]"
+                                    }`}
+                                  />
+                                ) : (
+                                  <span className="text-xs font-bold text-slate-300">-</span>
+                                )}
+                              </div>
+                              <span
+                                className={`text-[11px] font-bold ${
+                                  d.isToday ? "text-[#003882] font-black" : "text-slate-400"
+                                }`}
+                              >
+                                {d.label}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    })()}
                   </div>
-                ))}
+
+                  {/* Bottom Banner */}
+                  <div className="mt-4 rounded-xl bg-blue-50/80 border border-blue-100/70 p-2.5 text-center">
+                    <p className="text-xs font-medium text-slate-700">
+                      Jaga streak 7 hari berturut-turut <span className="font-black text-[#003882]">→ +10 bonus poin</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Card Cara Mendapatkan Points */}
+                <div className="glass-card rounded-[24px] p-5 border border-white/80 shadow-xs flex flex-col justify-between">
+                  <div>
+                    <div className="text-[10px] font-black uppercase tracking-wider text-[#0292fc]">
+                      EARN POINTS
+                    </div>
+                    <h2 className="text-lg font-black text-[#002554] tracking-tight mt-0.5">
+                      Cara Mendapatkan Points
+                    </h2>
+
+                    {/* Table / List Cara Mendapatkan Poin */}
+                    <div className="mt-3 overflow-hidden rounded-xl border border-slate-200/70 bg-white shadow-2xs">
+                      <div className="flex items-center justify-between bg-[#003882] px-4 py-2.5 text-xs font-bold text-white">
+                        <span>Aktivitas Edukasi & Proteksi</span>
+                        <span>Points</span>
+                      </div>
+                      <div className="divide-y divide-slate-100 text-xs">
+                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
+                          <span className="font-medium text-slate-700">Menyelesaikan 2-Min Scam Challenge (Skor ≥80)</span>
+                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
+                            +30
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
+                          <span className="font-medium text-slate-700">Menyelesaikan 2-Min Scam Challenge</span>
+                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
+                            +20
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
+                          <span className="font-medium text-slate-700">Menonton Video Edukasi Resmi #AwasModus</span>
+                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
+                            +15
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
+                          <span className="font-medium text-slate-700">Membaca Artikel Resmi & Rumus Jitu BCA</span>
+                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
+                            +10
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
+                          <span className="font-medium text-slate-700">Bonus Streak Challenge 7 Hari Beruntun</span>
+                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
+                            +10
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
+                          <span className="font-medium text-slate-700">Membagikan Skor atau Proteksi ke Keluarga</span>
+                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
+                            +5
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bagian Katalog Tukar Hadiah */}
+              <div className="space-y-3 pt-1">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-xs font-black uppercase tracking-wider text-[#002554]">
+                    Tukar Hadiah Digital
+                  </span>
+                  <span className="text-[11px] text-slate-400">Merchant Resmi BCA</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {REWARD_CATALOG.map((item) => (
+                    <div
+                      key={item.id}
+                      className="glass-card rounded-[24px] p-4 flex flex-col justify-between border border-white hover:shadow-md transition"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#0292fc]">
+                            {item.category}
+                          </span>
+                          <span className="rounded-full bg-amber-50 text-amber-600 px-2 py-0.5 text-[10px] font-black">
+                            {item.cost} PTS
+                          </span>
+                        </div>
+                        <h3 className="text-sm font-black text-[#002554] mt-2 leading-snug">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                          {item.desc}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setSelectedReward(item)}
+                        disabled={totalPoints < item.cost}
+                        className={`mt-4 w-full rounded-xl py-2 text-xs font-bold transition shadow-xs ${
+                          totalPoints >= item.cost
+                            ? "bg-[#0292fc] text-white hover:bg-[#007ad6] active:scale-95 cursor-pointer"
+                            : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                        }`}
+                      >
+                        {totalPoints >= item.cost ? "Tukarkan" : "Poin Belum Cukup"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}

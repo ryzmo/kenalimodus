@@ -51,6 +51,8 @@ export default function Home() {
   const [notifications, setNotifications] = useState(DEFAULT_NOTIFICATIONS)
   const notifRef = useRef(null)
 
+  const [userPoints, setUserPoints] = useState(null)
+
   useEffect(() => {
     // Tentukan salam otomatis berdasarkan jam lokal perangkat
     const currentHour = new Date().getHours()
@@ -69,16 +71,47 @@ export default function Home() {
     if (typeof window !== "undefined") {
       setOriginUrl(window.location.origin)
 
-      // HANYA tampilkan safe_score jika pengguna SUDAH LOGIN
-      if (session?.user) {
-        // Ambil dari sesi atau database
-        const score = session.user.safe_score ?? 78
-        setSafeScore(score)
-        setHasTested(true)
+      // Ambil skor & poin live dari database jika login, atau fallback histori challenge
+      if (session?.user?.id) {
+        fetch(`/api/user/sync?userId=${session.user.id}`)
+          .then((res) => res.json())
+          .then((res) => {
+            if (res.success && res.data) {
+              setSafeScore(res.data.safe_score ?? session.user.safe_score ?? 78)
+              setUserPoints(res.data.total_points ?? session.user.total_points ?? 120)
+              setHasTested(true)
+            }
+          })
+          .catch(() => {
+            setSafeScore(session.user.safe_score ?? 78)
+            setUserPoints(session.user.total_points ?? 120)
+            setHasTested(true)
+          })
       } else {
-        // Jika BELUM LOGIN: pastikan skor TIDAK DITAMPILKAN
-        setSafeScore(null)
-        setHasTested(false)
+        // Cek localStorage jika bermain secara tamu/guest
+        const storedAvg = localStorage.getItem("kenali_average_safe_score")
+        const storedResult = localStorage.getItem("kenali_modus_result")
+        const storedPoints = localStorage.getItem("kenali_points_data")
+
+        if (storedAvg) {
+          setSafeScore(Number(storedAvg))
+          setHasTested(true)
+        } else if (storedResult) {
+          try {
+            const parsed = JSON.parse(storedResult)
+            if (parsed.score !== undefined) {
+              setSafeScore(parsed.score)
+              setHasTested(true)
+            }
+          } catch (e) {}
+        }
+
+        if (storedPoints) {
+          try {
+            const parsedPts = JSON.parse(storedPoints)
+            if (parsedPts.totalPoints !== undefined) setUserPoints(parsedPts.totalPoints)
+          } catch (e) {}
+        }
       }
     }
   }, [session])
@@ -114,32 +147,32 @@ export default function Home() {
     {
       title: "2-Min Test",
       sub: "Cek Safe Score",
-      iconImg: "/3d-shield-icon.png",
+      iconImg: "/solar-shield-check.svg",
       href: "/challenge",
       badge: "Utama",
-      badgeColor: "bg-amber-500",
+      badgeColor: "bg-[#0292fc]",
     },
     {
       title: "Katalog Modus",
       sub: "Kumpulan Kejahatan",
-      iconImg: "/3d-alert-icon.png",
+      iconImg: "/solar-danger-triangle.svg",
       href: "/modus",
       badge: null,
     },
     {
       title: "Keluarga",
       sub: "Proteksi Bersama",
-      iconImg: "/3d-family-icon.png",
+      iconImg: "/solar-users-group.svg",
       href: "/keluarga",
       badge: null,
     },
     {
       title: "Rewards",
       sub: "Tukar Poin Berharga",
-      iconImg: "/3d-trophy-icon.png",
+      iconImg: "/solar-cup-first.svg",
       href: "/rewards",
       badge: "Poin",
-      badgeColor: "bg-red-500",
+      badgeColor: "bg-[#003882]",
     },
   ]
 
@@ -249,8 +282,13 @@ export default function Home() {
                     />
                   </div>
 
-                  <div className="mt-2.5 text-[11px] sm:text-sm font-semibold text-white/95 leading-relaxed drop-shadow-xs max-w-md">
-                    Cek Safe Score kamu, seberapa aman dari scam?
+                  <div className="mt-2 text-[11px] sm:text-xs font-semibold text-white/95 leading-relaxed drop-shadow-xs flex items-center gap-2">
+                    <span>Cek Safe Score kamu, seberapa aman dari scam?</span>
+                    {userPoints !== null && (
+                      <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold border border-white/25">
+                        {userPoints.toLocaleString()} PTS
+                      </span>
+                    )}
                   </div>
                 </>
               ) : (
@@ -336,12 +374,12 @@ export default function Home() {
                     className="glass-card rounded-[24px] p-4 flex flex-col justify-between group active:scale-95 transition hover:shadow-md hover:border-blue-200 border border-white"
                   >
                     <div className="flex items-start justify-between">
-                      <div className="relative h-12 w-12 rounded-2xl overflow-hidden shadow-2xs group-hover:scale-105 transition">
+                      <div className="relative h-12 w-12 rounded-2xl bg-blue-50/80 border border-blue-100 p-2.5 shadow-2xs group-hover:scale-105 transition flex items-center justify-center">
                         <Image
                           src={service.iconImg}
                           alt={service.title}
-                          fill
-                          sizes="48px"
+                          width={28}
+                          height={28}
                           className="object-contain"
                         />
                       </div>

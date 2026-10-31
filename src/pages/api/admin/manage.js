@@ -29,7 +29,23 @@ export default async function handler(req, res) {
       }
 
       if (req.method === "POST") {
-        const { title, category, description, difficulty, redFlags, tips } = req.body
+        const { id, title, category, description, difficulty, redFlags, tips } = req.body
+        if (id) {
+          const updated = await sql`
+            UPDATE custom_modus
+            SET title = ${title},
+                category = ${category || 'Social Engineering'},
+                description = ${description},
+                difficulty = ${difficulty || 'Sedang'},
+                red_flags = ${JSON.stringify(redFlags || [])}::jsonb,
+                prevention_tips = ${JSON.stringify(tips || [])}::jsonb,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ${parseInt(id, 10)}
+            RETURNING *
+          `
+          return res.status(200).json({ success: true, data: updated[0], message: "Modus berhasil diperbarui!" })
+        }
+
         const inserted = await sql`
           INSERT INTO custom_modus (title, category, description, difficulty, red_flags, prevention_tips)
           VALUES (
@@ -43,6 +59,23 @@ export default async function handler(req, res) {
           RETURNING *
         `
         return res.status(201).json({ success: true, data: inserted[0] })
+      }
+
+      if (req.method === "PUT") {
+        const { id, title, category, description, difficulty, redFlags, tips } = req.body
+        const updated = await sql`
+          UPDATE custom_modus
+          SET title = ${title},
+              category = ${category || 'Social Engineering'},
+              description = ${description},
+              difficulty = ${difficulty || 'Sedang'},
+              red_flags = ${JSON.stringify(redFlags || [])}::jsonb,
+              prevention_tips = ${JSON.stringify(tips || [])}::jsonb,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = ${parseInt(id, 10)}
+          RETURNING *
+        `
+        return res.status(200).json({ success: true, data: updated[0], message: "Modus berhasil diperbarui!" })
       }
 
       if (req.method === "DELETE") {
@@ -62,7 +95,23 @@ export default async function handler(req, res) {
       }
 
       if (req.method === "POST") {
-        const { title, modusType, sender, message, question, options } = req.body
+        const { id, title, modusType, sender, message, question, options } = req.body
+        if (id) {
+          const updated = await sql`
+            UPDATE custom_scenarios
+            SET title = ${title},
+                modus_type = ${modusType || 'Umum'},
+                sender = ${sender || 'Sistem BCA'},
+                message = ${message},
+                question = ${question},
+                options = ${JSON.stringify(options || [])}::jsonb,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ${parseInt(id, 10)}
+            RETURNING *
+          `
+          return res.status(200).json({ success: true, data: updated[0], message: "Soal skenario berhasil diperbarui!" })
+        }
+
         const inserted = await sql`
           INSERT INTO custom_scenarios (title, modus_type, sender, message, question, options)
           VALUES (
@@ -76,6 +125,23 @@ export default async function handler(req, res) {
           RETURNING *
         `
         return res.status(201).json({ success: true, data: inserted[0] })
+      }
+
+      if (req.method === "PUT") {
+        const { id, title, modusType, sender, message, question, options } = req.body
+        const updated = await sql`
+          UPDATE custom_scenarios
+          SET title = ${title},
+              modus_type = ${modusType || 'Umum'},
+              sender = ${sender || 'Sistem BCA'},
+              message = ${message},
+              question = ${question},
+              options = ${JSON.stringify(options || [])}::jsonb,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = ${parseInt(id, 10)}
+          RETURNING *
+        `
+        return res.status(200).json({ success: true, data: updated[0], message: "Soal skenario berhasil diperbarui!" })
       }
 
       if (req.method === "DELETE") {
@@ -128,7 +194,25 @@ export default async function handler(req, res) {
       }
 
       if (req.method === "POST") {
-        const { title, contentType, rewardPoints, readingTime, author, summary, fullContent, externalUrl } = req.body
+        const { id, title, contentType, rewardPoints, readingTime, author, summary, fullContent, externalUrl } = req.body
+        if (id) {
+          const updated = await sql`
+            UPDATE custom_articles
+            SET title = ${title},
+                content_type = ${contentType || 'article'},
+                reward_points = ${parseInt(rewardPoints, 10) || 15},
+                reading_time = ${readingTime || '3 Menit'},
+                author = ${author || 'Tim Edukasi Anti-Scam BCA'},
+                summary = ${summary},
+                full_content = ${fullContent || ''},
+                external_url = ${externalUrl || ''},
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ${parseInt(id, 10)}
+            RETURNING *
+          `
+          return res.status(200).json({ success: true, data: updated[0], message: "Artikel berhasil diperbarui!" })
+        }
+
         const inserted = await sql`
           INSERT INTO custom_articles (
             title, content_type, reward_points, reading_time, author, summary, full_content, external_url
@@ -145,6 +229,25 @@ export default async function handler(req, res) {
           RETURNING *
         `
         return res.status(201).json({ success: true, data: inserted[0] })
+      }
+
+      if (req.method === "PUT") {
+        const { id, title, contentType, rewardPoints, readingTime, author, summary, fullContent, externalUrl } = req.body
+        const updated = await sql`
+          UPDATE custom_articles
+          SET title = ${title},
+              content_type = ${contentType || 'article'},
+              reward_points = ${parseInt(rewardPoints, 10) || 15},
+              reading_time = ${readingTime || '3 Menit'},
+              author = ${author || 'Tim Edukasi Anti-Scam BCA'},
+              summary = ${summary},
+              full_content = ${fullContent || ''},
+              external_url = ${externalUrl || ''},
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = ${parseInt(id, 10)}
+          RETURNING *
+        `
+        return res.status(200).json({ success: true, data: updated[0], message: "Artikel berhasil diperbarui!" })
       }
 
       if (req.method === "DELETE") {

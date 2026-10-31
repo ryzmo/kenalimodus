@@ -83,7 +83,7 @@ function generateAnalysis(title, category, source) {
           text: "Langsung blokir nomor dan laporkan pesan sebagai spam tanpa mengunduh file.",
           isCorrect: true,
           scoreImpact: 20,
-          feedbackReason: "Tepat! File .APK dari sumber asing berisiko tinggi mencuri SMS OTP dan menguras saldo bank Anda."
+          feedbackReason: "Tepat & Terlindungi (+20 Poin)! File .APK dari sumber asing berisiko tinggi mencuri SMS OTP dan menguras saldo bank Anda."
         },
         {
           id: "b",
@@ -92,7 +92,25 @@ function generateAnalysis(title, category, source) {
           isCorrect: false,
           isRisky: true,
           scoreImpact: -20,
-          feedbackReason: "Sangat Berbahaya! Mengunduh APK memungkinkan malware otomatis menyadap ponsel Anda."
+          feedbackReason: "Sangat Berbahaya (-20 Poin)! Mengunduh APK memungkinkan malware otomatis menyadap SMS OTP dan membaca layar ponsel Anda."
+        },
+        {
+          id: "c",
+          label: "C",
+          text: "Meneruskan file APK ke grup keluarga untuk menanyakan apakah ada yang memesan paket.",
+          isCorrect: false,
+          isRisky: true,
+          scoreImpact: -10,
+          feedbackReason: "Kurang Tepat (-10 Poin)! Menyebarkan file APK berbahaya berisiko diunduh oleh anggota keluarga lain yang belum paham."
+        },
+        {
+          id: "d",
+          label: "D",
+          text: "Membalas chat pengirim dan meminta foto fisik paket sebelum mengunduh file.",
+          isCorrect: false,
+          isRisky: true,
+          scoreImpact: -10,
+          feedbackReason: "Kurang Tepat (-10 Poin)! Berinteraksi dengan pelaku tetap memberi ruang manipulasi rekayasa sosial."
         }
       ]
     }
@@ -127,7 +145,7 @@ function generateAnalysis(title, category, source) {
           text: "Abaikan dan verifikasi langsung via aplikasi resmi haloBCA atau telepon 1500888.",
           isCorrect: true,
           scoreImpact: 20,
-          feedbackReason: "Benar sekali! BCA tidak pernah menaikkan tarif transfer secara mendadak melalui chat WhatsApp non-resmi."
+          feedbackReason: "Benar sekali (+20 Poin)! BCA tidak pernah menaikkan tarif transfer secara mendadak melalui chat WhatsApp non-resmi."
         },
         {
           id: "b",
@@ -136,7 +154,25 @@ function generateAnalysis(title, category, source) {
           isCorrect: false,
           isRisky: true,
           scoreImpact: -20,
-          feedbackReason: "Salah! Link tersebut adalah situs phishing yang dirancang untuk menguras kredensial perbankan Anda."
+          feedbackReason: "Bahaya (-20 Poin)! Link tersebut adalah situs phishing yang dirancang untuk menguras kredensial perbankan Anda."
+        },
+        {
+          id: "c",
+          label: "C",
+          text: "Menelpon balik nomor pengirim untuk memarahi pelaku penipuan.",
+          isCorrect: false,
+          isRisky: true,
+          scoreImpact: -10,
+          feedbackReason: "Kurang Tepat (-10 Poin)! Menghubungi nomor pelaku hanya membuang waktu dan berisiko pulsa tersedot."
+        },
+        {
+          id: "d",
+          label: "D",
+          text: "Mengetik 'BATAL' dan membagikan OTP yang masuk via SMS ke nomor pengirim.",
+          isCorrect: false,
+          isRisky: true,
+          scoreImpact: -20,
+          feedbackReason: "Sangat Berbahaya (-20 Poin)! Memberikan OTP adalah penyebab utama saldo tabungan terkuras habis."
         }
       ]
     }
@@ -215,7 +251,7 @@ function generateAnalysis(title, category, source) {
           text: "Abaikan dan hapus pesan, karena hadiah resmi tidak pernah meminta transfer uang di muka.",
           isCorrect: true,
           scoreImpact: 20,
-          feedbackReason: "Tepat! Pajak hadiah resmi umumnya ditanggung penyelenggara atau dipotong langsung dari hadiah, bukan dengan transfer di muka."
+          feedbackReason: "Tepat & Terlindungi (+20 Poin)! Pajak hadiah resmi tidak pernah ditransfer ke nomor rekening pribadi."
         },
         {
           id: "b",
@@ -224,7 +260,25 @@ function generateAnalysis(title, category, source) {
           isCorrect: false,
           isRisky: true,
           scoreImpact: -20,
-          feedbackReason: "Terjebak! Pelaku akan terus meminta uang dengan alasan biaya administrasi lain sampai uang Anda habis."
+          feedbackReason: "Terjebak Scam (-20 Poin)! Pelaku akan terus meminta uang dengan alasan biaya administrasi lain sampai uang Anda habis."
+        },
+        {
+          id: "c",
+          label: "C",
+          text: "Membalas pesan dan meminta agar biaya dipotong langsung dari total hadiah.",
+          isCorrect: false,
+          isRisky: true,
+          scoreImpact: -10,
+          feedbackReason: "Kurang Tepat (-10 Poin)! Menanggapi penipu memberi celah manipulasi lebih lanjut."
+        },
+        {
+          id: "d",
+          label: "D",
+          text: "Meneruskan info hadiah tersebut ke grup WhatsApp agar teman ikut mendaftar.",
+          isCorrect: false,
+          isRisky: true,
+          scoreImpact: -15,
+          feedbackReason: "Berbahaya (-15 Poin)! Menyebarkan undian fiktif membahayakan relasi dan keluarga Anda."
         }
       ]
     }
@@ -577,7 +631,7 @@ export default async function handler(req, res) {
   // ----------------------------------------------------
   if (action === "publish" && req.method === "POST") {
     try {
-      const { publishType, payload, laporId } = req.body // publishType: "modus" | "scenario" | "article"
+      const { publishType, payload, laporId, caseId } = req.body // publishType: "modus" | "scenario" | "article" | "case_registry"
 
       await initDbSchema()
       const sql = getDb()
@@ -593,6 +647,17 @@ export default async function handler(req, res) {
           await sql`UPDATE lapor_bareng_reports SET is_converted_to_scenario = TRUE, status = 'converted' WHERE id = ${parseInt(laporId, 10)}`
         } else if (publishType === "article") {
           await sql`UPDATE lapor_bareng_reports SET is_converted_to_article = TRUE, status = 'converted' WHERE id = ${parseInt(laporId, 10)}`
+        }
+      }
+
+      // Tandai status konversi pada tabel Intelligence Cases jika bersumber dari registry investigasi
+      if (caseId) {
+        if (publishType === "modus") {
+          await sql`UPDATE intelligence_cases SET is_in_modus = TRUE, status = 'terpublikasi', updated_at = CURRENT_TIMESTAMP WHERE id = ${parseInt(caseId, 10)}`
+        } else if (publishType === "scenario") {
+          await sql`UPDATE intelligence_cases SET is_in_scenario = TRUE, status = 'terpublikasi', updated_at = CURRENT_TIMESTAMP WHERE id = ${parseInt(caseId, 10)}`
+        } else if (publishType === "article") {
+          await sql`UPDATE intelligence_cases SET is_in_article = TRUE, status = 'terpublikasi', updated_at = CURRENT_TIMESTAMP WHERE id = ${parseInt(caseId, 10)}`
         }
       }
 

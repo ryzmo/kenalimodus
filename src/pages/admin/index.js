@@ -27,6 +27,16 @@ export default function AdminDashboardPage() {
   const [scrapeResults, setScrapeResults] = useState([])
   const [selectedScrapeItem, setSelectedScrapeItem] = useState(null)
   const [publishingAction, setPublishingAction] = useState(false)
+  // Tracking item id mana yang sedang dalam proses aksi publikasi/simpan
+  const [publishingItemId, setPublishingItemId] = useState(null)
+  // Tracking case id yang statusnya sedang di-update
+  const [updatingCaseId, setUpdatingCaseId] = useState(null)
+  // Tracking id item yang sedang dihapus
+  const [deletingItemId, setDeletingItemId] = useState(null)
+  // Loading saat submit form modal
+  const [modalSubmitting, setModalSubmitting] = useState(false)
+  // Loading saat simpan pengaturan poin
+  const [settingsSaving, setSettingsSaving] = useState(false)
 
   // Data State dari Neon DB
   const [modusList, setModusList] = useState([])
@@ -40,8 +50,9 @@ export default function AdminDashboardPage() {
   // Tracking Status Case State
   const [caseStatusFilter, setCaseStatusFilter] = useState("all")
 
-  // Modal State
+  // Modal State & Edit Tracking State
   const [showModal, setShowModal] = useState(false)
+  const [editingId, setEditingId] = useState(null) // ID item yang sedang diedit (null jika tambah baru)
 
   // 0. Form Inputs: Internal Lapor Bareng BCA
   const [laporForm, setLaporForm] = useState({
@@ -67,16 +78,22 @@ export default function AdminDashboardPage() {
     tips: ""
   })
 
-  // 2. Form Inputs: Soal Skenario
+  // 2. Form Inputs: Soal Skenario (Pilihan Ganda 4 Opsi: A, B, C, D dengan Analisis Feedback Edukasi)
   const [scenarioForm, setScenarioForm] = useState({
     title: "",
     modusType: "Phishing Link",
     sender: "Halo BCA CS",
     message: "",
     question: "Apa tindakan paling aman yang harus Anda ambil?",
-    optionA: "Klik tautan untuk konfirmasi",
-    optionB: "Abaikan dan hubungi Halo BCA resmi 1500888",
-    correctOption: "B"
+    optionA: "Abaikan pesan, jangan berikan kredensial/OTP, dan segera konfirmasi via Halo BCA 1500888.",
+    feedbackA: "Tepat & Terlindungi (+20 Poin)! Tindakan verifikasi langsung melalui kontak resmi Halo BCA 1500888 berhasil mencegah pencurian data dan saldo rekening.",
+    optionB: "Segera klik tautan atau unduh lampiran sesuai instruksi pengirim agar akun tidak diblokir.",
+    feedbackB: "Sangat Berbahaya (-20 Poin)! Menekan tautan asing atau mengunduh lampiran akan mengaktifkan malware / situs phishing pencuri kredensial bank.",
+    optionC: "Membalas pesan pengirim dan menanyakan apakah nomor tersebut resmi dari pihak BCA.",
+    feedbackC: "Berisiko (-10 Poin)! Penipu akan menggunakan teknik manipulasi psikologis lebih lanjut untuk meyakinkan Anda bahwa mereka resmi.",
+    optionD: "Meneruskan pesan beserta nomor pengirim ke grup keluarga tanpa memverifikasi kebenarannya.",
+    feedbackD: "Kurang Tepat (-10 Poin)! Meneruskan pesan penipuan berisiko membuat anggota keluarga lain yang kurang waspada menjadi korban scam.",
+    correctOption: "A"
   })
 
   // 3. Form Inputs: Reward & Poin
@@ -153,76 +170,225 @@ export default function AdminDashboardPage() {
     }
   }, [session])
 
-  // Submit Modus
+  // Helper untuk membuka modal form tambah baru (reset state form & editingId)
+  const handleOpenAddModal = (menuKey) => {
+    setEditingId(null)
+    if (menuKey === "modus") {
+      setModusForm({
+        title: "",
+        category: "Social Engineering",
+        description: "",
+        difficulty: "Sedang",
+        redFlags: "",
+        tips: ""
+      })
+    } else if (menuKey === "soal") {
+      setScenarioForm({
+        title: "",
+        modusType: "Phishing Link",
+        sender: "Halo BCA CS",
+        message: "",
+        question: "Apa tindakan paling aman yang harus Anda ambil?",
+        optionA: "Abaikan pesan, jangan berikan kredensial/OTP, dan segera konfirmasi via Halo BCA 1500888.",
+        feedbackA: "Tepat & Terlindungi (+20 Poin)! Tindakan verifikasi langsung melalui kontak resmi Halo BCA 1500888 berhasil mencegah pencurian data dan saldo rekening.",
+        optionB: "Segera klik tautan atau unduh lampiran sesuai instruksi pengirim agar akun tidak diblokir.",
+        feedbackB: "Sangat Berbahaya (-20 Poin)! Menekan tautan asing atau mengunduh lampiran akan mengaktifkan malware / situs phishing pencuri kredensial bank.",
+        optionC: "Membalas pesan pengirim dan menanyakan apakah nomor tersebut resmi dari pihak BCA.",
+        feedbackC: "Berisiko (-10 Poin)! Penipu akan menggunakan teknik manipulasi psikologis lebih lanjut untuk meyakinkan Anda bahwa mereka resmi.",
+        optionD: "Meneruskan pesan beserta nomor pengirim ke grup keluarga tanpa memverifikasi kebenarannya.",
+        feedbackD: "Kurang Tepat (-10 Poin)! Meneruskan pesan penipuan berisiko membuat anggota keluarga lain yang kurang waspada menjadi korban scam.",
+        correctOption: "A"
+      })
+    } else if (menuKey === "articles") {
+      setArticleForm({
+        title: "",
+        contentType: "article",
+        rewardPoints: 15,
+        readingTime: "3 Menit",
+        author: "Tim Edukasi Anti-Scam BCA",
+        summary: "",
+        fullContent: "",
+        externalUrl: ""
+      })
+    } else if (menuKey === "rewards") {
+      setRewardForm({
+        title: "",
+        category: "voucher",
+        cost: 500,
+        stock: 25,
+        partner: "BCA",
+        description: ""
+      })
+    }
+    setShowModal(true)
+  }
+
+  // Helper untuk membuka modal edit pada Modus, Soal, dan Artikel
+  const handleEditItem = (menuKey, item) => {
+    setEditingId(item.id)
+    if (menuKey === "modus") {
+      setModusForm({
+        title: item.title || "",
+        category: item.category || "Social Engineering",
+        description: item.description || "",
+        difficulty: item.difficulty || "Sedang",
+        redFlags: Array.isArray(item.red_flags) ? item.red_flags.join("\n") : (item.redFlags || ""),
+        tips: Array.isArray(item.prevention_tips) ? item.prevention_tips.join("\n") : (item.tips || "")
+      })
+    } else if (menuKey === "soal") {
+      const opts = item.options || []
+      const optA = opts.find((o) => o.label === "A" || o.id === "a") || opts[0] || {}
+      const optB = opts.find((o) => o.label === "B" || o.id === "b") || opts[1] || {}
+      const optC = opts.find((o) => o.label === "C" || o.id === "c") || opts[2] || {}
+      const optD = opts.find((o) => o.label === "D" || o.id === "d") || opts[3] || {}
+
+      let detectedCorrect = "A"
+      if (optB.isCorrect) detectedCorrect = "B"
+      else if (optC.isCorrect) detectedCorrect = "C"
+      else if (optD.isCorrect) detectedCorrect = "D"
+
+      setScenarioForm({
+        title: item.title || "",
+        modusType: item.modus_type || "Umum",
+        sender: item.sender || "Sistem BCA",
+        message: item.message || "",
+        question: item.question || "Apa tindakan paling aman yang harus Anda ambil?",
+        optionA: optA.text || "",
+        feedbackA: optA.feedbackReason || (optA.isCorrect ? "Tindakan mitigasi aman dan tepat (+20 Poin)." : "Pilihan ini berisiko dan berbahaya."),
+        optionB: optB.text || "",
+        feedbackB: optB.feedbackReason || (optB.isCorrect ? "Tindakan mitigasi aman dan tepat (+20 Poin)." : "Pilihan ini berisiko dan berbahaya."),
+        optionC: optC.text || "Membalas dan meminta bukti surat resmi dari pengirim",
+        feedbackC: optC.feedbackReason || "Berisiko (-10 Poin)! Penipu dapat memalsukan surat dan dokumen perbankan.",
+        optionD: optD.text || "Meneruskan pesan ke kontak lain untuk menanyakan keabsahannya",
+        feedbackD: optD.feedbackReason || "Kurang Tepat (-10 Poin)! Jangan menyebarkan informasi mencurigakan sebelum verifikasi resmi.",
+        correctOption: detectedCorrect
+      })
+    } else if (menuKey === "articles") {
+      setArticleForm({
+        title: item.title || "",
+        contentType: item.content_type || "article",
+        rewardPoints: item.reward_points || 15,
+        readingTime: item.reading_time || "3 Menit",
+        author: item.author || "Tim Edukasi Anti-Scam BCA",
+        summary: item.summary || "",
+        fullContent: item.full_content || "",
+        externalUrl: item.external_url || ""
+      })
+    }
+    setShowModal(true)
+  }
+
+  // Submit Modus (Create / Update)
   const handleSubmitModus = async (e) => {
     e.preventDefault()
+    setModalSubmitting(true)
     try {
+      const payload = {
+        title: modusForm.title,
+        category: modusForm.category,
+        description: modusForm.description,
+        difficulty: modusForm.difficulty,
+        redFlags: modusForm.redFlags.split("\n").filter(Boolean),
+        tips: modusForm.tips.split("\n").filter(Boolean)
+      }
+      if (editingId) payload.id = editingId
+
       const res = await fetch("/api/admin/manage?type=modus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: modusForm.title,
-          category: modusForm.category,
-          description: modusForm.description,
-          difficulty: modusForm.difficulty,
-          redFlags: modusForm.redFlags.split("\n").filter(Boolean),
-          tips: modusForm.tips.split("\n").filter(Boolean)
-        })
+        body: JSON.stringify(payload)
       })
       if (res.ok) {
-        showToast("Modus baru berhasil disimpan ke Database!")
+        showToast(editingId ? "Modus berhasil diperbarui!" : "Modus baru berhasil disimpan ke Database!")
         setShowModal(false)
+        setEditingId(null)
         fetchAllData()
       }
     } catch (e) {
       showToast("Gagal menyimpan modus")
+    } finally {
+      setModalSubmitting(false)
     }
   }
 
-  // Submit Soal
+  // Submit Soal (Create / Update - Selalu format pilihan ganda 4 opsi A, B, C, D lengkap dengan feedback alasan benar & salah)
   const handleSubmitScenario = async (e) => {
     e.preventDefault()
+    setModalSubmitting(true)
     try {
+      const correct = scenarioForm.correctOption || "A"
+
       const options = [
         {
+          id: "a",
           label: "A",
           text: scenarioForm.optionA,
-          isCorrect: scenarioForm.correctOption === "A",
-          scoreImpact: scenarioForm.correctOption === "A" ? 20 : -10
+          isCorrect: correct === "A",
+          isRisky: correct !== "A",
+          scoreImpact: correct === "A" ? 20 : -20,
+          feedbackReason: scenarioForm.feedbackA || (correct === "A" ? "Tepat & Aman (+20 Poin)! Verifikasi langsung adalah langkah mitigasi terbaik." : "Berbahaya (-20 Poin)! Pilihan ini berisiko membocorkan data.")
         },
         {
+          id: "b",
           label: "B",
           text: scenarioForm.optionB,
-          isCorrect: scenarioForm.correctOption === "B",
-          scoreImpact: scenarioForm.correctOption === "B" ? 20 : -10
+          isCorrect: correct === "B",
+          isRisky: correct !== "B",
+          scoreImpact: correct === "B" ? 20 : -20,
+          feedbackReason: scenarioForm.feedbackB || (correct === "B" ? "Tepat & Aman (+20 Poin)! Verifikasi langsung adalah langkah mitigasi terbaik." : "Berbahaya (-20 Poin)! Pilihan ini berisiko membocorkan data.")
+        },
+        {
+          id: "c",
+          label: "C",
+          text: scenarioForm.optionC || "Membalas chat dan menanyakan keaslian pihak bank",
+          isCorrect: correct === "C",
+          isRisky: correct !== "C",
+          scoreImpact: correct === "C" ? 20 : -10,
+          feedbackReason: scenarioForm.feedbackC || (correct === "C" ? "Tepat & Aman (+20 Poin)! Verifikasi langsung adalah langkah mitigasi terbaik." : "Kurang Tepat (-10 Poin)! Berinteraksi dengan penipu memberi peluang manipulasi lebih lanjut.")
+        },
+        {
+          id: "d",
+          label: "D",
+          text: scenarioForm.optionD || "Meneruskan pesan ke grup keluarga untuk menanyakan kabar",
+          isCorrect: correct === "D",
+          isRisky: correct !== "D",
+          scoreImpact: correct === "D" ? 20 : -10,
+          feedbackReason: scenarioForm.feedbackD || (correct === "D" ? "Tepat & Aman (+20 Poin)! Verifikasi langsung adalah langkah mitigasi terbaik." : "Kurang Tepat (-10 Poin)! Menyebarkan hoaks/link berisiko membahayakan anggota lain.")
         }
       ]
+
+      const payload = {
+        title: scenarioForm.title,
+        modusType: scenarioForm.modusType,
+        sender: scenarioForm.sender,
+        message: scenarioForm.message,
+        question: scenarioForm.question,
+        options
+      }
+      if (editingId) payload.id = editingId
 
       const res = await fetch("/api/admin/manage?type=scenario", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: scenarioForm.title,
-          modusType: scenarioForm.modusType,
-          sender: scenarioForm.sender,
-          message: scenarioForm.message,
-          question: scenarioForm.question,
-          options
-        })
+        body: JSON.stringify(payload)
       })
       if (res.ok) {
-        showToast("Soal Skenario berhasil ditambahkan!")
+        showToast(editingId ? "Soal pilihan ganda (A, B, C, D) & analisis feedback berhasil diperbarui!" : "Soal Skenario 4 Opsi berhasil ditambahkan!")
         setShowModal(false)
+        setEditingId(null)
         fetchAllData()
       }
     } catch (e) {
       showToast("Gagal menyimpan skenario")
+    } finally {
+      setModalSubmitting(false)
     }
   }
 
   // Submit Reward
   const handleSubmitReward = async (e) => {
     e.preventDefault()
+    setModalSubmitting(true)
     try {
       const res = await fetch("/api/admin/manage?type=reward", {
         method: "POST",
@@ -232,35 +398,46 @@ export default function AdminDashboardPage() {
       if (res.ok) {
         showToast("Katalog Reward berhasil ditambahkan!")
         setShowModal(false)
+        setEditingId(null)
         fetchAllData()
       }
     } catch (e) {
       showToast("Gagal menyimpan reward")
+    } finally {
+      setModalSubmitting(false)
     }
   }
 
-  // Submit Artikel
+  // Submit Artikel (Create / Update)
   const handleSubmitArticle = async (e) => {
     e.preventDefault()
+    setModalSubmitting(true)
     try {
+      const payload = { ...articleForm }
+      if (editingId) payload.id = editingId
+
       const res = await fetch("/api/admin/manage?type=article", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(articleForm)
+        body: JSON.stringify(payload)
       })
       if (res.ok) {
-        showToast("Artikel & Nilai Poin Edukasi Berhasil Disimpan!")
+        showToast(editingId ? "Artikel edukasi berhasil diperbarui!" : "Artikel & Nilai Poin Edukasi Berhasil Disimpan!")
         setShowModal(false)
+        setEditingId(null)
         fetchAllData()
       }
     } catch (e) {
       showToast("Gagal menyimpan artikel")
+    } finally {
+      setModalSubmitting(false)
     }
   }
 
   // Submit Laporan Internal Lapor Bareng BCA
   const handleSubmitLaporBareng = async (e) => {
     e.preventDefault()
+    setModalSubmitting(true)
     try {
       const res = await fetch("/api/admin/manage?type=lapor_bareng", {
         method: "POST",
@@ -286,12 +463,15 @@ export default function AdminDashboardPage() {
       }
     } catch (e) {
       showToast("Gagal menyimpan laporan internal Lapor Bareng")
+    } finally {
+      setModalSubmitting(false)
     }
   }
 
   // Simpan Perubahan Setting Poin Global
   const handleSaveSettings = async (e) => {
     e.preventDefault()
+    setSettingsSaving(true)
     try {
       const res = await fetch("/api/admin/manage?type=settings", {
         method: "POST",
@@ -304,12 +484,15 @@ export default function AdminDashboardPage() {
       }
     } catch (e) {
       showToast("Gagal memperbarui konfigurasi sistem")
+    } finally {
+      setSettingsSaving(false)
     }
   }
 
   // Delete Handler
   const handleDelete = async (type, id) => {
     if (!confirm("Apakah Anda yakin ingin menghapus data ini?")) return
+    setDeletingItemId(id)
     try {
       const res = await fetch(`/api/admin/manage?type=${type}`, {
         method: "DELETE",
@@ -322,6 +505,8 @@ export default function AdminDashboardPage() {
       }
     } catch (e) {
       showToast("Gagal menghapus data")
+    } finally {
+      setDeletingItemId(null)
     }
   }
 
@@ -356,7 +541,9 @@ export default function AdminDashboardPage() {
 
   // Fungsi Publikasi Satu-Klik dari Hasil Scraping
   const handlePublishScrape = async (publishType, item) => {
+    const actionKey = `${publishType}_${item.id || item.title}`
     setPublishingAction(true)
+    setPublishingItemId(actionKey)
     try {
       let payload = {}
       if (publishType === "modus") {
@@ -410,7 +597,8 @@ export default function AdminDashboardPage() {
         body: JSON.stringify({
           publishType,
           payload,
-          laporId: item.isLaporBareng ? item.laporId : null
+          laporId: item.isLaporBareng ? item.laporId : null,
+          caseId: item.isCaseRegistry ? item.id : null
         })
       })
 
@@ -425,11 +613,13 @@ export default function AdminDashboardPage() {
       showToast("Terjadi kendala saat publikasi")
     } finally {
       setPublishingAction(false)
+      setPublishingItemId(null)
     }
   }
 
   // Update Status Case di Registry
   const handleUpdateCaseStatus = async (id, newStatus, adminNotes) => {
+    setUpdatingCaseId(id)
     try {
       const res = await fetch("/api/admin/manage?type=cases", {
         method: "PATCH",
@@ -445,6 +635,8 @@ export default function AdminDashboardPage() {
       }
     } catch (e) {
       showToast("Koneksi gagal")
+    } finally {
+      setUpdatingCaseId(null)
     }
   }
 
@@ -913,10 +1105,17 @@ export default function AdminDashboardPage() {
                               type="button"
                               disabled={publishingAction}
                               onClick={() => handlePublishScrape("case_registry", item)}
-                              className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-[10px] shadow-sm transition active:scale-95 cursor-pointer flex items-center gap-1"
+                              className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-black text-[10px] shadow-sm transition active:scale-95 cursor-pointer flex items-center gap-1.5"
                               title="Simpan ke Investigasi Case Modus untuk ditindaklanjuti"
                             >
-                              <span>+ Simpan ke Case Registry</span>
+                              {publishingItemId === `case_registry_${item.id || item.title}` ? (
+                                <>
+                                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                  <span>Menyimpan Case...</span>
+                                </>
+                              ) : (
+                                <span>+ Simpan ke Case Registry</span>
+                              )}
                             </button>
                           </div>
 
@@ -926,28 +1125,37 @@ export default function AdminDashboardPage() {
                               type="button"
                               disabled={publishingAction}
                               onClick={() => handlePublishScrape("modus", item)}
-                              className="px-2.5 py-1 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003882] font-black text-[10px] border border-blue-200 transition active:scale-95 cursor-pointer"
+                              className="px-2.5 py-1 rounded-xl bg-blue-50 hover:bg-blue-100 disabled:opacity-50 text-[#003882] font-black text-[10px] border border-blue-200 transition active:scale-95 cursor-pointer flex items-center gap-1"
                               title="Masukkan ke Katalog Modus"
                             >
-                              + Katalog
+                              {publishingItemId === `modus_${item.id || item.title}` && (
+                                <div className="w-2.5 h-2.5 border-2 border-[#003882] border-t-transparent rounded-full animate-spin" />
+                              )}
+                              <span>+ Katalog</span>
                             </button>
                             <button
                               type="button"
                               disabled={publishingAction}
                               onClick={() => handlePublishScrape("scenario", item)}
-                              className="px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-black text-[10px] border border-amber-200 transition active:scale-95 cursor-pointer"
+                              className="px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 disabled:opacity-50 text-amber-800 font-black text-[10px] border border-amber-200 transition active:scale-95 cursor-pointer flex items-center gap-1"
                               title="Jadikan Soal Simulasi 2-Minute Test"
                             >
-                              + Soal Test
+                              {publishingItemId === `scenario_${item.id || item.title}` && (
+                                <div className="w-2.5 h-2.5 border-2 border-amber-800 border-t-transparent rounded-full animate-spin" />
+                              )}
+                              <span>+ Soal Test</span>
                             </button>
                             <button
                               type="button"
                               disabled={publishingAction}
                               onClick={() => handlePublishScrape("article", item)}
-                              className="px-2.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black text-[10px] border border-emerald-200 transition active:scale-95 cursor-pointer"
+                              className="px-2.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 disabled:opacity-50 text-emerald-800 font-black text-[10px] border border-emerald-200 transition active:scale-95 cursor-pointer flex items-center gap-1"
                               title="Jadikan Artikel Edukasi Berhadiah Poin"
                             >
-                              + Artikel Poin
+                              {publishingItemId === `article_${item.id || item.title}` && (
+                                <div className="w-2.5 h-2.5 border-2 border-emerald-800 border-t-transparent rounded-full animate-spin" />
+                              )}
+                              <span>+ Artikel Poin</span>
                             </button>
                           </div>
                         </div>
@@ -1074,6 +1282,40 @@ export default function AdminDashboardPage() {
                                 )}
                               </div>
 
+                              {/* Status Distribusi / Sudah Masuk ke Ekosistem Mana Saja */}
+                              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                <span className="text-[10px] font-bold text-slate-400 mr-1">Telah Masuk ke:</span>
+                                {caseItem.is_in_scenario ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500 text-white shadow-2xs">
+                                    <Icon name="Check" size={10} /> Soal Test (PG)
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                                    Belum Soal
+                                  </span>
+                                )}
+
+                                {caseItem.is_in_modus ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-600 text-white shadow-2xs">
+                                    <Icon name="Check" size={10} /> Katalog
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                                    Belum Katalog
+                                  </span>
+                                )}
+
+                                {caseItem.is_in_article ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-600 text-white shadow-2xs">
+                                    <Icon name="Check" size={10} /> Artikel Edukasi
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                                    Belum Artikel
+                                  </span>
+                                )}
+                              </div>
+
                               {/* Kronologi Singkat */}
                               {caseItem.chronology && (
                                 <div className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
@@ -1085,11 +1327,17 @@ export default function AdminDashboardPage() {
                             {/* Kontrol Status & Aksi Publikasi */}
                             <div className="pt-3 border-t border-slate-100 space-y-2.5">
                               <div className="flex items-center justify-between gap-2">
-                                <span className="text-[11px] font-bold text-slate-600">Status Investigasi:</span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[11px] font-bold text-slate-600">Status Investigasi:</span>
+                                  {updatingCaseId === caseItem.id && (
+                                    <div className="w-3 h-3 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                                  )}
+                                </div>
                                 <select
+                                  disabled={updatingCaseId === caseItem.id}
                                   value={caseItem.status || "analisis"}
                                   onChange={(e) => handleUpdateCaseStatus(caseItem.id, e.target.value, caseItem.admin_notes)}
-                                  className={`text-xs font-black px-2.5 py-1 rounded-xl border focus:outline-hidden ${statusColors[caseItem.status] || statusColors.analisis}`}
+                                  className={`text-xs font-black px-2.5 py-1 rounded-xl border focus:outline-hidden disabled:opacity-50 cursor-pointer ${statusColors[caseItem.status] || statusColors.analisis}`}
                                 >
                                   <option value="analisis">Sedang dalam Analisis</option>
                                   <option value="investigasi">Dalam Investigasi</option>
@@ -1105,54 +1353,100 @@ export default function AdminDashboardPage() {
                                 <div className="flex items-center gap-1.5">
                                   <button
                                     type="button"
+                                    disabled={publishingAction}
                                     onClick={() => handlePublishScrape("modus", {
+                                      id: caseItem.id,
+                                      isCaseRegistry: true,
                                       title: caseItem.title,
                                       category: caseItem.category,
                                       chronology: caseItem.chronology,
                                       preventionTips: caseItem.prevention_tips || []
                                     })}
-                                    className="px-2 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#003882] font-black text-[10px] border border-blue-200 transition cursor-pointer"
+                                    className={`px-2 py-1 rounded-lg font-black text-[10px] border transition cursor-pointer flex items-center gap-1 ${
+                                      caseItem.is_in_modus
+                                        ? "bg-blue-600 text-white border-blue-600 shadow-2xs"
+                                        : "bg-blue-50 hover:bg-blue-100 disabled:opacity-50 text-[#003882] border-blue-200"
+                                    }`}
+                                    title={caseItem.is_in_modus ? "Sudah masuk Katalog Modus" : "Masukkan ke Katalog Modus"}
                                   >
-                                    + Katalog
+                                    {publishingItemId === `modus_${caseItem.id}` && (
+                                      <div className="w-2.5 h-2.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    )}
+                                    <span>{caseItem.is_in_modus ? "✓ Katalog" : "+ Katalog"}</span>
                                   </button>
                                   <button
                                     type="button"
+                                    disabled={publishingAction}
                                     onClick={() => handlePublishScrape("scenario", {
+                                      id: caseItem.id,
+                                      isCaseRegistry: true,
                                       title: caseItem.title,
                                       category: caseItem.category,
                                       scenarioDraft: {
                                         title: `Simulasi: ${caseItem.title.slice(0, 80)}`,
-                                        sender: "Indikasi Scammer",
+                                        sender: caseItem.source || "Indikasi Scammer",
                                         message: (caseItem.chronology || caseItem.title).slice(0, 180) + "...",
                                         question: "Apa tindakan mitigasi teraman saat menghadapi situasi ini?",
                                         options: [
                                           {
                                             id: "a",
                                             label: "A",
-                                            text: "Abaikan dan konfirmasi melalui kontak resmi BCA 1500888.",
+                                            text: (caseItem.prevention_tips && caseItem.prevention_tips[0])
+                                              ? caseItem.prevention_tips[0]
+                                              : "Abaikan pesan, jangan berikan kredensial/OTP, dan segera konfirmasi via Halo BCA 1500888.",
                                             isCorrect: true,
+                                            isRisky: false,
                                             scoreImpact: 20,
-                                            feedbackReason: "Tepat! Konfirmasi saluran resmi mencegah kebocoran data."
+                                            feedbackReason: "Tepat & Terlindungi (+20 Poin)! Tindakan verifikasi resmi melalui Halo BCA 1500888 atau memblokir kontak penipu berhasil menggagalkan pencurian dana nasabah."
                                           },
                                           {
                                             id: "b",
                                             label: "B",
-                                            text: "Ikuti perintah dan klik tautan untuk verifikasi cepat.",
+                                            text: "Segera klik tautan, unduh lampiran, atau transfer sejumlah dana sesuai arahan pelaku.",
                                             isCorrect: false,
                                             isRisky: true,
                                             scoreImpact: -20,
-                                            feedbackReason: "Bahaya! Menekan tautan sembarangan dapat mencuri kredensial."
+                                            feedbackReason: "Bahaya & Berisiko Tinggi (-20 Poin)! Mengikuti perintah pelaku dapat membocorkan kredensial m-BCA, menyadap SMS OTP, dan mengakibatkan kerugian finansial."
+                                          },
+                                          {
+                                            id: "c",
+                                            label: "C",
+                                            text: "Membalas pesan pengirim dan meminta nomor telepon alternatif lainnya.",
+                                            isCorrect: false,
+                                            isRisky: true,
+                                            scoreImpact: -10,
+                                            feedbackReason: "Kurang Tepat (-10 Poin)! Berkomunikasi lebih lanjut memberi celah bagi pelaku untuk melancarkan rekayasa sosial manipulatif."
+                                          },
+                                          {
+                                            id: "d",
+                                            label: "D",
+                                            text: "Meneruskan pesan ke teman atau media sosial untuk mencari tahu kebenarannya.",
+                                            isCorrect: false,
+                                            isRisky: true,
+                                            scoreImpact: -10,
+                                            feedbackReason: "Kurang Tepat (-10 Poin)! Tautan atau APK berbahaya berpotensi diklik oleh orang lain jika disebarkan tanpa verifikasi resmi."
                                           }
                                         ]
                                       }
                                     })}
-                                    className="px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-black text-[10px] border border-amber-200 transition cursor-pointer"
+                                    className={`px-2 py-1 rounded-lg font-black text-[10px] border transition cursor-pointer flex items-center gap-1 ${
+                                      caseItem.is_in_scenario
+                                        ? "bg-amber-500 text-white border-amber-500 shadow-2xs"
+                                        : "bg-amber-50 hover:bg-amber-100 disabled:opacity-50 text-amber-800 border-amber-200"
+                                    }`}
+                                    title={caseItem.is_in_scenario ? "Sudah masuk Soal Test PG" : "Jadikan Soal Test Pilihan Ganda"}
                                   >
-                                    + Soal Test
+                                    {publishingItemId === `scenario_${caseItem.id}` && (
+                                      <div className="w-2.5 h-2.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    )}
+                                    <span>{caseItem.is_in_scenario ? "✓ Soal (PG)" : "+ Soal Test"}</span>
                                   </button>
                                   <button
                                     type="button"
+                                    disabled={publishingAction}
                                     onClick={() => handlePublishScrape("article", {
+                                      id: caseItem.id,
+                                      isCaseRegistry: true,
                                       title: caseItem.title,
                                       articleDraft: {
                                         title: `Peringatan: ${caseItem.title.slice(0, 80)}`,
@@ -1164,9 +1458,17 @@ export default function AdminDashboardPage() {
                                       source: caseItem.source,
                                       preventionTips: caseItem.prevention_tips || []
                                     })}
-                                    className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black text-[10px] border border-emerald-200 transition cursor-pointer"
+                                    className={`px-2 py-1 rounded-lg font-black text-[10px] border transition cursor-pointer flex items-center gap-1 ${
+                                      caseItem.is_in_article
+                                        ? "bg-emerald-600 text-white border-emerald-600 shadow-2xs"
+                                        : "bg-emerald-50 hover:bg-emerald-100 disabled:opacity-50 text-emerald-800 border-emerald-200"
+                                    }`}
+                                    title={caseItem.is_in_article ? "Sudah masuk Artikel Edukasi" : "Jadikan Artikel Edukasi Berhadiah Poin"}
                                   >
-                                    + Artikel
+                                    {publishingItemId === `article_${caseItem.id}` && (
+                                      <div className="w-2.5 h-2.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    )}
+                                    <span>{caseItem.is_in_article ? "✓ Artikel" : "+ Artikel"}</span>
                                   </button>
                                 </div>
                               </div>
@@ -1258,10 +1560,14 @@ export default function AdminDashboardPage() {
                         {/* Tombol Aksi Konversi Langsung */}
                         <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
                           <button
+                            disabled={deletingItemId === item.id}
                             onClick={() => handleDelete("lapor_bareng", item.id)}
-                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
+                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer disabled:opacity-50 flex items-center gap-1"
                           >
-                            Hapus
+                            {deletingItemId === item.id && (
+                              <div className="w-2.5 h-2.5 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+                            )}
+                            <span>Hapus</span>
                           </button>
 
                           <div className="flex items-center gap-1.5">
@@ -1269,6 +1575,7 @@ export default function AdminDashboardPage() {
                               type="button"
                               disabled={publishingAction}
                               onClick={() => handlePublishScrape("modus", {
+                                id: item.id,
                                 title: item.title,
                                 category: item.modus_category,
                                 source: `Lapor Bareng BCA (${item.reporter_name})`,
@@ -1282,15 +1589,19 @@ export default function AdminDashboardPage() {
                                   "Jangan pernah transfer dana ke rekening perorangan yang tidak jelas"
                                 ]
                               })}
-                              className="px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003882] font-black text-[10px] border border-blue-200 transition active:scale-95 cursor-pointer"
+                              className="px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 disabled:opacity-50 text-[#003882] font-black text-[10px] border border-blue-200 transition active:scale-95 cursor-pointer flex items-center gap-1"
                               title="Konversi ke Katalog Modus"
                             >
-                              + Katalog
+                              {publishingItemId === `modus_${item.id}` && (
+                                <div className="w-2.5 h-2.5 border-2 border-[#003882] border-t-transparent rounded-full animate-spin" />
+                              )}
+                              <span>+ Katalog</span>
                             </button>
                             <button
                               type="button"
                               disabled={publishingAction}
                               onClick={() => handlePublishScrape("scenario", {
+                                id: item.id,
                                 title: item.title,
                                 category: item.modus_category,
                                 scenarioDraft: {
@@ -1304,8 +1615,9 @@ export default function AdminDashboardPage() {
                                       label: "A",
                                       text: "Tolak dan konfirmasi langsung ke cabang BCA terdekat atau Halo BCA 1500888.",
                                       isCorrect: true,
+                                      isRisky: false,
                                       scoreImpact: 20,
-                                      feedbackReason: "Tepat! Verifikasi langsung adalah kunci utama mencegah pembobolan rekening."
+                                      feedbackReason: "Tepat & Terlindungi (+20 Poin)! Verifikasi langsung adalah kunci utama mencegah pembobolan rekening."
                                     },
                                     {
                                       id: "b",
@@ -1314,20 +1626,42 @@ export default function AdminDashboardPage() {
                                       isCorrect: false,
                                       isRisky: true,
                                       scoreImpact: -20,
-                                      feedbackReason: "Salah! Anda akan mengalami kerugian finansial."
+                                      feedbackReason: "Salah & Bahaya (-20 Poin)! Anda akan mengalami kerugian finansial karena mentransfer dana ke rekening penipu."
+                                    },
+                                    {
+                                      id: "c",
+                                      label: "C",
+                                      text: "Menghubungi nomor telepon seluler pribadi yang dicantumkan pelaku.",
+                                      isCorrect: false,
+                                      isRisky: true,
+                                      scoreImpact: -10,
+                                      feedbackReason: "Kurang Tepat (-10 Poin)! Menghubungi nomor pelaku membuat Anda masuk dalam perangkap rekayasa sosial mereka."
+                                    },
+                                    {
+                                      id: "d",
+                                      label: "D",
+                                      text: "Menyebarkan kabar transfer ini ke grup obrolan tanpa mengecek mutasi rekening.",
+                                      isCorrect: false,
+                                      isRisky: true,
+                                      scoreImpact: -10,
+                                      feedbackReason: "Kurang Tepat (-10 Poin)! Periksa rekening terlebih dahulu melalui aplikasi resmi m-BCA."
                                     }
                                   ]
                                 }
                               })}
-                              className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-black text-[10px] border border-amber-200 transition active:scale-95 cursor-pointer"
+                              className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 disabled:opacity-50 text-amber-800 font-black text-[10px] border border-amber-200 transition active:scale-95 cursor-pointer flex items-center gap-1"
                               title="Konversi ke Soal Test 2-Minute Challenge"
                             >
-                              + Soal Test
+                              {publishingItemId === `scenario_${item.id}` && (
+                                <div className="w-2.5 h-2.5 border-2 border-amber-800 border-t-transparent rounded-full animate-spin" />
+                              )}
+                              <span>+ Soal Test</span>
                             </button>
                             <button
                               type="button"
                               disabled={publishingAction}
                               onClick={() => handlePublishScrape("article", {
+                                id: item.id,
                                 title: item.title,
                                 articleDraft: {
                                   title: `Peringatan Kasus: ${item.title.slice(0, 80)}`,
@@ -1342,10 +1676,13 @@ export default function AdminDashboardPage() {
                                   "Laporkan indikasi penipuan langsung ke laporbareng.bca.co.id"
                                 ]
                               })}
-                              className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black text-[10px] border border-emerald-200 transition active:scale-95 cursor-pointer"
+                              className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 disabled:opacity-50 text-emerald-800 font-black text-[10px] border border-emerald-200 transition active:scale-95 cursor-pointer flex items-center gap-1"
                               title="Konversi ke Artikel Edukasi Berhadiah Poin"
                             >
-                              + Artikel Poin
+                              {publishingItemId === `article_${item.id}` && (
+                                <div className="w-2.5 h-2.5 border-2 border-emerald-800 border-t-transparent rounded-full animate-spin" />
+                              )}
+                              <span>+ Artikel Poin</span>
                             </button>
                           </div>
                         </div>
@@ -1367,7 +1704,7 @@ export default function AdminDashboardPage() {
                     <p className="text-xs text-slate-500">Daftar tipologi penipuan yang muncul di halaman Katalog</p>
                   </div>
                   <button
-                    onClick={() => setShowModal(true)}
+                    onClick={() => handleOpenAddModal("modus")}
                     className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs shadow-sm cursor-pointer hover:bg-[#002b66] transition active:scale-95"
                   >
                     <span>Tambah Modus</span>
@@ -1391,12 +1728,24 @@ export default function AdminDashboardPage() {
                         </div>
                         <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
                           <span className="text-[11px] text-slate-400">ID #{item.id}</span>
-                          <button
-                            onClick={() => handleDelete("modus", item.id)}
-                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
-                          >
-                            Hapus
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleEditItem("modus", item)}
+                              className="text-blue-600 text-xs font-bold hover:underline cursor-pointer"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              disabled={deletingItemId === item.id}
+                              onClick={() => handleDelete("modus", item.id)}
+                              className="text-rose-500 text-xs font-bold hover:underline cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                            >
+                              {deletingItemId === item.id && (
+                                <div className="w-2.5 h-2.5 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+                              )}
+                              <span>Hapus</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -1413,10 +1762,10 @@ export default function AdminDashboardPage() {
                 <div className="glass-card rounded-[24px] p-4 border border-white flex items-center justify-between">
                   <div>
                     <h2 className="text-lg font-black text-[#002554]">Manajemen Soal Skenario</h2>
-                    <p className="text-xs text-slate-500">Studi kasus yang disajikan pada 2-Minute Challenge</p>
+                    <p className="text-xs text-slate-500">Studi kasus pilihan ganda yang disajikan pada 2-Minute Challenge</p>
                   </div>
                   <button
-                    onClick={() => setShowModal(true)}
+                    onClick={() => handleOpenAddModal("soal")}
                     className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs shadow-sm cursor-pointer hover:bg-[#002b66] transition active:scale-95"
                   >
                     <span>Tambah Soal</span>
@@ -1446,12 +1795,24 @@ export default function AdminDashboardPage() {
                         </div>
                         <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
                           <span className="text-[11px] text-slate-400">ID #{item.id}</span>
-                          <button
-                            onClick={() => handleDelete("scenario", item.id)}
-                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
-                          >
-                            Hapus
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleEditItem("soal", item)}
+                              className="text-amber-700 text-xs font-bold hover:underline cursor-pointer"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              disabled={deletingItemId === item.id}
+                              onClick={() => handleDelete("scenario", item.id)}
+                              className="text-rose-500 text-xs font-bold hover:underline cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                            >
+                              {deletingItemId === item.id && (
+                                <div className="w-2.5 h-2.5 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+                              )}
+                              <span>Hapus</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -1471,7 +1832,7 @@ export default function AdminDashboardPage() {
                     <p className="text-xs text-slate-500">Tentukan artikel dan berapa reward poin yang didapat nasabah setelah membaca</p>
                   </div>
                   <button
-                    onClick={() => setShowModal(true)}
+                    onClick={() => handleOpenAddModal("articles")}
                     className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs shadow-sm cursor-pointer hover:bg-[#002b66] transition active:scale-95"
                   >
                     <span>Tambah Artikel</span>
@@ -1501,12 +1862,24 @@ export default function AdminDashboardPage() {
                         </div>
                         <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
                           <span className="text-[11px] text-slate-400">ID #{item.id}</span>
-                          <button
-                            onClick={() => handleDelete("article", item.id)}
-                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
-                          >
-                            Hapus
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleEditItem("articles", item)}
+                              className="text-emerald-700 text-xs font-bold hover:underline cursor-pointer"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              disabled={deletingItemId === item.id}
+                              onClick={() => handleDelete("article", item.id)}
+                              className="text-rose-500 text-xs font-bold hover:underline cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                            >
+                              {deletingItemId === item.id && (
+                                <div className="w-2.5 h-2.5 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+                              )}
+                              <span>Hapus</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -1526,7 +1899,7 @@ export default function AdminDashboardPage() {
                     <p className="text-xs text-slate-500">Atur harga poin dan sisa stok voucher hadiah</p>
                   </div>
                   <button
-                    onClick={() => setShowModal(true)}
+                    onClick={() => handleOpenAddModal("rewards")}
                     className="px-4 py-2 rounded-2xl bg-[#003882] text-white font-black text-xs shadow-sm cursor-pointer hover:bg-[#002b66] transition active:scale-95"
                   >
                     <span>Tambah Reward</span>
@@ -1556,10 +1929,14 @@ export default function AdminDashboardPage() {
                         <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
                           <span className="text-[11px] text-slate-400">ID #{item.id}</span>
                           <button
+                            disabled={deletingItemId === item.id}
                             onClick={() => handleDelete("reward", item.id)}
-                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer"
+                            className="text-rose-500 text-xs font-bold hover:underline cursor-pointer disabled:opacity-50 flex items-center gap-1"
                           >
-                            Hapus
+                            {deletingItemId === item.id && (
+                              <div className="w-2.5 h-2.5 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+                            )}
+                            <span>Hapus</span>
                           </button>
                         </div>
                       </div>
@@ -1614,9 +1991,13 @@ export default function AdminDashboardPage() {
                   <div className="pt-3">
                     <button
                       type="submit"
-                      className="w-full sm:w-auto px-6 py-2.5 rounded-2xl bg-[#003882] hover:bg-[#002554] text-white font-black text-xs shadow-md transition active:scale-95 cursor-pointer"
+                      disabled={settingsSaving}
+                      className="w-full sm:w-auto px-6 py-2.5 rounded-2xl bg-[#003882] hover:bg-[#002554] disabled:bg-[#003882]/60 text-white font-black text-xs shadow-md transition active:scale-95 cursor-pointer flex items-center justify-center gap-2"
                     >
-                      Simpan Seluruh Pengaturan
+                      {settingsSaving && (
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      )}
+                      <span>{settingsSaving ? "Menyimpan Konfigurasi..." : "Simpan Seluruh Pengaturan"}</span>
                     </button>
                   </div>
                 </form>
@@ -1630,15 +2011,25 @@ export default function AdminDashboardPage() {
               <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
                 <div className="w-full max-w-lg bg-white rounded-[32px] p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <h2 className="text-base font-black text-[#002554]">
-                      {currentMenu === "lapor_internal" && "Input Aduan Lapor Bareng BCA"}
-                      {currentMenu === "modus" && "Formulir Modus Baru"}
-                      {currentMenu === "soal" && "Formulir Soal Simulasi Baru"}
-                      {currentMenu === "rewards" && "Formulir Reward Baru"}
-                      {currentMenu === "articles" && "Formulir Artikel Edukasi Baru"}
-                    </h2>
+                    <div>
+                      <h2 className="text-base font-black text-[#002554]">
+                        {currentMenu === "lapor_internal" && "Input Aduan Lapor Bareng BCA"}
+                        {currentMenu === "modus" && (editingId ? "Edit Tipologi Modus" : "Formulir Modus Baru")}
+                        {currentMenu === "soal" && (editingId ? "Edit Soal Simulasi (Pilihan Ganda)" : "Formulir Soal Simulasi Baru (Pilihan Ganda)")}
+                        {currentMenu === "rewards" && "Formulir Reward Baru"}
+                        {currentMenu === "articles" && (editingId ? "Edit Artikel Edukasi" : "Formulir Artikel Edukasi Baru")}
+                      </h2>
+                      {editingId && (
+                        <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 mt-1 inline-block">
+                          Mode Pembaruan Data (ID #{editingId})
+                        </span>
+                      )}
+                    </div>
                     <button
-                      onClick={() => setShowModal(false)}
+                      onClick={() => {
+                        setShowModal(false)
+                        setEditingId(null)
+                      }}
                       className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"
                     >
                       <Icon name="X" size={16} />
@@ -1745,9 +2136,13 @@ export default function AdminDashboardPage() {
                       </div>
                       <button
                         type="submit"
-                        className="w-full py-3 rounded-2xl bg-[#003882] text-white font-black shadow-md cursor-pointer mt-2 hover:bg-[#002554] transition"
+                        disabled={modalSubmitting}
+                        className="w-full py-3 rounded-2xl bg-[#003882] text-white font-black shadow-md cursor-pointer mt-2 hover:bg-[#002554] disabled:bg-[#003882]/60 transition flex items-center justify-center gap-2"
                       >
-                        Simpan ke Database Lapor Bareng BCA
+                        {modalSubmitting && (
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        )}
+                        <span>{modalSubmitting ? "Menyimpan Aduan..." : "Simpan ke Database Lapor Bareng BCA"}</span>
                       </button>
                     </form>
                   )}
@@ -1812,9 +2207,13 @@ export default function AdminDashboardPage() {
                       </div>
                       <button
                         type="submit"
-                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
+                        disabled={modalSubmitting}
+                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2 disabled:bg-[#0292fc]/60 flex items-center justify-center gap-2"
                       >
-                        Simpan Modus ke Cloud Neon
+                        {modalSubmitting && (
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        )}
+                        <span>{modalSubmitting ? "Menyimpan Modus..." : "Simpan Modus ke Cloud Neon"}</span>
                       </button>
                     </form>
                   )}
@@ -1874,42 +2273,137 @@ export default function AdminDashboardPage() {
                           className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
                         />
                       </div>
-                      <div>
-                        <label className="font-bold text-slate-700">Pilihan A</label>
-                        <input
-                          type="text"
-                          required
-                          value={scenarioForm.optionA}
-                          onChange={(e) => setScenarioForm({ ...scenarioForm, optionA: e.target.value })}
-                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                        />
+                      <div className="space-y-3 p-3 rounded-2xl bg-slate-50 border border-slate-200">
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="font-bold text-slate-800">Opsi Pilihan A</label>
+                            <span className="text-[10px] text-slate-400 font-semibold">Teks Jawaban Pilihan A</span>
+                          </div>
+                          <input
+                            type="text"
+                            required
+                            value={scenarioForm.optionA}
+                            onChange={(e) => setScenarioForm({ ...scenarioForm, optionA: e.target.value })}
+                            placeholder="Teks pilihan A..."
+                            className="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-semibold"
+                          />
+                          <label className="block text-[11px] font-bold text-slate-600 mt-2 mb-1">
+                            Alasan & Feedback Edukasi Pilihan A (Analisis Mengapa Benar/Salah)
+                          </label>
+                          <textarea
+                            rows={2}
+                            required
+                            value={scenarioForm.feedbackA}
+                            onChange={(e) => setScenarioForm({ ...scenarioForm, feedbackA: e.target.value })}
+                            placeholder="Uraikan mengapa pilihan A benar atau salah serta dampaknya..."
+                            className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs font-normal"
+                          />
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-200">
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="font-bold text-slate-800">Opsi Pilihan B</label>
+                            <span className="text-[10px] text-slate-400 font-semibold">Teks Jawaban Pilihan B</span>
+                          </div>
+                          <input
+                            type="text"
+                            required
+                            value={scenarioForm.optionB}
+                            onChange={(e) => setScenarioForm({ ...scenarioForm, optionB: e.target.value })}
+                            placeholder="Teks pilihan B..."
+                            className="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-semibold"
+                          />
+                          <label className="block text-[11px] font-bold text-slate-600 mt-2 mb-1">
+                            Alasan & Feedback Edukasi Pilihan B (Analisis Mengapa Benar/Salah)
+                          </label>
+                          <textarea
+                            rows={2}
+                            required
+                            value={scenarioForm.feedbackB}
+                            onChange={(e) => setScenarioForm({ ...scenarioForm, feedbackB: e.target.value })}
+                            placeholder="Uraikan mengapa pilihan B benar atau salah serta dampaknya..."
+                            className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs font-normal"
+                          />
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-200">
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="font-bold text-slate-800">Opsi Pilihan C</label>
+                            <span className="text-[10px] text-slate-400 font-semibold">Teks Jawaban Pilihan C</span>
+                          </div>
+                          <input
+                            type="text"
+                            required
+                            value={scenarioForm.optionC}
+                            onChange={(e) => setScenarioForm({ ...scenarioForm, optionC: e.target.value })}
+                            placeholder="Teks pilihan C..."
+                            className="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-semibold"
+                          />
+                          <label className="block text-[11px] font-bold text-slate-600 mt-2 mb-1">
+                            Alasan & Feedback Edukasi Pilihan C (Analisis Mengapa Benar/Salah)
+                          </label>
+                          <textarea
+                            rows={2}
+                            required
+                            value={scenarioForm.feedbackC}
+                            onChange={(e) => setScenarioForm({ ...scenarioForm, feedbackC: e.target.value })}
+                            placeholder="Uraikan mengapa pilihan C benar atau salah serta dampaknya..."
+                            className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs font-normal"
+                          />
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-200">
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="font-bold text-slate-800">Opsi Pilihan D</label>
+                            <span className="text-[10px] text-slate-400 font-semibold">Teks Jawaban Pilihan D</span>
+                          </div>
+                          <input
+                            type="text"
+                            required
+                            value={scenarioForm.optionD}
+                            onChange={(e) => setScenarioForm({ ...scenarioForm, optionD: e.target.value })}
+                            placeholder="Teks pilihan D..."
+                            className="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-semibold"
+                          />
+                          <label className="block text-[11px] font-bold text-slate-600 mt-2 mb-1">
+                            Alasan & Feedback Edukasi Pilihan D (Analisis Mengapa Benar/Salah)
+                          </label>
+                          <textarea
+                            rows={2}
+                            required
+                            value={scenarioForm.feedbackD}
+                            onChange={(e) => setScenarioForm({ ...scenarioForm, feedbackD: e.target.value })}
+                            placeholder="Uraikan mengapa pilihan D benar atau salah serta dampaknya..."
+                            className="w-full p-2 rounded-xl border border-slate-200 bg-white text-xs font-normal"
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <label className="font-bold text-slate-700">Pilihan B</label>
-                        <input
-                          type="text"
-                          required
-                          value={scenarioForm.optionB}
-                          onChange={(e) => setScenarioForm({ ...scenarioForm, optionB: e.target.value })}
-                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="font-bold text-slate-700">Kunci Jawaban Tepat</label>
+
+                      <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between">
+                        <div>
+                          <label className="font-black text-emerald-900 block">Kunci Jawaban Yang Benar (Aman)</label>
+                          <span className="text-[11px] text-emerald-700">Pilihan ini akan mendapat +20 Poin, sedangkan opsi lainnya dianggap berisiko</span>
+                        </div>
                         <select
                           value={scenarioForm.correctOption}
                           onChange={(e) => setScenarioForm({ ...scenarioForm, correctOption: e.target.value })}
-                          className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 font-semibold"
+                          className="p-2 px-3 rounded-xl border border-emerald-300 bg-white font-black text-xs text-emerald-900 focus:outline-hidden"
                         >
-                          <option value="A">Pilihan A</option>
-                          <option value="B">Pilihan B</option>
+                          <option value="A">Jawaban Benar: Pilihan A</option>
+                          <option value="B">Jawaban Benar: Pilihan B</option>
+                          <option value="C">Jawaban Benar: Pilihan C</option>
+                          <option value="D">Jawaban Benar: Pilihan D</option>
                         </select>
                       </div>
                       <button
                         type="submit"
-                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
+                        disabled={modalSubmitting}
+                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2 disabled:bg-[#0292fc]/60 flex items-center justify-center gap-2"
                       >
-                        Simpan Soal ke Cloud Neon
+                        {modalSubmitting && (
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        )}
+                        <span>{modalSubmitting ? "Menyimpan Soal..." : "Simpan Soal ke Cloud Neon"}</span>
                       </button>
                     </form>
                   )}
@@ -1983,9 +2477,13 @@ export default function AdminDashboardPage() {
                       </div>
                       <button
                         type="submit"
-                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
+                        disabled={modalSubmitting}
+                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2 disabled:bg-[#0292fc]/60 flex items-center justify-center gap-2"
                       >
-                        Simpan Artikel & Atur Poin
+                        {modalSubmitting && (
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        )}
+                        <span>{modalSubmitting ? "Menyimpan Artikel..." : "Simpan Artikel & Atur Poin"}</span>
                       </button>
                     </form>
                   )}
@@ -2038,9 +2536,13 @@ export default function AdminDashboardPage() {
                       </div>
                       <button
                         type="submit"
-                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2"
+                        disabled={modalSubmitting}
+                        className="w-full py-3 rounded-2xl bg-[#0292fc] text-white font-black shadow-md cursor-pointer mt-2 disabled:bg-[#0292fc]/60 flex items-center justify-center gap-2"
                       >
-                        Simpan Reward ke Cloud Neon
+                        {modalSubmitting && (
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        )}
+                        <span>{modalSubmitting ? "Menyimpan Reward..." : "Simpan Reward ke Cloud Neon"}</span>
                       </button>
                     </form>
                   )}
