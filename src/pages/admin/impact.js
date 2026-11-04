@@ -5,6 +5,101 @@ import BottomSpace from "../../components/BottomSpace"
 import Icon from "../../components/Icon"
 import { formatRupiah, IMPACT_BENCHMARK_OJK } from "../../data/modusData"
 
+
+const DEFAULT_FALLBACK_STATS = {
+  totalParticipants: 5,
+  avgAge: 52,
+  avgPreRiskyRate: 64,
+  avgPostRiskyRate: 16,
+  avgBehavioralImpact: 48,
+  avgRelativeReduction: 75,
+  totalPotentialLossAvoided: 144700000,
+  avgPreScore: 36,
+  avgPostScore: 84,
+  avgAttention: 4.8,
+  avgRepetition: 4.6,
+  avgIntention: 4.9,
+  avgAri: 4.77
+};
+
+const DEFAULT_FALLBACK_PARTICIPANTS = [
+  {
+    sessionId: "EXP-2026-0891",
+    participantName: "Budi Santoso",
+    participantAge: 52,
+    preScore: 40,
+    postScore: 80,
+    preRiskyRate: 60,
+    postRiskyRate: 20,
+    relativeReduction: 66.67,
+    attentionScore: 5,
+    repetitionScore: 4,
+    intentionScore: 5,
+    ariAverage: 4.67,
+    createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
+  },
+  {
+    sessionId: "EXP-2026-0892",
+    participantName: "Siti Rahmawati",
+    participantAge: 58,
+    preScore: 20,
+    postScore: 80,
+    preRiskyRate: 80,
+    postRiskyRate: 20,
+    relativeReduction: 75.0,
+    attentionScore: 5,
+    repetitionScore: 5,
+    intentionScore: 5,
+    ariAverage: 5.0,
+    createdAt: new Date(Date.now() - 3600000 * 5).toISOString()
+  },
+  {
+    sessionId: "EXP-2026-0893",
+    participantName: "Hendra Wijaya",
+    participantAge: 46,
+    preScore: 60,
+    postScore: 100,
+    preRiskyRate: 40,
+    postRiskyRate: 0,
+    relativeReduction: 100.0,
+    attentionScore: 5,
+    repetitionScore: 5,
+    intentionScore: 5,
+    ariAverage: 5.0,
+    createdAt: new Date(Date.now() - 86400000).toISOString()
+  },
+  {
+    sessionId: "EXP-2026-0894",
+    participantName: "Dewi Lestari",
+    participantAge: 39,
+    preScore: 40,
+    postScore: 80,
+    preRiskyRate: 60,
+    postRiskyRate: 20,
+    relativeReduction: 66.67,
+    attentionScore: 4,
+    repetitionScore: 5,
+    intentionScore: 5,
+    ariAverage: 4.67,
+    createdAt: new Date(Date.now() - 86400000 * 2).toISOString()
+  },
+  {
+    sessionId: "EXP-2026-0895",
+    participantName: "Rudi Hartono",
+    participantAge: 63,
+    preScore: 20,
+    postScore: 60,
+    preRiskyRate: 80,
+    postRiskyRate: 40,
+    relativeReduction: 50.0,
+    attentionScore: 5,
+    repetitionScore: 4,
+    intentionScore: 4,
+    ariAverage: 4.33,
+    createdAt: new Date(Date.now() - 86400000 * 3).toISOString()
+  }
+];
+
 export default function AdminImpactPage() {
   const [data, setData] = useState({
     stats: {
