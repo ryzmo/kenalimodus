@@ -19,6 +19,7 @@ export default function AppHeader({
     { href: "/modus", label: "Katalog Modus" },
     { href: "/challenge", label: "Challenge" },
     { href: "/keluarga", label: "Keluarga" },
+    { href: "/entrypoint", label: "Entry Point" },
     { href: "/profil", label: "Profil" }
   ]
 

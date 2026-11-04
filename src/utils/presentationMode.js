@@ -103,26 +103,75 @@ export const DUMMY_PRESENTATION_DATA = {
     {
       id: "demo-ch-1",
       score: 86,
+      evaluation_headline: "Ketahanan Siber Sangat Kuat",
       created_at: new Date(Date.now() - 3600000).toISOString(),
       total_questions: 5,
       correct_count: 4,
-      failed_count: 1
+      failed_count: 1,
+      points_earned: 20,
+      details_json: [
+        {
+          title: "Situs Phishing KlikBCA Tiruan",
+          category: "Phishing",
+          isCorrect: true,
+          chosenText: "Ketik manual www.klikbca.com dan cek sertifikat SSL",
+          feedback: "Sangat tepat! Selalu verifikasi domain sebelum memasukkan kredensial."
+        },
+        {
+          title: "File APK Undangan Pernikahan",
+          category: "APK Berbahaya",
+          isCorrect: true,
+          chosenText: "Hapus pesan dan jangan pernah instal file .apk dari chat",
+          feedback: "Benar! File .apk di chat berisiko mencuri SMS OTP perbankan."
+        },
+        {
+          title: "CS Palsu Perubahan Tarif Transfer",
+          category: "Social Engineering",
+          isCorrect: false,
+          chosenText: "Menghubungi nomor WhatsApp pengirim untuk klarifikasi",
+          feedback: "Rentan! Hubungi hanya nomor resmi Halo BCA 1500888 bukan nomor kontak penipu."
+        },
+        {
+          title: "Modus QRIS Palsu Tertimpa Stiker",
+          category: "QRIS Palsu",
+          isCorrect: true,
+          chosenText: "Cocokkan nama merchant di layar sebelum konfirmasi PIN",
+          feedback: "Bagus! Memastikan nama merchant mencegah transfer dana ke penipu."
+        },
+        {
+          title: "Permintaan OTP Mengaku Petugas Bank",
+          category: "Social Engineering",
+          isCorrect: true,
+          chosenText: "Tolak dan segera ganti PIN serta amankan rekening",
+          feedback: "Tepat! Pihak bank tidak pernah meminta kode OTP untuk alasan apapun."
+        }
+      ]
     },
     {
       id: "demo-ch-2",
       score: 100,
+      evaluation_headline: "Sempurna Tanpa Celah (Refleks Teladan)",
       created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
       total_questions: 5,
       correct_count: 5,
-      failed_count: 0
-    },
-    {
-      id: "demo-ch-3",
-      score: 80,
-      created_at: new Date(Date.now() - 86400000 * 4).toISOString(),
-      total_questions: 5,
-      correct_count: 4,
-      failed_count: 1
+      failed_count: 0,
+      points_earned: 20,
+      details_json: [
+        {
+          title: "Modus Tilang Elektronik APK",
+          category: "APK Berbahaya",
+          isCorrect: true,
+          chosenText: "Abaikan dan konfirmasi melalui situs resmi Korlantas",
+          feedback: "Langkah tepat dan aman."
+        },
+        {
+          title: "Promo Hadiah Mengatasnamakan BCA",
+          category: "Phishing",
+          isCorrect: true,
+          chosenText: "Cek kanal resmi bca.co.id/promo",
+          feedback: "Mantra B-C-A berhasil dijalankan dengan sangat baik."
+        }
+      ]
     }
   ]
 }

@@ -7,6 +7,7 @@ import AppHeader from "../components/AppHeader"
 import BottomNav from "../components/BottomNav"
 import BottomSpace from "../components/BottomSpace"
 import Icon from "../components/Icon"
+import ScenarioMockIllustration from "../components/ScenarioMockIllustration"
 import {
   ALL_SCENARIOS_POOL,
   POST_TEST_SCENARIOS,
@@ -397,13 +398,15 @@ export default function ChallengePage() {
         }
       }
 
-      const pointsEarned = calculatedScore >= 80 ? 30 : 20
+      const pointsEarned = calculatedScore === 100 ? 20 : (calculatedScore > 0 ? 10 : 0)
       const newPoints = currentTotalPoints + pointsEarned
       const newLog = [
         {
           id: `log-${Date.now()}`,
+          activity: "Menyelesaikan 2-Minute Challenge",
           title: "Menyelesaikan 2-Minute Challenge",
-          date: "Hari ini",
+          date: new Date().toISOString(),
+          points: pointsEarned,
           pts: `+${pointsEarned} Poin`,
           type: "earn"
         },
@@ -554,33 +557,11 @@ export default function ChallengePage() {
                     {activeScenario.context}
                   </div>
 
-                  {/* Chat / Mock Interface */}
-                  <div className="my-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5">
-                      <div className="grid h-7 w-7 place-items-center rounded-full bg-blue-50 text-[#003882]">
-                        <Icon
-                          name={
-                            activeScenario.mockType === "sms"
-                              ? "MessageSquare"
-                              : activeScenario.mockType === "qris"
-                                ? "QrCode"
-                                : "PhoneCall"
-                          }
-                          size={14}
-                        />
-                      </div>
-                      <span className="text-xs font-black text-[#102a54]">
-                        {activeScenario.sender}
-                      </span>
-                    </div>
-
-                    <div className="mt-3 text-xs leading-relaxed text-slate-700 bg-white p-3 rounded-xl border border-slate-100 font-medium">
-                      {activeScenario.message}
-                    </div>
-                  </div>
+                  {/* Visual Real-Life Mock Illustration (WhatsApp, Phone, SMS, QRIS) */}
+                  <ScenarioMockIllustration scenario={activeScenario} />
 
                   {/* Question */}
-                  <h3 className="text-sm font-black text-[#102a54] mb-3">
+                  <h3 className="text-sm font-black text-[#102a54] mb-3 mt-4">
                     {activeScenario.question}
                   </h3>
 

@@ -47,7 +47,12 @@ import {
   Sparkles,
   Medal,
   Plus,
-  Link as LinkIcon
+  Link as LinkIcon,
+  ChevronDown,
+  ShieldCheck,
+  History,
+  LogOut,
+  LogIn
 } from "lucide-react"
 
 const icons = {
@@ -101,7 +106,12 @@ const icons = {
   Sparkles,
   Medal,
   Plus,
-  Link: LinkIcon
+  Link: LinkIcon,
+  ChevronDown,
+  ShieldCheck,
+  History,
+  LogOut,
+  LogIn
 }
 
 export default function Icon({ name, className = "", size = 20, strokeWidth = 2, ...props }) {

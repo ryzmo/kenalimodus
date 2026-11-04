@@ -38,7 +38,7 @@ export default function ProfilPage() {
     latestScore: 0,
     totalSessions: 0
   })
-  const [activeTab, setActiveTab] = useState("panduan") // "panduan" | "histori"
+  const [activeTab, setActiveTab] = useState("detail") // "detail" | "histori" | "panduan"
   const [expandedSessionId, setExpandedSessionId] = useState(null)
   const [totalPoints, setTotalPoints] = useState(null)
 
@@ -150,6 +150,8 @@ export default function ProfilPage() {
 
   const hasScore = displayScore !== null
 
+  const latestSession = challengeHistory.length > 0 ? challengeHistory[0] : null
+
   const statusLabel = hasScore
     ? (displayScore >= 80 ? "Sangat Waspada" : displayScore >= 60 ? "Cukup Waspada" : "Perlu Latihan")
     : "Belum Ada Skor"
@@ -210,7 +212,7 @@ export default function ProfilPage() {
               <p className="text-xs sm:text-sm text-white/90 mt-2 max-w-sm leading-relaxed">
                 {session
                   ? (stats.totalSessions > 0
-                    ? `Akun Anda telah menyelesaikan ${stats.totalSessions} sesi simulasi refleks dengan total ${totalPoints.toLocaleString()} poin aktif tersimpan di cloud.`
+                    ? `Akun Anda telah menyelesaikan ${stats.totalSessions} sesi simulasi refleks dengan total ${(totalPoints || 0).toLocaleString()} poin aktif tersimpan di cloud.`
                     : "Akun Anda siap mengikuti challenge untuk mengukur ketahanan safe score digital perbankan.")
                   : "Anda masuk sebagai tamu. Login untuk menyimpan progres, Safe Score, lencana, dan poin rewards."}
               </p>
@@ -255,42 +257,194 @@ export default function ProfilPage() {
         <main className="flex-1 w-full bg-gradient-to-b from-[#f4faff] to-[#edf5fc] rounded-t-[36px] md:rounded-t-[44px] shadow-2xl pt-6 md:pt-8 pb-10">
           <div className="max-w-6xl mx-auto px-5 sm:px-8 space-y-5">
 
-            {/* TAB SELECTOR: Panduan Keamanan vs Histori Challenge */}
-            <div className="flex items-center gap-2 border-b border-slate-200/80 pb-2">
+            {/* TAB SELECTOR: Segmented Control Bar Simple & Rapi */}
+            <div className="flex rounded-2xl bg-slate-200/60 p-1 border border-slate-200/80 text-xs font-bold text-slate-600">
               <button
                 type="button"
-                onClick={() => setActiveTab("panduan")}
-                className={`relative px-4 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${activeTab === "panduan"
-                  ? "bg-[#003882] text-white shadow-sm"
-                  : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200/80"
+                onClick={() => setActiveTab("detail")}
+                className={`flex-1 py-2 px-2.5 rounded-xl transition text-center cursor-pointer ${activeTab === "detail"
+                    ? "bg-white text-[#003882] shadow-xs"
+                    : "hover:text-[#003882]"
                   }`}
               >
-                <Icon name="ShieldCheck" size={14} />
-                <span>Panduan Keamanan</span>
+                Detail Safe Score
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveTab("histori")}
-                className={`relative px-4 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${activeTab === "histori"
-                  ? "bg-[#003882] text-white shadow-sm"
-                  : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200/80"
+                className={`flex-1 py-2 px-2.5 rounded-xl transition text-center cursor-pointer ${activeTab === "histori"
+                    ? "bg-white text-[#003882] shadow-xs"
+                    : "hover:text-[#003882]"
                   }`}
               >
-                <Icon name="History" size={14} />
-                <span>Histori Challenge</span>
-                {challengeHistory.length > 0 && (
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-black ${activeTab === "histori"
-                      ? "bg-white text-[#003882]"
-                      : "bg-blue-50 text-[#003882]"
-                      }`}
-                  >
-                    {challengeHistory.length}
-                  </span>
-                )}
+                Histori Challenge
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("panduan")}
+                className={`flex-1 py-2 px-2.5 rounded-xl transition text-center cursor-pointer ${activeTab === "panduan"
+                    ? "bg-white text-[#003882] shadow-xs"
+                    : "hover:text-[#003882]"
+                  }`}
+              >
+                Panduan
               </button>
             </div>
+
+            {/* TAB 0: DETAIL & EVALUASI ANALISIS SAFE SCORE */}
+            {activeTab === "detail" && (
+              <div className="space-y-4 animate-in fade-in">
+                {/* Ringkasan Evaluasi Safe Score */}
+                <section className="glass-card rounded-[28px] p-5 sm:p-6 border border-white space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#003882]">
+                        DIAGNOSA REFLEKS KEAMANAN
+                      </span>
+                      <h2 className="text-base sm:text-lg font-black text-[#002554] tracking-tight mt-0.5">
+                        {latestSession
+                          ? (latestSession.evaluation_headline || "Analisis Ketahanan Siber")
+                          : hasScore
+                            ? (displayScore >= 80 ? "Ketahanan Sangat Kuat" : displayScore >= 60 ? "Cukup Waspada" : "Risiko Kerentanan Tinggi")
+                            : "Belum Mengikuti Challenge"}
+                      </h2>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl sm:text-3xl font-black text-[#003882]">
+                        {hasScore ? displayScore : 0}
+                      </span>
+                      <span className="text-xs text-slate-400 font-bold">/100</span>
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-[#003882] border border-blue-100">
+                        {statusLabel}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 4 Kartu Breakdown dengan warna seragam dan teks clean tanpa icon */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {/* 1. Evaluasi & Nilai */}
+                    <div className="rounded-2xl bg-white border border-slate-200/80 p-4">
+                      <div className="text-xs font-black uppercase tracking-wider text-[#003882]">
+                        Evaluasi Performa Nilai
+                      </div>
+                      <p className="text-xs text-slate-600 mt-2 leading-relaxed font-medium">
+                        {hasScore
+                          ? displayScore >= 80
+                            ? `Skor Anda ${displayScore}/100 menunjukkan ketajaman refleks perbankan digital yang sangat prima dalam menangkal rekayasa sosial dan tautan berbahaya.`
+                            : displayScore >= 60
+                              ? `Skor Anda ${displayScore}/100 berada pada level moderat. Anda sudah mengenali modus umum, namun beberapa trik manipulasi psikologis masih dapat mengecoh refleks Anda.`
+                              : `Skor Anda ${displayScore}/100 tergolong rentan. Akun Anda memiliki risiko tinggi menjadi korban kebocoran kredensial atau penipuan file malware.`
+                          : "Anda belum memiliki catatan skor. Kerjakan simulasi 2-Minute Scam Challenge untuk mengukur tingkat kerentanan akun Anda."}
+                      </p>
+                    </div>
+
+                    {/* 2. Titik Kurang / Celah Terdeteksi */}
+                    <div className="rounded-2xl bg-white border border-slate-200/80 p-4">
+                      <div className="text-xs font-black uppercase tracking-wider text-[#003882]">
+                        Titik Kurang & Celah Terdeteksi
+                      </div>
+                      <p className="text-xs text-slate-600 mt-2 leading-relaxed font-medium">
+                        {latestSession && Array.isArray(latestSession.details_json) && latestSession.details_json.some((d) => !d.isCorrect)
+                          ? `Terdeteksi celah pada modus: ${latestSession.details_json.filter((d) => !d.isCorrect).map((d) => d.title || d.category).join(", ")}. Modus ini memanfaatkan rasa terburu-buru dan kepanikan.`
+                          : hasScore && displayScore < 80
+                            ? "Celah umumnya muncul pada skenario kontak WhatsApp tidak resmi yang menyamar sebagai CS Bank, serta kelalaian memeriksa alamat tautan URL KlikBCA resmi."
+                            : "Tidak ditemukan titik rawan kritis. Seluruh skenario terbaru berhasil direspon dengan tepat tanpa terjebak manipulasi."}
+                      </p>
+                    </div>
+
+                    {/* 3. Apa yang Harus Dilakukan */}
+                    <div className="rounded-2xl bg-white border border-slate-200/80 p-4">
+                      <div className="text-xs font-black uppercase tracking-wider text-[#003882]">
+                        Tindakan yang Harus Dilakukan
+                      </div>
+                      <ul className="text-xs text-slate-600 mt-2 space-y-1.5 leading-relaxed font-medium list-disc list-inside">
+                        <li><strong>Terapkan Aturan 3 Detik:</strong> Berhenti sejenak dan jangan langsung klik tautan atau menyetujui transaksi mendesak.</li>
+                        <li><strong>Kunci Kerahasiaan:</strong> Jangan pernah membagikan OTP, PIN, atau CVV kepada siapa pun termasuk pihak mengaku bank.</li>
+                        <li><strong>Tolak File .APK:</strong> Segera tolak dan hapus dokumen berakhiran .apk yang dikirim via WhatsApp/Telegram.</li>
+                      </ul>
+                    </div>
+
+                    {/* 4. Rekomendasi Pelatihan */}
+                    <div className="rounded-2xl bg-white border border-slate-200/80 p-4">
+                      <div className="text-xs font-black uppercase tracking-wider text-[#003882]">
+                        Rekomendasi Langkah Nyata
+                      </div>
+                      <div className="text-xs text-slate-600 mt-2 space-y-2 leading-relaxed font-medium">
+                        <p>
+                          Pelajari materi katalog modus terkait dan lakukan uji ulang berkala untuk memperkuat memori refleks proteksi siber Anda.
+                        </p>
+                        <div className="pt-1 flex flex-wrap gap-2">
+                          <Link
+                            href="/modus"
+                            className="inline-flex items-center px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-[#003882] text-[11px] font-bold hover:bg-slate-100 transition"
+                          >
+                            <span>Buka Katalog Modus</span>
+                          </Link>
+                          <Link
+                            href="/challenge"
+                            className="inline-flex items-center px-3 py-1.5 rounded-xl bg-[#003882] text-white text-[11px] font-bold hover:bg-[#002554] transition"
+                          >
+                            <span>Ikuti Challenge Ulang</span>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Sesi Soal Terakhir yang Dikerjakan Beserta Pembahasan */}
+                {latestSession && Array.isArray(latestSession.details_json) && latestSession.details_json.length > 0 && (
+                  <section className="glass-card rounded-[28px] p-5 sm:p-6 border border-white space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-[#003882]">
+                        Hasil Soal Sesi Terakhir ({latestSession.details_json.length} Soal)
+                      </span>
+                      <span className="text-xs font-bold text-slate-500">
+                        Benar: {latestSession.correct_count || 0} • Salah: {latestSession.failed_count || 0}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2.5 mt-2">
+                      {latestSession.details_json.map((d, dIdx) => (
+                        <div
+                          key={dIdx}
+                          className="p-3.5 rounded-2xl border border-slate-100 bg-white text-xs"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 bg-blue-50 text-[#003882]">
+                                {dIdx + 1}
+                              </span>
+                              <span className="font-black text-[#002554]">{d.title}</span>
+                              {d.category && (
+                                <span className="text-[9px] font-semibold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                                  {d.category}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[10px] font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
+                              {d.isCorrect ? "Tepat" : "Rentan"}
+                            </span>
+                          </div>
+
+                          <div className="mt-2 text-slate-600 pl-7 text-[11px] leading-relaxed space-y-1">
+                            <div>Jawaban Anda: <strong>{d.chosenText || "-"}</strong></div>
+                            {d.feedback && (
+                              <div className="text-slate-500 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
+                                Evaluasi: {d.feedback}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+              </div>
+            )}
 
             {/* TAB 1: PANDUAN KEAMANAN */}
             {activeTab === "panduan" && (

@@ -323,56 +323,104 @@ export default function ModusPage() {
 
       {/* MODAL: Modus Detail */}
       {activeModusModal && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in">
-          <div className="w-full max-w-md rounded-t-[32px] sm:rounded-[32px] bg-white p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <span className="rounded-full bg-blue-50 text-[#0292fc] px-3 py-1 text-[10px] font-black uppercase">
-                {activeModusModal.tag}
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in">
+          <div className="w-full max-w-lg rounded-t-[32px] sm:rounded-[32px] bg-white p-5 sm:p-6 shadow-2xl max-h-[88vh] overflow-y-auto">
+            {/* Header Modal */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <span className="rounded-full bg-blue-50 text-[#0055b8] px-3 py-1 text-[11px] font-bold uppercase tracking-wide">
+                {activeModusModal.tag || activeModusModal.category}
               </span>
               <button
                 type="button"
                 onClick={() => setActiveModusModal(null)}
-                className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"
+                className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition"
               >
                 ✕
               </button>
             </div>
 
-            <h3 className="mt-3 text-base font-black text-[#002554]">
-              {activeModusModal.title}
-            </h3>
-            <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-              {activeModusModal.desc}
+            <div className="mt-4 flex items-center gap-3">
+              <div className="h-10 w-10 shrink-0 rounded-xl bg-blue-50 text-[#0055b8] flex items-center justify-center border border-blue-100">
+                <Icon name={activeModusModal.icon || "AlertTriangle"} size={20} />
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-[#002554] leading-snug">
+                {activeModusModal.title}
+              </h3>
+            </div>
+            
+            <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              {activeModusModal.desc || activeModusModal.description}
             </p>
 
-            <div className="mt-4 rounded-2xl bg-amber-50/70 border border-amber-200/60 p-3.5">
-              <div className="text-[11px] font-bold text-amber-800 flex items-center gap-1.5">
-                <Icon name="AlertTriangle" size={14} />
-                <span>Ciri-ciri Utama Penipuan:</span>
+            {/* Visual Alur Cara Kerja Modus (Flow Card) */}
+            {activeModusModal.flowVisual && (
+              <div className="mt-4 p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
+                <span className="text-[11px] font-black text-[#002554] uppercase tracking-wider block mb-2.5">
+                  Alur Jerat Penipu:
+                </span>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  {activeModusModal.flowVisual.map((item, idx) => (
+                    <div key={idx} className="bg-white p-2.5 rounded-xl border border-slate-200/60 shadow-2xs flex flex-col justify-between">
+                      <div className="w-5 h-5 mx-auto rounded-full bg-blue-100 text-[#0055b8] text-[10px] font-black flex items-center justify-center mb-1">
+                        {item.step}
+                      </div>
+                      <div className="text-[11px] font-bold text-[#002554] leading-tight mb-1">
+                        {item.title}
+                      </div>
+                      <div className="text-[10px] text-slate-500 leading-tight">
+                        {item.note}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <ul className="mt-1.5 space-y-1 text-xs text-amber-900/90 pl-4 list-disc">
-                {activeModusModal.traits?.map((t, idx) => (
-                  <li key={idx}>{t}</li>
-                )) || <li>Menggunakan nomor acak tidak resmi / kontak palsu.</li>}
-              </ul>
-            </div>
+            )}
 
-            <div className="mt-3 rounded-2xl bg-blue-50/70 border border-blue-200/60 p-3.5">
-              <div className="text-[11px] font-bold text-[#003882] flex items-center gap-1.5">
-                <Icon name="Shield" size={14} />
-                <span>Langkah Pencegahan BCA:</span>
+            {/* Perbandingan Bahaya vs Solusi Aman */}
+            {activeModusModal.badVsGood && (
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
+                  <div className="text-[11px] font-black text-slate-700 flex items-center gap-1.5 mb-1">
+                    <span className="w-4 h-4 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-[10px] font-bold">✕</span>
+                    <span>Tanda Bahaya:</span>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    {activeModusModal.badVsGood.bad}
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-blue-50/60 border border-blue-200/70">
+                  <div className="text-[11px] font-black text-[#003882] flex items-center gap-1.5 mb-1">
+                    <span className="w-4 h-4 rounded-full bg-blue-100 text-[#0055b8] flex items-center justify-center text-[10px] font-bold">✓</span>
+                    <span>Kaidah Aman:</span>
+                  </div>
+                  <p className="text-xs text-[#003882] leading-relaxed">
+                    {activeModusModal.badVsGood.good}
+                  </p>
+                </div>
               </div>
-              <p className="mt-1 text-xs text-[#003882]/90 leading-relaxed">
-                {activeModusModal.prevention || "Jangan pernah memberikan kode OTP, PIN, atau mengklik tautan / file dari nomor tak dikenal."}
-              </p>
-            </div>
+            )}
+
+            {/* Tindakan Pencegahan Ringkas */}
+            {activeModusModal.preventionPoints && (
+              <div className="mt-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                <span className="text-[11px] font-black text-[#002554] uppercase tracking-wider block mb-1.5">
+                  Langkah Penyelamat:
+                </span>
+                <ul className="text-xs text-slate-700 space-y-1.5 pl-4 list-disc leading-relaxed">
+                  {activeModusModal.preventionPoints.map((pt, pIdx) => (
+                    <li key={pIdx}>{pt}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <button
               type="button"
               onClick={() => setActiveModusModal(null)}
-              className="mt-5 w-full rounded-2xl bg-[#0292fc] py-3 text-xs font-black text-white shadow-md hover:bg-[#0081e3] transition active:scale-98"
+              className="mt-5 w-full rounded-2xl bg-[#0055b8] py-3 text-xs sm:text-sm font-bold text-white shadow-md hover:bg-[#003882] transition active:scale-98"
             >
-              Saya Sudah Paham
+              Saya Paham & Siap Waspada
             </button>
           </div>
         </div>
@@ -430,28 +478,72 @@ export default function ModusPage() {
 
       {/* MODAL: Article Reader */}
       {activeArticleModal && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in">
-          <div className="w-full max-w-md rounded-t-[32px] sm:rounded-[32px] bg-white p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <span className="rounded-full bg-amber-50 text-amber-700 px-3 py-1 text-[10px] font-black uppercase">
-                {activeArticleModal.readTime}
-              </span>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in">
+          <div className="w-full max-w-lg rounded-t-[32px] sm:rounded-[32px] bg-white p-5 sm:p-6 shadow-2xl max-h-[88vh] overflow-y-auto">
+            {/* Header Modal */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-blue-50 text-[#0055b8] px-3 py-1 text-[11px] font-bold uppercase">
+                  {activeArticleModal.category || "Edukasi"}
+                </span>
+                <span className="text-[11px] text-slate-400 font-medium">
+                  • {activeArticleModal.readTime}
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => setActiveArticleModal(null)}
-                className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"
+                className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition"
               >
                 ✕
               </button>
             </div>
 
-            <h3 className="mt-3 text-base font-black text-[#002554]">
+            <h3 className="mt-4 text-base sm:text-lg font-black text-[#002554] leading-snug">
               {activeArticleModal.title}
             </h3>
 
-            <div className="mt-3 text-xs text-slate-600 leading-relaxed space-y-2 whitespace-pre-line">
-              {activeArticleModal.content}
-            </div>
+            {activeArticleModal.summary && (
+              <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                {activeArticleModal.summary}
+              </p>
+            )}
+
+            {/* Visual Flashcards / Steps */}
+            {activeArticleModal.cards && (
+              <div className="mt-4 space-y-2.5">
+                {activeArticleModal.cards.map((card, cIdx) => (
+                  <div
+                    key={cIdx}
+                    className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-start gap-3"
+                  >
+                    <div className="w-7 h-7 shrink-0 rounded-xl bg-blue-50 text-[#0055b8] border border-blue-200/60 font-black text-xs flex items-center justify-center">
+                      {card.step}
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-[#002554] mb-0.5">
+                        {card.title}
+                      </div>
+                      <div className="text-xs text-slate-600 leading-relaxed">
+                        {card.desc}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Kunci Keamanan */}
+            {activeArticleModal.rule && (
+              <div className="mt-3.5 p-3 rounded-2xl bg-blue-50/60 border border-blue-200/70 flex items-center gap-2.5">
+                <div className="w-5 h-5 shrink-0 rounded-full bg-blue-100 text-[#0055b8] flex items-center justify-center text-xs font-bold">
+                  ✓
+                </div>
+                <div className="text-xs text-[#003882] font-semibold leading-relaxed">
+                  {activeArticleModal.rule}
+                </div>
+              </div>
+            )}
 
             <button
               type="button"
@@ -459,9 +551,9 @@ export default function ModusPage() {
                 handleClaimEduPoints(activeArticleModal.id, activeArticleModal.rewardPoints, activeArticleModal.title)
                 setActiveArticleModal(null)
               }}
-              className="mt-5 w-full rounded-2xl bg-emerald-500 py-3 text-xs font-black text-white shadow-md hover:bg-emerald-600 transition active:scale-98"
+              className="mt-5 w-full rounded-2xl bg-[#0055b8] py-3 text-xs sm:text-sm font-bold text-white shadow-md hover:bg-[#003882] transition active:scale-98"
             >
-              Selesai Membaca & Klaim +{activeArticleModal.rewardPoints} Poin
+              Selesai & Dapatkan +{activeArticleModal.rewardPoints} Poin
             </button>
           </div>
         </div>

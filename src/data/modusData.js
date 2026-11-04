@@ -12,116 +12,196 @@ export const MODUS_CATEGORIES = [
 
 export const MODUS_LIST = [
   {
-    "id": "cs-palsu-wa",
-    "category": "Impersonation",
-    "title": "Customer Service Palsu",
-    "description": "Penipu menyamar sebagai haloBCA via nomor WhatsApp acak atau telepon tak resmi meminta verifikasi.",
-    "icon": "PhoneCall",
-    "difficulty": "Sulit",
-    "traits": [
-      "Nomor tidak terverifikasi (tanpa centang hijau resmi BCA).",
-      "Meminta kode OTP 6-digit atau PIN m-BCA dengan alasan pembaruan sistem.",
-      "Mendesak korban agar segera melakukan konfirmasi pembatalan transaksi."
+    id: "cs-palsu-wa",
+    category: "Impersonation",
+    tag: "Impersonation",
+    title: "Customer Service Palsu",
+    desc: "Penipu menyamar sebagai Halo BCA via telepon atau WhatsApp palsu dan meminta OTP/PIN rekening.",
+    description: "Penipu menyamar sebagai Halo BCA via telepon atau WhatsApp palsu dan meminta OTP/PIN rekening.",
+    icon: "PhoneCall",
+    difficulty: "Sulit",
+    flowVisual: [
+      { step: "1", title: "Kontak Tak Dikenal", note: "Penelepon nomor 08xx atau WA tanpa centang hijau" },
+      { step: "2", title: "Gertakan Darurat", note: "Bilang rekening diblokir / ada kenaikan tarif transfer" },
+      { step: "3", title: "Minta Data Rahasia", note: "Mendesak korban menyebutkan 6 angka SMS OTP" }
     ],
-    "prevention": "Halo BCA resmi hanya diakses via 1500888 atau app haloBCA. Petugas resmi TIDAK PERNAH meminta OTP, PIN, atau CVV."
+    badVsGood: {
+      bad: "Nomor WA biasa 08xx, mengancam rekening diblokir, & meminta kode OTP / PIN.",
+      good: "Halo BCA Resmi HANYA 1500888 atau app haloBCA. Petugas TIDAK PERNAH minta OTP/PIN."
+    },
+    preventionPoints: [
+      "Tutup telepon segera jika penelepon mendesak meminta angka verifikasi atau kode rahasia.",
+      "Nomor resmi WhatsApp BCA memiliki centang hijau (08111500888).",
+      "Gunakan aplikasi resmi haloBCA untuk panggilan gratis dan terjamin aman."
+    ]
   },
   {
-    "id": "apk-berbahaya",
-    "category": "APK Berbahaya",
-    "title": "APK Berbahaya",
-    "description": "File instalasi .apk disamarkan sebagai surat undangan pernikahan, resi kurir, atau tilang elektronik.",
-    "icon": "Smartphone",
-    "difficulty": "Sulit",
-    "traits": [
-      "File berekstensi .apk dikirim melalui chat WhatsApp atau Telegram.",
-      "Meminta izin akses SMS dan notifikasi saat diinstal.",
-      "Membaca SMS OTP secara diam-diam untuk membobol akun perbankan."
+    id: "apk-berbahaya",
+    category: "APK Berbahaya",
+    tag: "APK Berbahaya",
+    title: "APK Berbahaya (Sniffer)",
+    desc: "File aplikasi jahat berakhiran .apk yang menyamar jadi undangan nikah, resi paket, atau surat tilang.",
+    description: "File aplikasi jahat berakhiran .apk yang menyamar jadi undangan nikah, resi paket, atau surat tilang.",
+    icon: "Smartphone",
+    difficulty: "Sulit",
+    flowVisual: [
+      { step: "1", title: "Kirim File Chat", note: "Pesan WA: 'Surat Undangan.apk' atau 'Resi_Paket.apk'" },
+      { step: "2", title: "Korban Klik & Pasang", note: "Aplikasi meminta izin baca SMS & notifikasi ponsel" },
+      { step: "3", title: "Sadap SMS OTP", note: "Pelaku membaca OTP secara diam-diam untuk bobol m-banking" }
     ],
-    "prevention": "Jangan pernah klik atau buka file .apk dari chat. Matikan izin instalasi aplikasi tidak dikenal di pengaturan HP."
+    badVsGood: {
+      bad: "File di WhatsApp berakhiran '.apk' (ikon robot Android / dokumen misterius).",
+      good: "Foto asli berakhiran .jpg / .png. Pasang aplikasi hanya dari Google Play Store resmi."
+    },
+    preventionPoints: [
+      "Jangan pernah mengklik atau membuka file berekstensi .apk di WhatsApp.",
+      "Jika terlanjur klik: Segera aktifkan Mode Pesawat (Airplane Mode) agar internet mati.",
+      "Hubungi Halo BCA 1500888 untuk meminta pemblokiran akun m-BCA sementara."
+    ]
   },
   {
-    "id": "phishing-link",
-    "category": "Phishing",
-    "title": "Phishing Link",
-    "description": "Tautan web palsu yang menyerupai internet banking resmi KlikBCA untuk mencuri kredensial login.",
-    "icon": "ExternalLink",
-    "difficulty": "Sulit",
-    "traits": [
-      "Alamat URL salah/typo (misal: klik-bca-login.com, bca-info.id).",
-      "Sering dipromosikan lewat Google Ads atau SMS blast.",
-      "Halaman meminta username, PIN, dan kode respon KeyBCA sekaligus."
+    id: "phishing-link",
+    category: "Phishing",
+    tag: "Phishing",
+    title: "Website Phishing (Tautan Palsu)",
+    desc: "Tautan situs tiruan yang menyerupai internet banking resmi untuk menjebak username, PIN, dan kode token.",
+    description: "Tautan situs tiruan yang menyerupai internet banking resmi untuk menjebak username, PIN, dan kode token.",
+    icon: "ExternalLink",
+    difficulty: "Sulit",
+    flowVisual: [
+      { step: "1", title: "Tautan Pancingan", note: "Link di SMS/iklan: 'klik-bca-promo.com' atau sejenisnya" },
+      { step: "2", title: "Tampilan Meniru Asli", note: "Halaman web dibuat mirip persis dengan situs bank asli" },
+      { step: "3", title: "Formulir Jebakan", note: "Meminta User ID, PIN login, & respon KeyBCA sekaligus" }
     ],
-    "prevention": "Terapkan mantra B-C-A: Buka dengan ketik manual bca.co.id, Cek keaslian SSL gembok hijau, dan Ayo bintangin/bookmark."
+    badVsGood: {
+      bad: "Mengklik link dari SMS / chat atau dari hasil iklan teratas di pencarian Google.",
+      good: "Ketik manual www.bca.co.id di browser & bookmark (bintangin) halaman resminya."
+    },
+    preventionPoints: [
+      "B - Buka dengan ketik manual alamat resmi di browser HP Anda.",
+      "C - Cek keaslian nama domain (.bca.co.id atau .klikbca.com) dan ikon gembok SSL.",
+      "A - Ayo bintangin (bookmark) agar kunjungan berikutnya langsung menuju situs resmi."
+    ]
   },
   {
-    "id": "social-engineering",
-    "category": "Social Engineering",
-    "title": "Social Engineering",
-    "description": "Pelaku memanipulasi emosi, rasa panik, atau iming-iming hadiah agar korban bertindak tanpa berpikir jernih.",
-    "icon": "AlertTriangle",
-    "difficulty": "Sangat Sulit",
-    "traits": [
-      "Menciptakan kondisi darurat palsu (keluarga kecelakaan, rekening diblokir).",
-      "Menuntut tindakan cepat dalam hitungan menit agar korban panik.",
-      "Memandu transfer uang ke virtual account atau e-wallet penipu."
+    id: "social-engineering",
+    category: "Social Engineering",
+    tag: "Social Engineering",
+    title: "Manipulasi Psikologis",
+    desc: "Pelaku membuat korban panik atau terbuai iming-iming hadiah agar segera transfer tanpa sempat berpikir jernih.",
+    description: "Pelaku membuat korban panik atau terbuai iming-iming hadiah agar segera transfer tanpa sempat berpikir jernih.",
+    icon: "AlertTriangle",
+    difficulty: "Sangat Sulit",
+    flowVisual: [
+      { step: "1", title: "Picu Emosi Korban", note: "Kabar darurat keluarga kecelakaan atau hadiah ratusan juta" },
+      { step: "2", title: "Buru-buru & Rahasia", note: "Dilarang mematikan telepon dan dilarang cerita ke orang lain" },
+      { step: "3", title: "Instruksi Transfer", note: "Dipandu ke mesin ATM atau m-banking transfer ke rekening penipu" }
     ],
-    "prevention": "Tarik napas, jangan panik. Tutup telepon dan hubungi kerabat atau bank melalui kanal resmi independen."
+    badVsGood: {
+      bad: "Panik dan langsung menuruti instruksi transfer uang tanpa konfirmasi.",
+      good: "Tarik napas, tutup telepon, dan telepon langsung kerabat terkait secara mandiri."
+    },
+    preventionPoints: [
+      "Jika penelepon melarang menutup panggilan, itu 100% ciri utama penipu.",
+      "Jangan pernah transfer uang karena kabar mendadak dari nomor baru.",
+      "Hubungi kerabat bersangkutan melalui nomor kontak yang sudah tersimpan di HP Anda."
+    ]
   },
   {
-    "id": "qris-palsu",
-    "category": "Quishing (QRIS)",
-    "title": "QRIS Palsu (Quishing)",
-    "description": "Stiker QRIS merchant resmi ditimpa stiker palsu sehingga pembayaran masuk ke rekening pelaku.",
-    "icon": "QrCode",
-    "difficulty": "Sulit",
-    "traits": [
-      "Stiker QRIS terlihat bertumpuk atau mencurigakan di meja kasir.",
-      "Nama merchant yang muncul di layar pembayaran berbeda dengan nama toko.",
-      "Sering ditempel di kotak amal, rumah ibadah, atau kasir tanpa pengawasan."
+    id: "qris-palsu",
+    category: "Quishing (QRIS)",
+    tag: "Quishing (QRIS)",
+    title: "QRIS Palsu (Quishing)",
+    desc: "Stiker barcode pembayaran di kasir atau kotak amal ditimpa stiker barcode rekening pelaku.",
+    description: "Stiker barcode pembayaran di kasir atau kotak amal ditimpa stiker barcode rekening pelaku.",
+    icon: "QrCode",
+    difficulty: "Sulit",
+    flowVisual: [
+      { step: "1", title: "Stiker Ditimpa", note: "Penipu menempel barcode palsu di atas akrilik QRIS toko" },
+      { step: "2", title: "Scan Tanpa Cek", note: "Pembeli memindai QR code dan langsung memasukkan PIN" },
+      { step: "3", title: "Uang Salah Masuk", note: "Saldo berpindah ke dompet penipu bukan ke toko asli" }
     ],
-    "prevention": "Selalu cocokkan nama merchant di layar ponsel dengan nama toko fisik sebelum menekan konfirmasi bayar."
+    badVsGood: {
+      bad: "Langsung klik bayar tanpa membaca nama merchant penerima di layar m-banking.",
+      good: "Cocokkan nama penerima di layar dengan nama toko fisik sebelum tekan bayar."
+    },
+    preventionPoints: [
+      "Perhatikan fisik stiker QR, hindari yang bertumpuk atau mencurigakan.",
+      "Lihat nama toko yang muncul di layar konfirmasi m-banking Anda.",
+      "Tanyakan singkat ke kasir: 'Apakah nama penerimanya betul ini?' sebelum memasukkan PIN."
+    ]
   },
   {
-    "id": "account-takeover",
-    "category": "Account Takeover",
-    "title": "Account Takeover (SIM Swap)",
-    "description": "Pelaku mengambil alih kartu SIM atau nomor ponsel korban untuk membajak verifikasi SMS OTP.",
-    "icon": "LockKeyhole",
-    "difficulty": "Sangat Sulit",
-    "traits": [
-      "Ponsel tiba-tiba kehilangan sinyal secara permanen di area biasanya normal.",
-      "Muncul notifikasi login atau perubahan password email dan m-banking.",
-      "Pelaku memanfaatkan KTP palsu untuk menduplikasi SIM card di gerai operator."
+    id: "account-takeover",
+    category: "Account Takeover",
+    tag: "Account Takeover",
+    title: "Pengambilalihan Akun (SIM Swap)",
+    desc: "Pelaku menduplikasi kartu SIM ponsel korban di gerai operator untuk mencegat SMS OTP perbankan.",
+    description: "Pelaku menduplikasi kartu SIM ponsel korban di gerai operator untuk mencegat SMS OTP perbankan.",
+    icon: "LockKeyhole",
+    difficulty: "Sangat Sulit",
+    flowVisual: [
+      { step: "1", title: "Pencurian Data KTP", note: "Pelaku mengumpulkan foto KTP/KK korban yang tersebar online" },
+      { step: "2", title: "Kloning Kartu SIM", note: "Membuat kartu pengganti di gerai mengaku kartunya hilang" },
+      { step: "3", title: "Bajak SMS OTP", note: "Sinyal HP korban mati total, seluruh SMS OTP masuk ke HP pelaku" }
     ],
-    "prevention": "Bila nomor mendadak hilang sinyal tanpa sebab, segera hubungi operator seluler dan blokir rekening bank sementara."
+    badVsGood: {
+      bad: "Membiarkan ponsel hilang sinyal seharian tanpa memeriksa ke operator.",
+      good: "Segera lapor operator & hubungi bank untuk blokir akun sementara jika sinyal mati."
+    },
+    preventionPoints: [
+      "Jangan pernah mengunggah foto KTP, SIM, atau Kartu Keluarga di media sosial.",
+      "Jika HP mendadak 'No Service' di wilayah biasanya lancar, segera cek ke operator seluler.",
+      "Hubungi Halo BCA 1500888 untuk mengamankan rekening bila nomor ponsel dicurigai dibajak."
+    ]
   },
   {
-    "id": "recovery-scam",
-    "category": "Recovery Scam",
-    "title": "Recovery Scam (Bantuan Palsu)",
-    "description": "Pelaku mengaku sebagai tim investigasi atau hacker putih yang bisa mengembalikan dana korban penipuan.",
-    "icon": "Shield",
-    "difficulty": "Sangat Sulit",
-    "traits": [
-      "Menghubungi korban yang baru saja curhat kehilangan uang di media sosial.",
-      "Menjanjikan dana kembali 100% dengan syarat membayar uang jasa/admin di awal.",
-      "Menggunakan testimoni palsu dan akun rekayasa."
+    id: "recovery-scam",
+    category: "Recovery Scam",
+    tag: "Recovery Scam",
+    title: "Bantuan Palsu Tarik Dana",
+    desc: "Akun penipu kedua yang mengaku hacker atau tim investigasi yang bisa mengembalikan uang korban penipuan.",
+    description: "Akun penipu kedua yang mengaku hacker atau tim investigasi yang bisa mengembalikan uang korban penipuan.",
+    icon: "Shield",
+    difficulty: "Sangat Sulit",
+    flowVisual: [
+      { step: "1", title: "Incar Korban Curhat", note: "Mencari korban yang bercerita tertipu di medsos/forum" },
+      { step: "2", title: "Janji Manis 100%", note: "Mengaku bisa melacak dan menarik saldo penipu secara kilat" },
+      { step: "3", title: "Minta Uang Jasa", note: "Meminta korban transfer biaya administrasi/sewa alat di awal" }
     ],
-    "prevention": "Tidak ada pihak selain penegak hukum dan bank resmi yang dapat memproses tindak lanjut penipuan. Jangan bayar biaya recovery."
+    badVsGood: {
+      bad: "Percaya akun media sosial yang menawarkan jasa pengembalian uang penipuan.",
+      good: "Hanya bank resmi dan kantor polisi yang berwenang menindaklanjuti kasus penipuan."
+    },
+    preventionPoints: [
+      "Abaikan seluruh tawaran jasa pengembalian dana di media sosial (itu penipuan lapis ke-2).",
+      "Jangan pernah mentransfer biaya admin apa pun kepada oknum di internet.",
+      "Laporkan kejadian resmi ke kantor kepolisian dan kantor cabang BCA terdekat."
+    ]
   },
   {
-    "id": "investment-scam",
-    "category": "Investment Scam",
-    "title": "Investasi Bodong & Tugas Freelance",
-    "description": "Penipuan berbasis imbal hasil tidak masuk akal atau misi harian menyukai video yang berakhir deposit fiktif.",
-    "icon": "Briefcase",
-    "difficulty": "Sangat Sulit",
-    "traits": [
-      "Menjanjikan return profit tinggi tanpa risiko dalam waktu singkat.",
-      "Mengundang korban ke grup Telegram tertutup dengan admin yang persuasif.",
-      "Awalnya memberi komisi kecil, lalu menuntut deposit jutaan rupiah yang tidak bisa ditarik."
+    id: "investment-scam",
+    category: "Investment Scam",
+    tag: "Investment Scam",
+    title: "Investasi Bodong & Tugas Freelance",
+    desc: "Tawaran kerja sampingan klik video dibayar jutaan atau robot trading keuntungan instan tanpa risiko.",
+    description: "Tawaran kerja sampingan klik video dibayar jutaan atau robot trading keuntungan instan tanpa risiko.",
+    icon: "Briefcase",
+    difficulty: "Sangat Sulit",
+    flowVisual: [
+      { step: "1", title: "Umpan Awal", note: "Diberi komisi kecil Rp20-50 ribu setelah like video agar percaya" },
+      { step: "2", title: "Tugas Deposit Besar", note: "Diminta setor dana jutaan rupiah untuk dapat komisi besar" },
+      { step: "3", title: "Uang Ditahan", note: "Saldo tidak bisa dicairkan dan pelaku meminta uang tebusan lagi" }
     ],
-    "prevention": "Cek legalitas platform di situs resmi OJK (ojk.go.id). Ingat prinsip 2L: Legal dan Logis."
+    badVsGood: {
+      bad: "Tergiur keuntungan kilat tanpa risiko dan menyetor deposit ke rekening pribadi.",
+      good: "Pegang prinsip 2L: Legal (izin resmi OJK) & Logis (keuntungan masuk akal)."
+    },
+    preventionPoints: [
+      "Waspadai setiap tawaran kerja sampingan online yang mewajibkan deposit uang pribadi.",
+      "Cek izin perusahaan investasi di Kontak OJK 157 atau situs ojk.go.id.",
+      "Segera tinggalkan grup Telegram / WhatsApp jika ada ajakan setor uang berjamaah."
+    ]
   }
 ];
 // Pool lengkap 10 Skenario Dunia Nyata
@@ -2114,12 +2194,12 @@ export const BCA_EDU_VIDEOS = [
     desc: "Kenali rumus sakti B-C-A: Buka dengan ketik manual, Cek keaslian website, Ayo bintangin di browser agar aman dari link jebakan situs palsu.",
     duration: "0:55",
     youtubeId: "V5i1X00R8Qk",
-    rewardPoints: 15,
+    rewardPoints: 2,
     views: "2.100 Views",
     date: "26 Jan 2026",
     badge: "Utama",
     source: "Solusi BCA / #AwasModus",
-    pointsAward: 15,
+    pointsAward: 2,
     mantraPoints: [
       { letter: "B", title: "Buka dengan ketik manual", desc: "Ketik alamat portal resmi langsung di browser (contoh: bca.co.id atau klikbca.com)." },
       { letter: "C", title: "Cek keaslian website", desc: "Pastikan ada ikon gembok keamanan SSL/HTTPS dan sertifikat digital resmi." },
@@ -2134,12 +2214,12 @@ export const BCA_EDU_VIDEOS = [
     desc: "Penipu membeli iklan berbayar di mesin pencari dengan tampilan mirip situs resmi KlikBCA Bisnis. Jangan asal klik hasil teratas.",
     duration: "0:55",
     youtubeId: "Y8E_HjW-B4A",
-    rewardPoints: 15,
+    rewardPoints: 2,
     views: "1.850 Views",
     date: "20 Jan 2026",
     badge: "Bisnis",
     source: "Berita BCA",
-    pointsAward: 15,
+    pointsAward: 2,
     mantraPoints: [
       { letter: "1", title: "Jangan Klik Hasil Iklan (Ad)", desc: "Situs phishing sering dipromosikan lewat Google Ads dengan URL tiruan." },
       { letter: "2", title: "Perhatikan Typo Nama Domain", desc: "Penipu sering menggunakan nama mirip seperti klik-bca-id atau bca-online." }
@@ -2150,39 +2230,88 @@ export const BCA_EDU_VIDEOS = [
 export const BCA_EDU_ARTICLES = [
   {
     id: "art-1",
-    title: "Hindari Website Palsu dengan Mantra B-C-A",
+    title: "Mantra B-C-A: Hindari Situs Tiruan",
     category: "Awas Modus",
     date: "9 Sep 2026",
-    readTime: "2 mnt baca",
-    rewardPoints: 10,
+    readTime: "1 mnt baca",
+    rewardPoints: 1,
     sourceUrl: "https://www.bca.co.id/id/informasi/news-and-features/awas-modus",
-    summary: "Saat ini marak website tiruan yang menyerupai internet banking. Lindungi diri Anda dengan menerapkan tiga langkah sederhana: Buka dengan ketik manual, Cek keaslian, dan Ayo bintangin.",
-    content: "Penipuan bermodus website palsu kian marak. Modus ini biasanya memancing korban dengan tampilan antarmuka yang sangat mirip situs resmi bank.\n\nTips Mengamankan Diri:\n1. B - Buka dengan ketik manual: Jangan klik link dari SMS, chat WhatsApp, atau email mencurigakan.\n2. C - Cek keaslian website: Pastikan domain resmi berakhiran .bca.co.id atau .klikbca.com dan memiliki sertifikat SSL gembok hijau/aman.\n3. A - Ayo bintangin: Simpan (bookmark) alamat resmi di browser agar akses berikutnya selalu terarah ke situs yang benar.",
-    pointsAward: 10
+    summary: "Lindungi diri dari web phishing dengan mengingat rumus 3 langkah: Buka manual, Cek gembok, Ayo simpan.",
+    cards: [
+      { step: "B", title: "Buka Manual", desc: "Ketik sendiri alamat bca.co.id di browser ponsel, jangan klik dari link SMS atau chat." },
+      { step: "C", title: "Cek Keaslian", desc: "Periksa alamat domain resmi dan pastikan ada tanda gembok aman (SSL) di baris URL." },
+      { step: "A", title: "Ayo Bintangin", desc: "Simpan (bookmark) alamat resmi agar kunjungan berikutnya aman tanpa lewat mesin pencari." }
+    ],
+    rule: "Petugas BCA tidak pernah mengirim link pembatalan tarif atau formulir perubahan data.",
+    pointsAward: 1
   },
   {
     id: "art-2",
-    title: "Informasi Perubahan Layanan & Waspada Modus CS Palsu",
+    title: "Waspada Kontak CS Palsu & Jaga Data Rahasia",
     category: "News & Features",
     date: "8 Sep 2026",
-    readTime: "3 mnt baca",
-    rewardPoints: 10,
+    readTime: "1 mnt baca",
+    rewardPoints: 1,
     sourceUrl: "https://www.bca.co.id/id/informasi/news-and-features",
-    summary: "Waspadai nomor telepon atau akun WhatsApp tidak bercentang hijau yang mengatasnamakan Bank BCA dan meminta verifikasi OTP/PIN.",
-    content: "Halo BCA resmi hanya dapat dihubungi melalui nomor resmi 1500888 atau aplikasi haloBCA (bebas pulsa), serta akun WhatsApp resmi yang memiliki centang hijau terverifikasi.\n\nPetugas BCA tidak pernah:\n• Meminta kode OTP, PIN m-BCA, atau nomor CVV kartu debit/kredit.\n• Meminta nasabah menginstal file aplikasi berformat .apk.\n• Mengirimkan link pembatalan tarif transfer.",
-    pointsAward: 10
+    summary: "Kenali nomor resmi Halo BCA dan 4 data pribadi perbankan yang pantang dibagikan ke siapa pun.",
+    cards: [
+      { step: "1", title: "Nomor Resmi HANYA 1500888", desc: "Telepon resmi tanpa awalan +62/021. WhatsApp resmi bercentang hijau di 08111500888." },
+      { step: "2", title: "4 Data Pantang Dibagi", desc: "Jangan pernah sebutkan: Kode OTP SMS, PIN m-BCA, Password, atau 3 angka CVV di belakang kartu." },
+      { step: "3", title: "Aplikasi Bebas Pulsa", desc: "Hubungi Halo BCA langsung melalui aplikasi haloBCA secara gratis dan aman." }
+    ],
+    rule: "Bank resmi tidak pernah meminta kode OTP atau PIN dengan alasan pembaruan sistem atau verifikasi.",
+    pointsAward: 1
   },
   {
     id: "art-3",
-    title: "Tips Terhindar dari Penipuan File .APK di WhatsApp",
+    title: "Cara Mudah Mengenali File .APK Berbahaya",
     category: "Edukatips",
     date: "1 Sep 2026",
-    readTime: "2 mnt baca",
-    rewardPoints: 10,
+    readTime: "1 mnt baca",
+    rewardPoints: 1,
     sourceUrl: "https://www.bca.co.id/id/informasi/edukatips",
-    summary: "Ketahui bahaya file APK undangan pernikahan, resi kurir, dan surat tilang yang dapat menyadap SMS OTP m-banking.",
-    content: "File berekstensi .apk adalah paket aplikasi Android yang dapat mengakses SMS dan notifikasi tanpa izin jika diinstal.\n\nPencegahan:\n• Jangan pernah klik atau buka file .apk dari kontak tak dikenal.\n• Matikan izin 'Install unknown apps' pada pengaturan smartphone Anda.\n• Jika terlanjur terinstal, segera putuskan koneksi internet dan hubungi Halo BCA.",
-    pointsAward: 10
+    summary: "Cegah pencurian SMS OTP dari file aplikasi palsu yang berkedok surat undangan nikah atau resi paket.",
+    cards: [
+      { step: "1", title: "Lihat Akhiran File", desc: "Foto resmi berakhiran .jpg/.png. Jangan pernah klik atau buka file berakhiran '.apk'." },
+      { step: "2", title: "Kunci Pengaturan HP", desc: "Matikan opsi 'Install unknown apps' pada WhatsApp agar aplikasi tidak terpasang otomatis." },
+      { step: "3", title: "Bila Terlanjur Klik", desc: "Segera nyalakan Mode Pesawat (Airplane Mode) agar koneksi internet mati dan penipu gagal menyadap." }
+    ],
+    rule: "Aplikasi resmi BCA hanya diunduh melalui Google Play Store atau Apple App Store.",
+    pointsAward: 1
+  },
+  {
+    id: "art-4",
+    title: "Cek Stiker QRIS Sebelum Membayar",
+    category: "Awas Modus",
+    date: "25 Agu 2026",
+    readTime: "1 mnt baca",
+    rewardPoints: 1,
+    sourceUrl: "https://www.bca.co.id/id/informasi/edukatips",
+    summary: "Pastikan pembayaran digital Anda masuk ke toko yang benar dengan 3 pengecekan kilat.",
+    cards: [
+      { step: "1", title: "Periksa Fisik Barcode", desc: "Hindari memindai barcode QRIS yang terlihat bertumpuk tempelan stiker baru di atasnya." },
+      { step: "2", title: "Cocokkan Nama Toko", desc: "Sebelum memasukkan PIN, baca nama penerima yang muncul di layar HP. Harus sama dengan nama toko." },
+      { step: "3", title: "Tanya Singkat ke Kasir", desc: "Konfirmasi nama penerima ke kasir: 'Mbak/Mas, apakah nama toko di layar betul ini?'." }
+    ],
+    rule: "Jika nama penerima di layar m-banking berbeda dengan nama gerai toko, segera batalkan transaksi.",
+    pointsAward: 1
+  },
+  {
+    id: "art-5",
+    title: "Prinsip 2L: Tolak Investasi Bodong",
+    category: "Edukatips",
+    date: "18 Agu 2026",
+    readTime: "1 mnt baca",
+    rewardPoints: 1,
+    sourceUrl: "https://www.bca.co.id/id/informasi/edukatips",
+    summary: "Pedoman praktis OJK agar terhindar dari janji keuntungan instan atau tugas freelance online fiktif.",
+    cards: [
+      { step: "L1", title: "LEGAL (Izin Resmi)", desc: "Periksa izin perusahaan investasi di situs ojk.go.id atau hubungi kontak OJK di 157." },
+      { step: "L2", title: "LOGIS (Wajar)", desc: "Waspada jika menjanjikan untung pasti ratusan persen tanpa risiko. Tidak ada investasi tanpa risiko." },
+      { step: "!", title: "Waspada Tugas Deposit", desc: "Tolak tugas sampingan seperti klik video/like media sosial yang mewajibkan transfer deposit." }
+    ],
+    rule: "Jangan pernah mentransfer uang modal pribadi untuk menebus komisi yang tertahan.",
+    pointsAward: 1
   }
 ]
 

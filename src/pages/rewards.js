@@ -8,7 +8,8 @@ import BottomSpace from "../components/BottomSpace"
 import Icon from "../components/Icon"
 import {
   REWARD_CATALOG,
-  LEADERBOARD_MOCK
+  LEADERBOARD_MOCK,
+  POINTS_ACTIVITIES
 } from "../data/modusData"
 import { isPresentationMode, DUMMY_PRESENTATION_DATA } from "../utils/presentationMode"
 
@@ -67,6 +68,22 @@ export default function RewardsPage() {
     }
   }, [session])
 
+  const formatLogDate = (rawDate) => {
+    if (!rawDate) return "Hari ini"
+    if (typeof rawDate === "string" && (rawDate.toLowerCase().includes("hari") || rawDate.toLowerCase().includes("lalu"))) {
+      return rawDate
+    }
+    const parsed = new Date(rawDate)
+    if (isNaN(parsed.getTime())) {
+      return "Hari ini"
+    }
+    return parsed.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    })
+  }
+
   const handleRedeem = (item) => {
     if (totalPoints < item.cost) {
       setToastMsg("Poin Anda belum mencukupi")
@@ -117,7 +134,7 @@ export default function RewardsPage() {
                 Total Poin Aktif
               </div>
               <div className="text-4xl font-black tracking-tight text-white mt-0.5">
-                {totalPoints.toLocaleString()} <span className="text-sm font-bold text-sky-200">PTS</span>
+                {(totalPoints || 0).toLocaleString()} <span className="text-sm font-bold text-sky-200">PTS</span>
               </div>
               {!session && (
                 <div className="mt-1 text-[11px] font-medium text-white/80">
@@ -263,39 +280,45 @@ export default function RewardsPage() {
                       </div>
                       <div className="divide-y divide-slate-100 text-xs">
                         <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
-                          <span className="font-medium text-slate-700">Menyelesaikan 2-Min Scam Challenge (Skor ≥80)</span>
-                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
-                            +30
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
-                          <span className="font-medium text-slate-700">Menyelesaikan 2-Min Scam Challenge</span>
-                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
-                            +20
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
-                          <span className="font-medium text-slate-700">Menonton Video Edukasi Resmi #AwasModus</span>
-                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
-                            +15
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
-                          <span className="font-medium text-slate-700">Membaca Artikel Resmi & Rumus Jitu BCA</span>
+                          <span className="font-medium text-slate-700">Selesaikan Challenge</span>
                           <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
                             +10
                           </span>
                         </div>
                         <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
-                          <span className="font-medium text-slate-700">Bonus Streak Challenge 7 Hari Beruntun</span>
+                          <span className="font-medium text-slate-700">Semua Benar (Skor 100)</span>
                           <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
                             +10
                           </span>
                         </div>
                         <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
-                          <span className="font-medium text-slate-700">Membagikan Skor atau Proteksi ke Keluarga</span>
+                          <span className="font-medium text-slate-700">Tonton Video Edukasi</span>
+                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
+                            +2
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
+                          <span className="font-medium text-slate-700">Baca Artikel Edukasi</span>
+                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
+                            +1
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
+                          <span className="font-medium text-slate-700">Pelajari Modus Terbaru</span>
                           <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
                             +5
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
+                          <span className="font-medium text-slate-700">Jaga Streak</span>
+                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
+                            +10
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50/50 transition">
+                          <span className="font-medium text-slate-700">Protect Others (Bagikan Challenge)</span>
+                          <span className="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 font-black text-[#003882]">
+                            +10
                           </span>
                         </div>
                       </div>
@@ -399,16 +422,19 @@ export default function RewardsPage() {
                     className="glass-card rounded-[18px] p-3 flex items-center justify-between border border-white"
                   >
                     <div>
-                      <div className="text-xs font-bold text-[#002554]">{log.activity}</div>
+                      <div className="text-xs font-bold text-[#002554]">{log.activity || log.title || "Aktivitas Poin"}</div>
                       <div className="text-[9px] text-slate-400 mt-0.5">
-                        {new Date(log.date).toLocaleDateString("id-ID")}
+                        {formatLogDate(log.date)}
                       </div>
                     </div>
                     <span
-                      className={`text-xs font-black ${log.points > 0 ? "text-emerald-600" : "text-red-500"
-                        }`}
+                      className={`text-xs font-black ${
+                        (log.points || parseInt(log.pts, 10) || 0) > 0 ? "text-emerald-600" : "text-red-500"
+                      }`}
                     >
-                      {log.points > 0 ? `+${log.points}` : log.points} PTS
+                      {(log.points || parseInt(log.pts, 10) || 0) > 0
+                        ? `+${log.points || parseInt(log.pts, 10) || 0}`
+                        : (log.points || parseInt(log.pts, 10) || 0)} PTS
                     </span>
                   </div>
                 ))
