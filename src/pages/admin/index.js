@@ -139,7 +139,7 @@ export default function AdminDashboardPage() {
   // 5. Form Inputs: Pengaturan Poin Sistem
   const [editableSettings, setEditableSettings] = useState([])
 
-// Akses unauthenticated dibiarkan tampil di gate /admin agar penguji bisa langsung masuk
+  // Akses unauthenticated dibiarkan tampil di gate /admin agar penguji bisa langsung masuk
 
   const showToast = (msg) => {
     setToastMsg(msg)
@@ -776,13 +776,9 @@ export default function AdminDashboardPage() {
       <div className="min-h-screen bg-[#f8fafc] flex flex-col justify-between p-6 text-slate-800 font-sans">
         <AppHeader title="Portal Admin" subtitle="Kenali Modus BCA" />
         <div className="w-full max-w-md mx-auto my-auto bg-white rounded-2xl p-7 text-center border border-slate-200 shadow-sm">
-          <div className="w-12 h-12 mx-auto rounded-xl bg-blue-50 text-[#0055b8] flex items-center justify-center mb-3 font-bold text-base">
-            BCA
-          </div>
+
           <h2 className="text-lg font-black text-[#002554]">Autentikasi Administrator</h2>
-          <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
-            Halaman ini khusus untuk pengelolaan sistem dan riset edukasi KenaliModus BCA.
-          </p>
+
           <div className="mt-6 space-y-2.5">
             <button
               type="button"
@@ -858,34 +854,28 @@ export default function AdminDashboardPage() {
                     <button
                       type="button"
                       onClick={handleTogglePresentationMode}
-                      className={`px-4 py-2.5 rounded-2xl font-bold text-xs shadow-md flex items-center gap-2.5 transition active:scale-95 cursor-pointer border ${
-                        presentationEnabled
-                          ? "bg-amber-500 hover:bg-amber-600 text-white border-amber-400 ring-2 ring-amber-300"
-                          : "bg-white hover:bg-slate-50 text-[#003882] border-slate-200"
-                      }`}
+                      className={`px-4 py-2.5 rounded-2xl font-bold text-xs shadow-md transition active:scale-95 cursor-pointer border ${presentationEnabled
+                        ? "bg-amber-500 hover:bg-amber-600 text-white border-amber-400 ring-2 ring-amber-300"
+                        : "bg-white hover:bg-slate-50 text-[#003882] border-slate-200"
+                        }`}
                       title="Klik untuk on/off mode presentasi dummy di seluruh halaman"
                     >
-                      <span className={`h-2.5 w-2.5 rounded-full shrink-0 transition ${
-                        presentationEnabled ? "bg-white animate-ping" : "bg-slate-400"
-                      }`} />
                       <span>
-                        Mode Presentasi: <strong className="uppercase">{presentationEnabled ? "ON (Dummy Aktif)" : "OFF"}</strong>
+                        Mode Presentasi: <strong className="uppercase">{presentationEnabled ? "ON" : "OFF"}</strong>
                       </span>
                     </button>
 
                     <Link
                       href="/challenge-impact"
-                      className="px-4 py-2.5 rounded-2xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 shadow-md flex items-center gap-2 transition active:scale-95"
+                      className="px-4 py-2.5 rounded-2xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 shadow-md transition active:scale-95"
                     >
-                      <Icon name="Target" size={15} />
-                      <span>Uji Challenge Impact</span>
+                      Uji Challenge Impact
                     </Link>
                     <Link
                       href="/admin/impact"
-                      className="px-4 py-2.5 rounded-2xl bg-[#003882] text-white font-bold text-xs hover:bg-[#002554] shadow-md flex items-center gap-2 transition active:scale-95"
+                      className="px-4 py-2.5 rounded-2xl bg-[#003882] text-white font-bold text-xs hover:bg-[#002554] shadow-md transition active:scale-95"
                     >
-                      <Icon name="TrendingUp" size={15} />
-                      <span>Laporan Riset Impact</span>
+                      Laporan Riset Impact
                     </Link>
                   </div>
                 </div>
@@ -1273,14 +1263,14 @@ export default function AdminDashboardPage() {
                         }
                         const formattedDate = caseItem.scraped_at
                           ? new Date(caseItem.scraped_at).toLocaleString("id-ID", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              second: "2-digit",
-                              timeZone: "Asia/Jakarta"
-                            }) + " WIB"
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            timeZone: "Asia/Jakarta"
+                          }) + " WIB"
                           : "-"
 
                         return (
@@ -1321,11 +1311,10 @@ export default function AdminDashboardPage() {
                                     Status Keunikan Modus
                                   </span>
                                   <span
-                                    className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${
-                                      caseItem.is_known_in_db
-                                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                        : "bg-purple-50 text-purple-700 border-purple-200"
-                                    }`}
+                                    className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${caseItem.is_known_in_db
+                                      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                      : "bg-purple-50 text-purple-700 border-purple-200"
+                                      }`}
                                   >
                                     {caseItem.novelty_type || (caseItem.is_known_in_db ? "Sudah Dikenali di Database" : "Modus Unik & Baru")}
                                   </span>
@@ -1417,11 +1406,10 @@ export default function AdminDashboardPage() {
                                       chronology: caseItem.chronology,
                                       preventionTips: caseItem.prevention_tips || []
                                     })}
-                                    className={`px-2 py-1 rounded-lg font-black text-[10px] border transition cursor-pointer flex items-center gap-1 ${
-                                      caseItem.is_in_modus
-                                        ? "bg-blue-600 text-white border-blue-600 shadow-2xs"
-                                        : "bg-blue-50 hover:bg-blue-100 disabled:opacity-50 text-[#003882] border-blue-200"
-                                    }`}
+                                    className={`px-2 py-1 rounded-lg font-black text-[10px] border transition cursor-pointer flex items-center gap-1 ${caseItem.is_in_modus
+                                      ? "bg-blue-600 text-white border-blue-600 shadow-2xs"
+                                      : "bg-blue-50 hover:bg-blue-100 disabled:opacity-50 text-[#003882] border-blue-200"
+                                      }`}
                                     title={caseItem.is_in_modus ? "Sudah masuk Katalog Modus" : "Masukkan ke Katalog Modus"}
                                   >
                                     {publishingItemId === `modus_${caseItem.id}` && (
@@ -1484,11 +1472,10 @@ export default function AdminDashboardPage() {
                                         ]
                                       }
                                     })}
-                                    className={`px-2 py-1 rounded-lg font-black text-[10px] border transition cursor-pointer flex items-center gap-1 ${
-                                      caseItem.is_in_scenario
-                                        ? "bg-amber-500 text-white border-amber-500 shadow-2xs"
-                                        : "bg-amber-50 hover:bg-amber-100 disabled:opacity-50 text-amber-800 border-amber-200"
-                                    }`}
+                                    className={`px-2 py-1 rounded-lg font-black text-[10px] border transition cursor-pointer flex items-center gap-1 ${caseItem.is_in_scenario
+                                      ? "bg-amber-500 text-white border-amber-500 shadow-2xs"
+                                      : "bg-amber-50 hover:bg-amber-100 disabled:opacity-50 text-amber-800 border-amber-200"
+                                      }`}
                                     title={caseItem.is_in_scenario ? "Sudah masuk Soal Test PG" : "Jadikan Soal Test Pilihan Ganda"}
                                   >
                                     {publishingItemId === `scenario_${caseItem.id}` && (
@@ -1513,11 +1500,10 @@ export default function AdminDashboardPage() {
                                       source: caseItem.source,
                                       preventionTips: caseItem.prevention_tips || []
                                     })}
-                                    className={`px-2 py-1 rounded-lg font-black text-[10px] border transition cursor-pointer flex items-center gap-1 ${
-                                      caseItem.is_in_article
-                                        ? "bg-emerald-600 text-white border-emerald-600 shadow-2xs"
-                                        : "bg-emerald-50 hover:bg-emerald-100 disabled:opacity-50 text-emerald-800 border-emerald-200"
-                                    }`}
+                                    className={`px-2 py-1 rounded-lg font-black text-[10px] border transition cursor-pointer flex items-center gap-1 ${caseItem.is_in_article
+                                      ? "bg-emerald-600 text-white border-emerald-600 shadow-2xs"
+                                      : "bg-emerald-50 hover:bg-emerald-100 disabled:opacity-50 text-emerald-800 border-emerald-200"
+                                      }`}
                                     title={caseItem.is_in_article ? "Sudah masuk Artikel Edukasi" : "Jadikan Artikel Edukasi Berhadiah Poin"}
                                   >
                                     {publishingItemId === `article_${caseItem.id}` && (
