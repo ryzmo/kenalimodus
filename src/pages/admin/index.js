@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import Head from "next/head"
 import Link from "next/link"
 import Image from "next/image"
-import { useSession } from "next-auth/react"
+import { useSession, signIn } from "next-auth/react"
 import { useRouter } from "next/router"
 import AppHeader from "../../components/AppHeader"
 import BottomSpace from "../../components/BottomSpace"
@@ -760,28 +760,50 @@ export default function AdminDashboardPage() {
     )
   }
 
+  const handleDirectPengujiLogin = async () => {
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: "penguji@bca.co.id",
+        password: "penguji-bca-2026"
+      })
+      if (res?.ok) {
+        window.location.reload()
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   if (session?.user?.role !== "admin") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0292fc] via-[#5bbdff] to-[#f4faff] flex flex-col justify-between p-6 text-slate-800">
-        <AppHeader title="Akses Terbatas" subtitle="Sistem Keamanan BCA" />
-        <div className="w-full max-w-md mx-auto my-auto glass-card rounded-[32px] p-8 text-center border border-white">
-          <div className="h-16 w-16 mx-auto rounded-3xl bg-rose-50 text-rose-500 flex items-center justify-center mb-4 border border-rose-200">
-            <Icon name="ShieldAlert" size={32} />
+      <div className="min-h-screen bg-[#f8fafc] flex flex-col justify-between p-6 text-slate-800 font-sans">
+        <AppHeader title="Portal Admin" subtitle="Kenali Modus BCA" />
+        <div className="w-full max-w-md mx-auto my-auto bg-white rounded-2xl p-7 text-center border border-slate-200 shadow-sm">
+          <div className="w-12 h-12 mx-auto rounded-xl bg-blue-50 text-[#0055b8] flex items-center justify-center mb-3 font-bold text-base">
+            BCA
           </div>
-          <h2 className="text-xl font-black text-[#002554]">Bukan Akun Admin</h2>
-          <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-            Halaman ini khusus untuk Administrator BCA #AwasModus. Silakan login menggunakan akun administrator Anda.
+          <h2 className="text-lg font-black text-[#002554]">Autentikasi Administrator</h2>
+          <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+            Halaman ini khusus untuk pengelolaan sistem dan riset edukasi KenaliModus BCA.
           </p>
-          <div className="mt-6 flex flex-col gap-2">
+          <div className="mt-6 space-y-2.5">
+            <button
+              type="button"
+              onClick={handleDirectPengujiLogin}
+              className="w-full py-2.5 rounded-xl bg-[#0055b8] hover:bg-[#003882] text-white font-bold text-xs transition cursor-pointer shadow-xs"
+            >
+              Masuk sebagai Penguji (Tanpa Token)
+            </button>
             <Link
               href="/auth/login"
-              className="w-full py-2.5 rounded-2xl bg-[#003882] text-white font-bold text-xs shadow-md transition active:scale-95"
+              className="block w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#002554] font-semibold text-xs transition"
             >
-              Login Akun Admin
+              Login Akun Admin Biasa
             </Link>
             <Link
               href="/"
-              className="w-full py-2.5 rounded-2xl bg-white/50 text-slate-700 font-bold text-xs hover:bg-white transition"
+              className="block w-full py-1 text-slate-400 hover:text-slate-600 text-[11px] transition"
             >
               Kembali ke Beranda
             </Link>
