@@ -33,6 +33,7 @@ export default function ProfilPage() {
 
   // State histori pengerjaan dari database
   const [challengeHistory, setChallengeHistory] = useState([])
+  const [loadingHistory, setLoadingHistory] = useState(true)
   const [stats, setStats] = useState({
     avgScore: 0,
     latestScore: 0,
@@ -512,7 +513,25 @@ export default function ProfilPage() {
                   </div>
                 </div>
 
-                {challengeHistory.length === 0 ? (
+                {loadingHistory ? (
+                  <div className="space-y-2.5">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="p-4 bg-white rounded-2xl border border-slate-100 flex items-center justify-between animate-pulse">
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-8 w-8 rounded-full" />
+                          <div className="space-y-1.5">
+                            <Skeleton className="h-4 w-40" />
+                            <Skeleton className="h-2.5 w-24" />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Skeleton className="h-6 w-14 rounded-full" />
+                          <Skeleton className="h-6 w-16 rounded-full" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : challengeHistory.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center bg-slate-50/50">
                     <div className="mx-auto w-10 h-10 rounded-full bg-blue-50 text-[#003882] flex items-center justify-center mb-2">
                       <Icon name="Target" size={20} />

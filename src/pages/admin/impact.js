@@ -4,6 +4,7 @@ import AppHeader from "../../components/AppHeader"
 import BottomSpace from "../../components/BottomSpace"
 import Icon from "../../components/Icon"
 import { formatRupiah, IMPACT_BENCHMARK_OJK } from "../../data/modusData"
+import { Skeleton } from "../../components/Skeleton"
 
 
 const DEFAULT_FALLBACK_STATS = {
@@ -230,6 +231,17 @@ export default function AdminImpactPage() {
         </div>
 
         {/* Metric cards (Risk & ARI metrics) */}
+        {loading ? (
+          <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-2">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-8 w-16" />
+                <Skeleton className="h-2.5 w-20" />
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
           <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="text-xs font-medium text-slate-500">Total Partisipan</div>
@@ -271,6 +283,7 @@ export default function AdminImpactPage() {
             <div className="mt-1 text-[11px] text-slate-400">Penurunan risiko terukur</div>
           </div>
         </div>
+        )}
 
         {/* ARI Aggregate Bar */}
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -318,7 +331,23 @@ export default function AdminImpactPage() {
             </div>
           </div>
 
-          {filteredParticipants.length === 0 ? (
+          {loading ? (
+            <div className="mt-4 space-y-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="p-3.5 bg-white rounded-xl border border-slate-100 flex items-center justify-between gap-4 animate-pulse">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-9 w-9 rounded-full shrink-0" />
+                    <div className="space-y-1.5">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-2.5 w-20" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-6 w-20 rounded-md" />
+                  <Skeleton className="h-6 w-28 rounded-md" />
+                </div>
+              ))}
+            </div>
+          ) : filteredParticipants.length === 0 ? (
             <div className="py-14 text-center">
               <div className="text-sm font-semibold text-slate-700">
                 Belum ada data peserta

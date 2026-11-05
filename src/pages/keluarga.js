@@ -7,6 +7,7 @@ import BottomNav from "../components/BottomNav"
 import BottomSpace from "../components/BottomSpace"
 import Icon from "../components/Icon"
 import { isPresentationMode, DUMMY_PRESENTATION_DATA } from "../utils/presentationMode"
+import { Skeleton } from "../components/Skeleton"
 
 export default function KeluargaPage() {
   const { data: session } = useSession()
@@ -131,7 +132,31 @@ export default function KeluargaPage() {
               </div>
 
               <p className="text-xs sm:text-sm text-white/90 mt-2 max-w-sm leading-relaxed">
-                {!session && !isPresentationMode() ? (
+                {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="glass-card rounded-[24px] p-4.5 border border-white space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-11 w-11 rounded-2xl" />
+                        <div className="space-y-1.5">
+                          <Skeleton className="h-4 w-28" />
+                          <Skeleton className="h-2.5 w-16" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                    </div>
+                    <div className="space-y-2 pt-2 border-t border-slate-100/60">
+                      <div className="flex justify-between">
+                        <Skeleton className="h-3 w-20" />
+                        <Skeleton className="h-3 w-10" />
+                      </div>
+                      <Skeleton className="h-2 w-full rounded-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : !session && !isPresentationMode() ? (
                   <>
                     <Link href="/auth/login" className="underline font-bold hover:text-white">
                       Login ke akun Anda

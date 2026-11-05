@@ -8,6 +8,7 @@ import AppHeader from "../../components/AppHeader"
 import BottomSpace from "../../components/BottomSpace"
 import Icon from "../../components/Icon"
 import { isPresentationMode, setPresentationMode } from "../../utils/presentationMode"
+import { Skeleton } from "../../components/Skeleton"
 
 export default function AdminDashboardPage() {
   const { data: session, status } = useSession()
@@ -842,11 +843,9 @@ export default function AdminDashboardPage() {
                   <div>
 
                     <h1 className="text-xl sm:text-2xl font-black text-[#002554] tracking-tight">
-                      Pusat Pengaturan Ekosistem
+                      Pusat Ekosistem
                     </h1>
-                    <p className="text-xs text-slate-500 mt-1 max-w-xl">
-                      Kelola skenario simulasi, tipologi modus kejahatan, artikel edukasi berhadiah poin, dan parameter sistem dalam satu kendali.
-                    </p>
+
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2.5">
@@ -869,13 +868,13 @@ export default function AdminDashboardPage() {
                       href="/challenge-impact"
                       className="px-4 py-2.5 rounded-2xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 shadow-md transition active:scale-95"
                     >
-                      Uji Challenge Impact
+                      Uji Impact
                     </Link>
                     <Link
                       href="/admin/impact"
                       className="px-4 py-2.5 rounded-2xl bg-[#003882] text-white font-bold text-xs hover:bg-[#002554] shadow-md transition active:scale-95"
                     >
-                      Laporan Riset Impact
+                      Laporan Impact
                     </Link>
                   </div>
                 </div>
@@ -886,25 +885,17 @@ export default function AdminDashboardPage() {
                     const CardInner = (
                       <div className="flex flex-col justify-between h-full p-4 sm:p-5 text-left">
                         <div>
-                          {menu.badge && (
-                            <div className="mb-3">
-                              <span className={`inline-block text-[10px] font-black uppercase tracking-wider text-white px-2 py-0.5 rounded-md shadow-2xs ${menu.badgeColor || "bg-[#0292fc]"}`}>
-                                {menu.badge}
-                              </span>
-                            </div>
-                          )}
+
 
                           <h3 className="text-sm font-black text-[#002554] leading-snug group-hover:text-[#0292fc] transition-colors">
                             {menu.title}
                           </h3>
-                          <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-                            {menu.desc}
-                          </p>
+
                         </div>
 
                         <div className="mt-4 pt-3 w-full border-t border-slate-100 flex items-center justify-start">
                           <span className="text-[10px] font-black uppercase tracking-wider text-[#0292fc] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">
-                            {menu.count !== undefined ? `${menu.count} Data` : "Buka"}
+                            {loading && menu.count !== undefined ? <Skeleton className="inline-block h-3 w-10 rounded-sm" /> : (menu.count !== undefined ? `${menu.count} Data` : "Buka")}
                           </span>
                         </div>
                       </div>
