@@ -443,21 +443,31 @@ export default function ModusPage() {
               </button>
             </div>
 
-            <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-900 shadow-inner">
+            <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-900 shadow-inner border border-slate-200">
               <iframe
                 className="w-full h-full"
-                src={`https://www.youtube.com/embed/${activeVideoModal.youtubeId}?autoplay=1`}
+                src={`https://www.youtube-nocookie.com/embed/${activeVideoModal.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
                 title={activeVideoModal.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
             </div>
 
             <div className="mt-3">
-              <h4 className="text-xs font-black text-[#002554]">
-                {activeVideoModal.title}
-              </h4>
-              <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
+              <div className="flex items-start justify-between gap-2">
+                <h4 className="text-xs font-black text-[#002554] leading-snug">
+                  {activeVideoModal.title}
+                </h4>
+                <a
+                  href={`https://www.youtube.com/watch?v=${activeVideoModal.youtubeId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 text-[11px] font-bold text-[#0055b8] hover:underline"
+                >
+                  Buka di YouTube
+                </a>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
                 {activeVideoModal.desc}
               </p>
             </div>
@@ -468,7 +478,7 @@ export default function ModusPage() {
                 handleClaimEduPoints(activeVideoModal.id, activeVideoModal.rewardPoints, activeVideoModal.title)
                 setActiveVideoModal(null)
               }}
-              className="mt-4 w-full rounded-2xl bg-emerald-500 py-2.5 text-xs font-black text-white shadow-md hover:bg-emerald-600 transition active:scale-98"
+              className="mt-4 w-full rounded-2xl bg-emerald-600 hover:bg-emerald-700 py-2.5 text-xs font-black text-white shadow-md transition active:scale-98"
             >
               Selesai Menonton & Klaim +{activeVideoModal.rewardPoints} Poin
             </button>

@@ -2188,41 +2188,60 @@ export const LEADERBOARD_MOCK = [
 export const BCA_EDU_VIDEOS = [
   {
     id: "bca-vid-1",
-    title: "Jangan Tertipu Website Palsu! Ingat Selalu B-C-A!",
+    title: "Awas Modus Penipuan Nomor Palsu Halo BCA",
     campaign: "#AWASMODUS",
-    tagline: "Mantra Jitu Lawan Penipu",
-    desc: "Kenali rumus sakti B-C-A: Buka dengan ketik manual, Cek keaslian website, Ayo bintangin di browser agar aman dari link jebakan situs palsu.",
-    duration: "0:55",
-    youtubeId: "V5i1X00R8Qk",
+    tagline: "Waspada Kontak Halo BCA Palsu",
+    desc: "Ingat! Nomor resmi Halo BCA hanya di 1500888 (tanpa awalan 021, +62, dsb). Kenali cara penipu menghubungi nasabah melalui nomor mirip.",
+    duration: "1:00",
+    youtubeId: "9xf5aejidyw",
     rewardPoints: 2,
-    views: "2.100 Views",
+    views: "32.400 Views",
     date: "26 Jan 2026",
     badge: "Utama",
     source: "Solusi BCA / #AwasModus",
     pointsAward: 2,
     mantraPoints: [
-      { letter: "B", title: "Buka dengan ketik manual", desc: "Ketik alamat portal resmi langsung di browser (contoh: bca.co.id atau klikbca.com)." },
-      { letter: "C", title: "Cek keaslian website", desc: "Pastikan ada ikon gembok keamanan SSL/HTTPS dan sertifikat digital resmi." },
-      { letter: "A", title: "Ayo bintangin", desc: "Bookmark website resmi BCA di browser agar tidak perlu mencari di search engine yang rawan iklan palsu." }
+      { letter: "B", title: "Buka kontak resmi", desc: "Halo BCA hanya di 1500888 atau lewat aplikasi haloBCA (bebas pulsa)." },
+      { letter: "C", title: "Cek nomor penelepon", desc: "BCA tidak pernah menelepon menggunakan nomor ponsel pribadi atau WhatsApp biasa." },
+      { letter: "A", title: "Abaikan permintaan rahasia", desc: "Petugas BCA asli tidak pernah meminta PIN, Password, OTP, atau nomor kartu ATM." }
     ]
   },
   {
     id: "bca-vid-2",
-    title: "Awas Modus Situs Palsu KlikBCA Bisnis",
+    title: "Waspada Modus Penipuan SMS Mengatasnamakan BCA!",
     campaign: "#AWASMODUS",
-    tagline: "Waspada Iklan Palsu di Search Engine",
-    desc: "Penipu membeli iklan berbayar di mesin pencari dengan tampilan mirip situs resmi KlikBCA Bisnis. Jangan asal klik hasil teratas.",
-    duration: "0:55",
-    youtubeId: "Y8E_HjW-B4A",
+    tagline: "SMS Phishing & Link Palsu",
+    desc: "Waspadai pesan SMS berkedok kenaikan tarif transfer, blokir rekening, atau hadiah undian dengan tautan berbahaya.",
+    duration: "1:15",
+    youtubeId: "6-s5v8PCl_k",
     rewardPoints: 2,
-    views: "1.850 Views",
+    views: "24.800 Views",
     date: "20 Jan 2026",
-    badge: "Bisnis",
-    source: "Berita BCA",
+    badge: "Phishing",
+    source: "Solusi BCA / #AwasModus",
     pointsAward: 2,
     mantraPoints: [
-      { letter: "1", title: "Jangan Klik Hasil Iklan (Ad)", desc: "Situs phishing sering dipromosikan lewat Google Ads dengan URL tiruan." },
-      { letter: "2", title: "Perhatikan Typo Nama Domain", desc: "Penipu sering menggunakan nama mirip seperti klik-bca-id atau bca-online." }
+      { letter: "1", title: "Jangan Klik Link Sembarangan", desc: "Jangan pernah membuka link pada SMS yang mengatasnamakan BCA." },
+      { letter: "2", title: "Cek Pengirim SMS", desc: "Pengirim resmi adalah BCA ber-centang atau ber-sender ID resmi tanpa nomor GSM." }
+    ]
+  },
+  {
+    id: "bca-vid-3",
+    title: "Awas Modus APK Undangan & File Berbahaya",
+    campaign: "#AWASMODUS",
+    tagline: "Lindungi HP dari Aplikasi Pencuri OTP",
+    desc: "Modus kirim file .apk pura-pura undangan nikah, tagihan kurir, atau surat tilang untuk menyedot SMS OTP perbankan.",
+    duration: "0:58",
+    youtubeId: "uYuIBgjRXqs",
+    rewardPoints: 2,
+    views: "48.200 Views",
+    date: "15 Jan 2026",
+    badge: "Malware",
+    source: "Solusi BCA / #AwasModus",
+    pointsAward: 2,
+    mantraPoints: [
+      { letter: "1", title: "Jangan Pernah Install APK Luar Play Store", desc: "Hanya install aplikasi resmi dari Google Play Store atau App Store." },
+      { letter: "2", title: "Segera Putus Koneksi Jika Terlanjur", desc: "Matikan WiFi dan data seluler, lalu copot (uninstall) aplikasi mencurigakan." }
     ]
   }
 ]
