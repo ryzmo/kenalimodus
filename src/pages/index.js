@@ -123,26 +123,38 @@ export default function Home() {
         return
       }
 
-      // Hanya ambil skor jika user sudah login
+      // Hanya ambil skor jika user sudah login (prioritaskan avgScore dari challenge history agar konsisten dengan profil)
       if (session?.user?.id) {
+        fetch(`/api/challenge/history?userId=${session.user.id}`)
+          .then((res) => res.json())
+          .then((hRes) => {
+            if (hRes.success && hRes.data && hRes.data.totalSessions > 0) {
+              setSafeScore(hRes.data.avgScore)
+              setHasTested(true)
+            } else {
+              // Fallback ke user/sync jika belum ada histori challenge
+              fetch(`/api/user/sync?userId=${session.user.id}`)
+                .then((r) => r.json())
+                .then((res) => {
+                  if (res.success && res.data && res.data.safe_score !== null && res.data.safe_score !== undefined) {
+                    setSafeScore(res.data.safe_score)
+                    setHasTested(true)
+                  }
+                })
+            }
+          })
+          .catch(() => {})
+
         fetch(`/api/user/sync?userId=${session.user.id}`)
           .then((res) => res.json())
           .then((res) => {
             if (res.success && res.data) {
-              if (res.data.safe_score !== null && res.data.safe_score !== undefined) {
-                setSafeScore(res.data.safe_score)
-                setHasTested(true)
-              }
               if (res.data.total_points !== null && res.data.total_points !== undefined) {
                 setUserPoints(res.data.total_points)
               }
             }
           })
           .catch(() => {
-            if (session.user.safe_score !== null && session.user.safe_score !== undefined) {
-              setSafeScore(session.user.safe_score)
-              setHasTested(true)
-            }
             if (session.user.total_points !== null && session.user.total_points !== undefined) {
               setUserPoints(session.user.total_points)
             }

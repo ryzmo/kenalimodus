@@ -51,7 +51,7 @@ export async function syncPresentationModeFromServer() {
 
 export const DUMMY_PRESENTATION_DATA = {
   userName: "Budi Santoso",
-  safeScore: 86,
+  safeScore: 84,
   totalPoints: 1450,
   currentStreak: 5,
   avgScore: 84,
