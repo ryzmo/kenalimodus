@@ -857,7 +857,8 @@ export default function AdminDashboardPage() {
                         ? "bg-amber-500 hover:bg-amber-600 text-white border-amber-400 ring-2 ring-amber-300"
                         : "bg-white hover:bg-slate-50 text-[#003882] border-slate-200"
                         }`}
-                      title="Klik untuk on/off mode presentasi dummy di seluruh halaman"
+                      disabled={togglingPresentation}
+                      title="Klik untuk on/off mode presentasi dummy di seluruh device"
                     >
                       <span>
                         Mode Presentasi: <strong className="uppercase">{presentationEnabled ? "ON" : "OFF"}</strong>

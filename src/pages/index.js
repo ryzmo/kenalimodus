@@ -154,6 +154,7 @@ export default function Home() {
         setHasTested(false)
       }
     }
+    return () => window.removeEventListener("presentation-mode-changed", handlePresChange)
   }, [session])
 
   useEffect(() => {
