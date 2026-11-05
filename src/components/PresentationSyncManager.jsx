@@ -40,3 +40,4 @@ export default function PresentationSyncManager() {
 
   return null
 }
+

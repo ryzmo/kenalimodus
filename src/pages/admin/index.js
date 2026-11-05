@@ -21,19 +21,29 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(false)
   const [toastMsg, setToastMsg] = useState("")
   const [presentationEnabled, setPresentationEnabled] = useState(false)
+  const [togglingPresentation, setTogglingPresentation] = useState(false)
 
   useEffect(() => {
     setPresentationEnabled(isPresentationMode())
+
+    const handleModeChange = () => {
+      setPresentationEnabled(isPresentationMode())
+    }
+    window.addEventListener("presentation-mode-changed", handleModeChange)
+    return () => window.removeEventListener("presentation-mode-changed", handleModeChange)
   }, [])
 
-  const handleTogglePresentationMode = () => {
+  const handleTogglePresentationMode = async () => {
+    if (togglingPresentation) return
+    setTogglingPresentation(true)
     const nextVal = !presentationEnabled
     setPresentationEnabled(nextVal)
-    setPresentationMode(nextVal)
+    await setPresentationMode(nextVal)
+    setTogglingPresentation(false)
     setToastMsg(
       nextVal
-        ? "Mode Presentasi DIAKTIFKAN: Semua fitur kini terisi data dummy simulasi!"
-        : "Mode Presentasi DINONAKTIFKAN: Kembali ke data asli pengguna."
+        ? "Mode Presentasi GLOBAL AKTIF: Semua device & pengunjung kini melihat data simulasi!"
+        : "Mode Presentasi GLOBAL NONAKTIF: Semua device kembali ke data asli."
     )
     setTimeout(() => setToastMsg(""), 3500)
   }
