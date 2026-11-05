@@ -100,7 +100,7 @@ export default function ProfilPage() {
         latestScore: DUMMY_PRESENTATION_DATA.latestScore,
         totalSessions: DUMMY_PRESENTATION_DATA.totalSessions
       })
-      setChallengeHistory(DUMMY_PRESENTATION_DATA.challengeHistory)
+      setChallengeHistory(DUMMY_PRESENTATION_DATA.challengeHistoryLog || DUMMY_PRESENTATION_DATA.challengeHistory || [])
       return
     }
 
@@ -151,7 +151,8 @@ export default function ProfilPage() {
 
   const hasScore = displayScore !== null
 
-  const latestSession = challengeHistory.length > 0 ? challengeHistory[0] : null
+  const safeHistory = Array.isArray(challengeHistory) ? challengeHistory : []
+  const latestSession = safeHistory.length > 0 ? safeHistory[0] : null
 
   const statusLabel = hasScore
     ? (displayScore >= 80 ? "Sangat Waspada" : displayScore >= 60 ? "Cukup Waspada" : "Perlu Latihan")
@@ -509,7 +510,7 @@ export default function ProfilPage() {
                     </span>
                   </div>
                   <div className="text-xs font-bold text-slate-500">
-                    {challengeHistory.length > 0 ? `${challengeHistory.length} Sesi Terdata` : "Belum Ada Sesi"}
+                    {safeHistory.length > 0 ? `${safeHistory.length} Sesi Terdata` : "Belum Ada Sesi"}
                   </div>
                 </div>
 
@@ -531,7 +532,7 @@ export default function ProfilPage() {
                       </div>
                     ))}
                   </div>
-                ) : challengeHistory.length === 0 ? (
+                ) : safeHistory.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center bg-slate-50/50">
                     <div className="mx-auto w-10 h-10 rounded-full bg-blue-50 text-[#003882] flex items-center justify-center mb-2">
                       <Icon name="Target" size={20} />
@@ -550,7 +551,7 @@ export default function ProfilPage() {
                   </div>
                 ) : (
                   <div className="divide-y divide-slate-100 bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-2xs">
-                    {challengeHistory.map((item, idx) => {
+                    {safeHistory.map((item, idx) => {
                       const isExpanded = expandedSessionId === (item.id || idx)
                       return (
                         <div key={item.id || idx} className="transition">
@@ -562,7 +563,7 @@ export default function ProfilPage() {
                           >
                             <div className="flex items-center gap-3 min-w-0">
                               <span className="h-7 w-7 rounded-full bg-blue-50 text-[#003882] flex items-center justify-center text-xs font-black shrink-0">
-                                #{challengeHistory.length - idx}
+                                #{safeHistory.length - idx}
                               </span>
                               <div className="truncate">
                                 <div className="text-xs font-black text-[#002554] truncate">
